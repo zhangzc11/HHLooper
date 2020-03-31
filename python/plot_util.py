@@ -6,7 +6,7 @@ import shlex
 import sys
 import os
 
-leftMargin   = 0.1
+leftMargin   = 0.13
 rightMargin  = 0.01
 topMargin    = 0.07
 bottomMargin = 0.12
@@ -16,7 +16,6 @@ r.gStyle.SetOptFit(111)
 r.gROOT.SetBatch(1)
 
 def rebin(hists, nbin):
-    return
     for hist in hists:
         if not hist: continue
         currnbin = hist.GetNbinsX()
@@ -189,9 +188,9 @@ def makeplot_single(
             maxY = h1_data.GetMaximum()
         h1_data.Draw("samePEX0")
     stack.GetYaxis().SetTitle("Events")
-    stack.GetYaxis().SetTitleOffset(0.6)
+    stack.GetYaxis().SetTitleOffset(0.88)
     stack.GetYaxis().SetTitleSize(0.08)
-    stack.GetYaxis().SetLabelSize(0.05)
+    stack.GetYaxis().SetLabelSize(0.045)
     stack.GetYaxis().CenterTitle()
 
     leg = r.TLegend(0.65, 0.65, 0.95, 0.88)
@@ -237,6 +236,8 @@ def makeplot_single(
                 if L > ratio_High:
                     ratio_High = L
             ratio.SetBinContent(ibin, L)
+        if ratio_High > 1.0:
+		ratio_High = 1.0
         ratio.GetYaxis().SetRangeUser(ratio_Low, ratio_High*1.2)
         ratio.GetYaxis().SetTitle("S/#sqrt{B}")
         ratio.Draw("samehist")
@@ -249,7 +250,7 @@ def makeplot_single(
     ratio.GetXaxis().SetTitleSize(0.18)
     ratio.GetXaxis().SetLabelSize(0.12)
     ratio.GetXaxis().SetLabelOffset(0.013)
-    ratio.GetYaxis().SetTitleOffset(0.32)
+    ratio.GetYaxis().SetTitleOffset(0.40)
     ratio.GetYaxis().SetTitleSize(0.17)
     ratio.GetYaxis().SetLabelSize(0.13)
     ratio.GetYaxis().SetTickLength(0.01)
@@ -319,7 +320,7 @@ def makeplot_single(
             text_file.write(" | %7.3f "%h1_bkg[idx].GetBinContent(ibin)+"$\\pm$"+ " %7.3f"%h1_bkg[idx].GetBinError(ibin))
         text_file.write(" | %7.3f "%hist_b.GetBinContent(ibin)+"$\\pm$"+ " %7.3f"%hist_b.GetBinError(ibin))
         for idx in range(len(sig_legends_)):
-            text_file.write(" | %9.3f "%h1_bkg[idx].GetBinContent(ibin)+"$\\pm$"+ " %9.3f"%h1_bkg[idx].GetBinError(ibin))
+            text_file.write(" | %9.3f "%h1_sig[idx].GetBinContent(ibin)+"$\\pm$"+ " %9.3f"%h1_sig[idx].GetBinError(ibin))
         if h1_data:
             text_file.write(" | %d"%h1_data.GetBinContent(ibin))
         text_file.write("\n")
@@ -331,7 +332,7 @@ def makeplot_single(
     myC.SaveAs(outFile+"_linY.pdf")
     myC.SaveAs(outFile+"_linY.C")
     pad1.cd()
-    stack.SetMaximum(maxY*10.0)
+    stack.SetMaximum(maxY*100.0)
     stack.SetMinimum(0.1)
     pad1.SetLogy()
     myC.SaveAs(outFile+"_logY.png")

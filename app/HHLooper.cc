@@ -89,15 +89,27 @@ RooUtil::Cutflow cutflow;
 RooUtil::Histograms histograms;
 
 //define histograms
-histograms.addHistogram("yield",               "; yield; Events",                      1,     0.,   1.,    [&]() { return 0; } );
+histograms.addHistogram("yield",               "; yield; Events",                      1,    0.,   1.,    [&]() { return 0; } );
+histograms.addHistogram("ChsMET_pt",           "; p_{T}^{miss} (GeV); Events",         30,   0.,   500.,  [&]() { return hh.ChsMET_pt(); } );
 histograms.addHistogram("hh_pt",               "; p_{T}^{HH} (GeV); Events",           30,   0.,   900.,  [&]() { return hh.hh_pt(); } );
-histograms.addHistogram("hh_mass",             "; m_{HH} (GeV); Events",               30,   0.,   900.,  [&]() { return hh.hh_mass(); } );
+histograms.addHistogram("hh_mass",             "; m_{HH} (GeV); Events",               30,   0.,  1500.,  [&]() { return hh.hh_mass(); } );
+histograms.addHistogram("FatJet1_area",        "; fat j_{1} area; Events",             30,   1.,    3.0,  [&]() { return hh.nFatJet() > 0 ? hh.FatJet_area()[0] : -999; } );
+histograms.addHistogram("FatJet2_area",        "; fat j_{2} area; Events",             30,   1.,    3.0,  [&]() { return hh.nFatJet() > 1 ? hh.FatJet_area()[1] : -999; } );
 histograms.addHistogram("FatJet1_msoftdrop",   "; j_{1} soft drop mass (GeV); Events", 30,   0.,   200.,  [&]() { return hh.nFatJet() > 0 ? hh.FatJet_msoftdrop()[0] : -999; } );
 histograms.addHistogram("FatJet2_msoftdrop",   "; j_{2} soft drop mass (GeV); Events", 30,   0.,   200.,  [&]() { return hh.nFatJet() > 1 ? hh.FatJet_msoftdrop()[1] : -999; } );
 histograms.addHistogram("FatJet1_btagDDBvL",   "; j_{1} DDB tagger; Events",           30,   0.,   1.0,   [&]() { return hh.nFatJet() > 0 ? hh.FatJet_btagDDBvL()[0] : -999; } );
 histograms.addHistogram("FatJet2_btagDDBvL",   "; j_{2} DDB tagger; Events",           30,   0.,   1.0,   [&]() { return hh.nFatJet() > 1 ? hh.FatJet_btagDDBvL()[1] : -999; } );
+histograms.addHistogram("FatJet1_btagHbb",     "; j_{1} Hbb tagger; Events",           30,  -1.,   1.0,   [&]() { return hh.nFatJet() > 0 ? hh.FatJet_btagHbb()[0] : -999; } );
+histograms.addHistogram("FatJet2_btagHbb",     "; j_{2} Hbb tagger; Events",           30,  -1.,   1.0,   [&]() { return hh.nFatJet() > 1 ? hh.FatJet_btagHbb()[1] : -999; } );
+histograms.addHistogram("FatJet1_deepTagHbb",  "; j_{1} deepTagHbb tagger; Events",    30,   0.,   1.0,   [&]() { return hh.nFatJet() > 0 ? hh.FatJet_deepTagHbb()[0] : -999; } );
+histograms.addHistogram("FatJet2_deepTagHbb",  "; j_{2} deepTagHbb tagger; Events",    30,   0.,   1.0,   [&]() { return hh.nFatJet() > 1 ? hh.FatJet_deepTagHbb()[1] : -999; } );
+histograms.addHistogram("FatJet1_deepTagMDHbb", "; j_{1} deepTagMDHbb tagger; Events",   30,   0.,   1.0,   [&]() { return hh.nFatJet() > 0 ? hh.FatJet_deepTagMDHbb()[0] : -999; } );
+histograms.addHistogram("FatJet2_deepTagMDHbb", "; j_{2} deepTagMDHbb tagger; Events",   30,   0.,   1.0,   [&]() { return hh.nFatJet() > 1 ? hh.FatJet_deepTagMDHbb()[1] : -999; } );
 histograms.addHistogram("FatJet1_pt",          "; p_{T}^{j1} (GeV); Events",           30,   0.,   900.,  [&]() { return hh.nFatJet() > 0 ? hh.FatJet_pt()[0] : -999; } );
 histograms.addHistogram("FatJet2_pt",          "; p_{T}^{j2} (GeV); Events",           30,   0.,   900.,  [&]() { return hh.nFatJet() > 1 ? hh.FatJet_pt()[1] : -999; } );
+histograms.addHistogram("FatJet1_HminDR",      "; min DR(j_{1}, H); Events",           30,   0.,   5.,    [&]() { return hh.nFatJet() > 0 ? hh.FatJet_HminDR()[0] : -999; } );
+histograms.addHistogram("FatJet2_HminDR",      "; min DR(j_{2}, H); Events",           30,   0.,   5.,    [&]() { return hh.nFatJet() > 1 ? hh.FatJet_HminDR()[1] : -999; } );
+
 
 //define cuts
 cutflow.setTFile(outfile);
