@@ -103,8 +103,8 @@ histograms.addHistogram("FatJet1_btagHbb",     "; j_{1} Hbb tagger; Events",    
 histograms.addHistogram("FatJet2_btagHbb",     "; j_{2} Hbb tagger; Events",           30,  -1.,   1.0,   [&]() { return hh.nFatJet() > 1 ? hh.FatJet_btagHbb()[1] : -999; } );
 histograms.addHistogram("FatJet1_deepTagHbb",  "; j_{1} deepTagHbb tagger; Events",    30,   0.,   1.0,   [&]() { return hh.nFatJet() > 0 ? hh.FatJet_deepTagHbb()[0] : -999; } );
 histograms.addHistogram("FatJet2_deepTagHbb",  "; j_{2} deepTagHbb tagger; Events",    30,   0.,   1.0,   [&]() { return hh.nFatJet() > 1 ? hh.FatJet_deepTagHbb()[1] : -999; } );
-histograms.addHistogram("FatJet1_deepTagMDHbb", "; j_{1} deepTagMDHbb tagger; Events",   30,   0.,   1.0,   [&]() { return hh.nFatJet() > 0 ? hh.FatJet_deepTagMDHbb()[0] : -999; } );
-histograms.addHistogram("FatJet2_deepTagMDHbb", "; j_{2} deepTagMDHbb tagger; Events",   30,   0.,   1.0,   [&]() { return hh.nFatJet() > 1 ? hh.FatJet_deepTagMDHbb()[1] : -999; } );
+histograms.addHistogram("FatJet1_deepTagMDHbb", "; j_{1} deepTagMDHbb tagger; Events", 30,   0.,   1.0,   [&]() { return hh.nFatJet() > 0 ? hh.FatJet_deepTagMDHbb()[0] : -999; } );
+histograms.addHistogram("FatJet2_deepTagMDHbb", "; j_{2} deepTagMDHbb tagger; Events", 30,   0.,   1.0,   [&]() { return hh.nFatJet() > 1 ? hh.FatJet_deepTagMDHbb()[1] : -999; } );
 histograms.addHistogram("FatJet1_pt",          "; p_{T}^{j1} (GeV); Events",           30,   0.,   900.,  [&]() { return hh.nFatJet() > 0 ? hh.FatJet_pt()[0] : -999; } );
 histograms.addHistogram("FatJet2_pt",          "; p_{T}^{j2} (GeV); Events",           30,   0.,   900.,  [&]() { return hh.nFatJet() > 1 ? hh.FatJet_pt()[1] : -999; } );
 histograms.addHistogram("FatJet1_HminDR",      "; min DR(j_{1}, H); Events",           30,   0.,   5.,    [&]() { return hh.nFatJet() > 0 ? hh.FatJet_HminDR()[0] : -999; } );
