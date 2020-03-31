@@ -18,3 +18,9 @@ make
 source process.sh
 ```
 
+# make plots
+
+```
+cd python
+source plot_all.sh
+```
