@@ -24,7 +24,7 @@ namespace RooUtil
     {
         public:
             std::map<TString, std::tuple<std::vector<float>, std::function<float()>>> th1fs_varbin;
-            std::map<TString, std::tuple<unsigned int, float, float, std::function<float()>>> th1fs;
+            std::map<TString, std::tuple<unsigned int, float, float, std::function<float()>, TString>> th1fs;
             std::map<TString, std::tuple<std::vector<float>, std::function<std::vector<float>()>, std::function<std::vector<float>()>>> th1vecfs_varbin;
             std::map<TString, std::tuple<unsigned int, float, float, std::function<std::vector<float>()>, std::function<std::vector<float>()>>> th1vecfs;
             std::map<std::pair<TString, TString>, std::tuple<unsigned int, float, float, unsigned int, float, float, std::function<float()>, std::function<float()>>> th2fs;
@@ -32,7 +32,7 @@ namespace RooUtil
             std::map<std::pair<TString, TString>, std::tuple<std::vector<float>, unsigned int, float, float, std::function<std::vector<float>()>, std::function<std::vector<float>()>, std::function<std::vector<float>()>>> th2vecfs_xvarbin;
             Histograms();
             ~Histograms();
-            void addHistogram(TString, unsigned int, float, float, std::function<float()>);
+            void addHistogram(TString, TString title, unsigned int, float, float, std::function<float()>);
             void addVecHistogram(TString, unsigned int, float, float, std::function<std::vector<float>()>, std::function<std::vector<float>()> wgt=nullptr);
             void addHistogram(TString, std::vector<float>, std::function<float()>);
             void addVecHistogram(TString, std::vector<float>, std::function<std::vector<float>()>, std::function<std::vector<float>()> wgt=nullptr);
@@ -104,7 +104,7 @@ namespace RooUtil
             void fillCutflow_v2(std::vector<CutTree*>& cutlist, TH1F* h, TH1F* hraw, float wgtsyst=1);
             void fillCutflows_v2(TString syst="", bool iswgtsyst=true);
             void fillHistograms(TString syst="", bool iswgtsyst=true);
-            void bookHistogram(TString, std::pair<TString, std::tuple<unsigned, float, float, std::function<float()>>>, TString="");
+            void bookHistogram(TString, std::pair<TString, std::tuple<unsigned, float, float, std::function<float()>, TString>>, TString="");
             void bookVecHistogram(TString, std::pair<TString, std::tuple<unsigned, float, float, std::function<std::vector<float>()>, std::function<std::vector<float>()>>>, TString="");
             void bookHistogram(TString, std::pair<TString, std::tuple<std::vector<float>, std::function<float()>>>, TString="");
             void bookVecHistogram(TString, std::pair<TString, std::tuple<std::vector<float>, std::function<std::vector<float>()>, std::function<std::vector<float>()>>>, TString="");

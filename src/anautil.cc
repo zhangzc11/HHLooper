@@ -461,17 +461,18 @@ void RooUtil::Cutflow::bookHistograms(Histograms& histograms, std::vector<TStrin
 }
 
 //_______________________________________________________________________________________________________
-void RooUtil::Cutflow::bookHistogram(TString cut, std::pair<TString, std::tuple<unsigned, float, float, std::function<float()>>> key, TString syst)
+void RooUtil::Cutflow::bookHistogram(TString cut, std::pair<TString, std::tuple<unsigned, float, float, std::function<float()>, TString>> key, TString syst)
 {
     TString varname = key.first;
     unsigned int nbin = std::get<0>(key.second);
     float min = std::get<1>(key.second);
     float max = std::get<2>(key.second);
+    TString title = std::get<4>(key.second);
     std::function<float()> vardef = std::get<3>(key.second);
     TString histname = cut + syst + "__" + varname;
     if (booked_histograms.find(std::make_tuple(cut.Data(), syst.Data(), varname.Data())) == booked_histograms.end())
     {
-        booked_histograms[std::make_tuple(cut.Data(), syst.Data(), varname.Data())] = new TH1F(histname, "", nbin, min, max);
+        booked_histograms[std::make_tuple(cut.Data(), syst.Data(), varname.Data())] = new TH1F(histname, title, nbin, min, max);
         booked_histograms[std::make_tuple(cut.Data(), syst.Data(), varname.Data())]->SetDirectory(0);
         booked_histograms[std::make_tuple(cut.Data(), syst.Data(), varname.Data())]->Sumw2();
         if (syst.IsNull())
@@ -713,11 +714,11 @@ RooUtil::Histograms::~Histograms()
 }
 
 //_______________________________________________________________________________________________________
-void RooUtil::Histograms::addHistogram(TString name, unsigned int n, float min, float max, std::function<float()> vardef)
+void RooUtil::Histograms::addHistogram(TString name, TString title, unsigned int n, float min, float max, std::function<float()> vardef)
 {
     if (th1fs.find(name) == th1fs.end())
     {
-        th1fs[name] = std::make_tuple(n, min, max, vardef);
+        th1fs[name] = std::make_tuple(n, min, max, vardef, title);
     }
     else
     {
