@@ -10,7 +10,7 @@ CPPFLAGS += -g -Wall -Wextra -Wno-sign-compare
 
 TARGET1 = HHLooper
 
-SRC1 = app/HHLooper.cc src/hhtree.cc
+SRC1 = app/HHLooper.cc src/hhtree.cc src/anautil.cc src/cutflowutil.cc
 
 OBJ1 = $(SRC1:.cc=.o)
 
