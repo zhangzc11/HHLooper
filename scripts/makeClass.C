@@ -2,7 +2,7 @@
 
 void makeClass()
 {
- TFile * file = new TFile("../data/bbbb/ggHH_toBBBB_cit_tier_1pb_weighted.root");
+ TFile * file = new TFile("/mnt/hadoop/store/group/phys_susy/razor/Run2Analysis/HHBoost/ntuple_v1.0/bbbb/ggHH_toBBBB_cit_tier_1pb_weighted.root");
  TTree * tree = (TTree*)file->Get("hh");
  
 
@@ -52,9 +52,7 @@ void makeClass()
   TString branchname(branch->GetName());
   TString branchtitle(branch->GetTitle());
   TString branchclass(branch->GetClassName());
-  //std::cout <<"name: "<< branchname << std::endl;
-  std::cout <<"title: "<< branchtitle << std::endl;
-  //std::cout <<"class: "<< branchclass << std::endl; 
+  std::cout <<"branch: "<< branchtitle << std::endl;
  
   if (!branchname.BeginsWith("int") &&
         !branchname.BeginsWith("uint") &&
@@ -148,5 +146,7 @@ void makeClass()
  srcf.close();
  system("cat temp_c1 >> hhtree.cc");
  system("cat temp_c2 >> hhtree.cc");
+
+ system("rm temp*");
 
 }
