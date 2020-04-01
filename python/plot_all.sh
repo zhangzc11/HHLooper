@@ -1,9 +1,18 @@
 
+TAG=$1 
+
 for region in \
 CutWeight \
 TwoFatJets \
 FatJetsDDBCut \
-FatJetsSDMassCut 
+SRFatJetsSDMassCut 
 do
-	python plot.py -i ../hists/v_1.0_0330/ -s 100 -w ${region}
+	python plot.py -i ../hists/${TAG}/ -s 100 -w ${region}
+done
+
+for region in \
+SideBandJ1MassFatJetsSDMassCut \
+SideBandJ2MassFatJetsSDMassCut
+do
+	python plot.py -i ../hists/${TAG}/ -s 100 -w ${region} -d
 done

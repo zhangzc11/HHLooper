@@ -73,6 +73,9 @@ def makeplot_single(
     tfs_sig = {}
     h1_sig = []
     maxY = 0.0
+    if data_fname_ != None:
+        extraoptions["stack_signal"]=True
+        sig_scale_ = 1.0
     if "stack_signal" in extraoptions and extraoptions["stack_signal"]:
         sig_scale_ = 1.0
         for idx in range(len(sig_legends_)):
@@ -86,7 +89,7 @@ def makeplot_single(
         h1.Scale(sig_scale_)
         h1.SetLineWidth(2)
         h1.SetLineColor(s_color[idx])
-        print(h1.Integral())
+        #print(h1.Integral())
         h1_sig.append(h1)
      
     tfs_bkg = {}
@@ -100,7 +103,7 @@ def makeplot_single(
         h1.SetLineWidth(2)
         h1.SetLineColor(b_color[idx])
         h1.SetFillColorAlpha(b_color[idx], 1)
-        print(h1.Integral())
+        #print(h1.Integral())
         h1_bkg.append(h1)
     h1_data = None 
 
@@ -114,7 +117,7 @@ def makeplot_single(
         h1_data.SetLineWidth(2)
         h1_data.SetMarkerColor(1)
         h1_data.SetMarkerStyle(20)
-        print(h1_data.Integral())
+        #print(h1_data.Integral())
     if "nbins" in extraoptions:
         rebin(h1_sig, extraoptions["nbins"])   
         rebin(h1_bkg, extraoptions["nbins"])   
@@ -216,8 +219,6 @@ def makeplot_single(
     if h1_data:
         ratio = h1_data.Clone("ratio")
         ratio.Divide(hist_all)
-        print("debug ratio divide: "+str(h1_data.Integral()))
-        print("debug ratio divide: "+str(hist_all.Integral()))
         if "ratio_range" in extraoptions:
             ratio_Low = extraoptions["ratio_range"][0]
             ratio_High = extraoptions["ratio_range"][1]
@@ -295,7 +296,7 @@ def makeplot_single(
     else:
         outFile = outFile + "/" + hist_name_
 
-    print("maxY = "+str(maxY))
+    #print("maxY = "+str(maxY))
     stack.SetMaximum(maxY*1.3)
 
     #print everything into txt file
@@ -314,7 +315,7 @@ def makeplot_single(
     if h1_data:
         text_file.write("-------")
     text_file.write("\n")
-    for ibin in range(1,h1_sig[0].GetNbinsX()+1):
+    for ibin in range(0,h1_sig[0].GetNbinsX()+1):
         text_file.write("%3d"%ibin+"   ")
         for idx in range(len(bkg_legends_)):
             text_file.write(" | %7.3f "%h1_bkg[idx].GetBinContent(ibin)+"$\\pm$"+ " %7.3f"%h1_bkg[idx].GetBinError(ibin))
