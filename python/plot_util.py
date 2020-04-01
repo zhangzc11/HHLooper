@@ -238,7 +238,7 @@ def makeplot_single(
                     ratio_High = L
             ratio.SetBinContent(ibin, L)
         if ratio_High > 1.0:
-		ratio_High = 1.0
+            ratio_High = 1.0
         ratio.GetYaxis().SetRangeUser(ratio_Low, ratio_High*1.2)
         ratio.GetYaxis().SetTitle("S/#sqrt{B}")
         ratio.Draw("samehist")
@@ -301,7 +301,7 @@ def makeplot_single(
 
     #print everything into txt file
     text_file = open(outFile+"_linY.txt", "w")
-    text_file.write("bin   ")
+    text_file.write("bin    |   x    ")
     for idx in range(len(bkg_legends_)):
         text_file.write(" | %21s"%bkg_legends_[idx])
     text_file.write(" | %21s"%("total B"))
@@ -309,7 +309,7 @@ def makeplot_single(
         text_file.write(" | %25s"%sig_legends_[idx])
     if h1_data:
         text_file.write(" | data")
-    text_file.write("\n------")
+    text_file.write("\n-------------")
     for idx in range(24*(len(bkg_legends_) + 1)+ 29*len(sig_legends_)):
         text_file.write("-")
     if h1_data:
@@ -317,6 +317,7 @@ def makeplot_single(
     text_file.write("\n")
     for ibin in range(0,h1_sig[0].GetNbinsX()+1):
         text_file.write("%3d"%ibin+"   ")
+        text_file.write(" | %6.3f"%ratio.GetBinCenter(ibin)+" ")
         for idx in range(len(bkg_legends_)):
             text_file.write(" | %7.3f "%h1_bkg[idx].GetBinContent(ibin)+"$\\pm$"+ " %7.3f"%h1_bkg[idx].GetBinError(ibin))
         text_file.write(" | %7.3f "%hist_b.GetBinContent(ibin)+"$\\pm$"+ " %7.3f"%hist_b.GetBinError(ibin))
@@ -372,4 +373,316 @@ def makeplot_all(
     for hist_name in hist_names:
         makeplot_single(sig_fnames_=sig_fnames_, bkg_fnames_ = bkg_fnames_, data_fname_=data_fname_, sig_legends_=sig_legends_, bkg_legends_=bkg_legends_, sig_colors_=sig_colors_, bkg_colors_=bkg_colors_, hist_name_=hist_name, sig_scale_=sig_scale_, dir_name_=dir_name_, extraoptions=extraoptions)
 
+def makeplot_cutOptimize(
+    sig_fnames_=None,
+    bkg_fnames_=None,
+    sig_legends_=None,
+    bkg_legends_=None,
+    sig_colors_=None,
+    bkg_colors_=None,
+    hist_name_=None,
+    sig_scale_=1.0,
+    bkg_scale_=1.0,
+    dir_name_="plots",
+    output_name_=None,
+    right_hand_=False,
+    extraoptions=None
+    ):
+
+    if sig_fnames_ == None or bkg_fnames_ == None or hist_name_ == None or sig_legends_ == None or bkg_legends_ == None:
+        print("nothing to plot....")
+        return
+   
+    s_color = [632, 617, 839, 800, 1]
+    b_color = [920, 2007, 2005, 2003, 2001, 2011]
+    if sig_colors_:
+        s_color = sig_colors_
+    if bkg_colors_:
+        b_color = bkg_colors_
+    
+    tfs_sig = {}
+    h1_sig = []
+    for idx in range(len(sig_fnames_)): 
+        fn = sig_fnames_[idx]
+        n = os.path.basename(fn.replace(".root", ""))
+        tfs_sig[n] = r.TFile(fn)
+        h1 = tfs_sig[n].Get(hist_name_)
+        h1.SetName(hist_name_+"_sig_"+str(idx))
+        h1.Scale(sig_scale_)
+        h1.SetLineWidth(2)
+        h1.SetLineColor(s_color[idx])
+        h1_sig.append(h1)
+
+    tfs_bkg = {}
+    h1_bkg = []
+    for idx in range(len(bkg_fnames_)): 
+        fn = bkg_fnames_[idx]
+        n = os.path.basename(fn.replace(".root", ""))
+        tfs_bkg[n] = r.TFile(fn)
+        h1 = tfs_bkg[n].Get(hist_name_)
+        h1.SetName(hist_name_+"_bkg_"+str(idx))
+        h1.Scale(bkg_scale_)
+        h1.SetLineWidth(2)
+        h1.SetLineColor(b_color[idx])
+        h1.SetFillColorAlpha(b_color[idx], 1)
+        h1_bkg.append(h1)
+   
+    if "remove_underflow" in extraoptions:
+        if extraoptions["remove_underflow"]:
+            remove_underflow(h1_sig)
+            remove_underflow(h1_bkg)
+    if "remove_overflow" in extraoptions:
+        if extraoptions["remove_overflow"]:
+            remove_overflow(h1_sig)
+            remove_overflow(h1_bkg)
+
+    myC = r.TCanvas("myC","myC", 600, 600)
+    myC.SetTicky(1)
+    pad1 = r.TPad("pad1","pad1", 0.05, 0.33,0.95, 0.97)
+    pad1.SetBottomMargin(0)
+    pad1.SetRightMargin( rightMargin )
+    pad1.SetLeftMargin( leftMargin )
+    pad2 = r.TPad("pad2","pad2", 0.05, 0.045, 0.95, 0.33)
+    pad2.SetBottomMargin(0.4)
+    pad2.SetTopMargin(0.008)
+    pad2.SetRightMargin( rightMargin )
+    pad2.SetLeftMargin( leftMargin )
+
+    pad2.Draw()
+    pad1.Draw()
+
+    pad1.cd()
+
+
+    hist_noCut_s = h1_sig[0].Clone("hist_noCut_s")
+    hist_noCut_b = h1_bkg[0].Clone("hist_noCut_b")
+    for idx in range(len(h1_bkg)):
+        if idx > 0:
+            hist_noCut_b.Add(h1_bkg[idx])
+    for idx in range(len(h1_sig)):
+        if idx > 0:
+            hist_noCut_s.Add(h1_sig[idx])
+    nbins = hist_noCut_s.GetNbinsX()
+    print("nbins: "+str(nbins))
+    print("nS before cut: "+ str(hist_noCut_s.Integral()/sig_scale_))
+    print("nB before cut: "+ str(hist_noCut_b.Integral()))
+    ratio = hist_noCut_s.Clone("ratio")
+    hist_b = hist_noCut_b.Clone("hist_b")
+    hist_s = hist_noCut_b.Clone("hist_s")
+
+    maxY1 = 0.0
+    maxY2 = 0.0
+    bestCut = 0 
+    for ibin in range(0, nbins+1):
+        s = 0.0
+        b = 0.0
+        L = 0.0
+        if right_hand_: #<=
+            s = hist_noCut_s.Integral(0, ibin) 
+            b = hist_noCut_b.Integral(0, ibin)
+            for idx in range(len(h1_sig)):
+                s_this = h1_sig[idx].Integral(0, nbins-ibin+1)
+                h1_sig[idx].SetBinContent(nbins-ibin+1, s_this)
+            for idx in range(len(h1_bkg)):
+                b_this = h1_bkg[idx].Integral(0, nbins-ibin+1)
+                h1_bkg[idx].SetBinContent(nbins-ibin+1, b_this)
+        else: #>=
+            s = hist_noCut_s.Integral(ibin, nbins+1)
+            b = hist_noCut_b.Integral(ibin, nbins+1)
+            for idx in range(len(h1_sig)):
+                s_this = h1_sig[idx].Integral(ibin, nbins+1)
+                h1_sig[idx].SetBinContent(ibin, s_this)
+            for idx in range(len(h1_bkg)):
+                b_this = h1_bkg[idx].Integral(ibin, nbins+1)
+                h1_bkg[idx].SetBinContent(ibin, b_this)
+        if b > 0.0:
+            L = s/(sig_scale_*math.sqrt(b))
+        if s > maxY1:
+            maxY1 = s
+        if b > maxY1:
+            maxY1 = b
+        if L > maxY2:
+            maxY2 = L
+            bestCut = ibin
+        ratio.SetBinContent(ibin, L)
+        hist_b.SetBinContent(ibin, b)
+        hist_s.SetBinContent(ibin, s)
+    
+    x_title = "cut (>=) on "+hist_noCut_s.GetXaxis().GetTitle()
+    if right_hand_:
+        x_title = "cut (<=) on "+hist_noCut_s.GetXaxis().GetTitle()
+    if "xaxis_label" in extraoptions and extraoptions["xaxis_label"] != None:
+        x_title = extraoptions["xaxis_label"]
+
+    stack = r.THStack("stack", "stack")
+    for idx in range(len(h1_bkg)):
+        stack.Add(h1_bkg[idx])
+    stack.SetTitle("")
+    stack.Draw("hist")
+    for idx in range(len(h1_sig)):
+        h1_sig[idx].Draw("samehist")
+    stack.GetYaxis().SetTitle("Events")
+    stack.GetYaxis().SetTitleOffset(0.88)
+    stack.GetYaxis().SetTitleSize(0.08)
+    stack.GetYaxis().SetLabelSize(0.045)
+    stack.GetYaxis().CenterTitle()
+
+    leg = r.TLegend(0.65, 0.65, 0.95, 0.88)
+    leg.SetFillStyle(0)
+    leg.SetBorderSize(0)
+    leg.SetTextFont(42)
+    for idx in range(len(h1_bkg)):
+        leg.AddEntry(h1_bkg[idx], bkg_legends_[idx], "F")
+    for idx in range(len(h1_sig)):
+        leg.AddEntry(h1_sig[idx], sig_legends_[idx], "L")
+    leg.Draw()
+
+    pad2.cd()
+    pad2.SetGridy(1)
+    
+    if maxY2 > 1.0:
+        maxY2 = 1.0
+    ratio.GetYaxis().SetRangeUser(0.0, 1.2*maxY2)
+    ratio.GetYaxis().SetTitle("S/#sqrt{B}")
+    ratio.Draw("samehist")
+    ratio.SetLineColor(1)
+    ratio.SetLineWidth(2)
+    ratio.SetMarkerStyle(20)
+    ratio.SetMarkerColor(1)
+    ratio.SetFillColorAlpha(1, 0)
+    ratio.GetXaxis().SetTitleOffset(0.94)
+    ratio.GetXaxis().SetTitleSize(0.18)
+    ratio.GetXaxis().SetLabelSize(0.12)
+    ratio.GetXaxis().SetLabelOffset(0.013)
+    ratio.GetYaxis().SetTitleOffset(0.40)
+    ratio.GetYaxis().SetTitleSize(0.17)
+    ratio.GetYaxis().SetLabelSize(0.13)
+    ratio.GetYaxis().SetTickLength(0.01)
+    ratio.GetYaxis().SetNdivisions(505)
+    ratio.GetXaxis().SetTitle(x_title)
+
+    ##########draw CMS preliminary
+    pad1.cd()
+    tex1 = r.TLatex(leftMargin, 0.91, "CMS")
+    tex1.SetNDC()
+    tex1.SetTextFont(61)
+    tex1.SetTextSize(0.070)
+    tex1.SetLineWidth(2)
+    tex1.Draw()
+    tex2 = r.TLatex(leftMargin+0.12,0.912,"Preliminary")
+    tex2.SetNDC()
+    tex2.SetTextFont(52)
+    tex2.SetTextSize(0.055)
+    tex2.SetLineWidth(2)
+    tex2.Draw()
+
+    lumi_value = 137
+    if "lumi_value" in extraoptions:
+        lumi_value = extraoptions["lumi_value"]
+    tex3 = r.TLatex(0.72,0.912,"%d"%lumi_value+" fb^{-1} (13 TeV)")
+    tex3.SetNDC()
+    tex3.SetTextFont(42)
+    tex3.SetTextSize(0.055)
+    tex3.SetLineWidth(2)
+    tex3.Draw()
+
+    ##print out best cut and s, b, L
+    c_best = ratio.GetBinCenter(bestCut)
+    s_best = hist_s.GetBinContent(bestCut) / sig_scale_
+    b_best = hist_b.GetBinContent(bestCut)
+    L_best = ratio.GetBinContent(bestCut)
+    print("best cut: %6.3f"%c_best)
+    print("nS at best cut: %7.3f"%s_best)
+    print("nB at best cut: %7.3f"%b_best)
+    print("s/sqrt(b) at best cut: %7.3f"%L_best)
+
+    tex4 = r.TLatex(leftMargin+0.05, 0.85, "best cut = %6.2f"%c_best)
+    tex4.SetNDC()
+    tex4.SetTextFont(42)
+    tex4.SetTextSize(0.055)
+    tex4.SetLineWidth(2)
+    tex4.Draw()
+
+    tex5 = r.TLatex(leftMargin+0.05, 0.80, "s = %6.2f"%s_best)
+    tex5.SetNDC()
+    tex5.SetTextFont(42)
+    tex5.SetTextSize(0.055)
+    tex5.SetLineWidth(2)
+    tex5.Draw()
+
+    tex6 = r.TLatex(leftMargin+0.05, 0.75, "b = %6.2f"%b_best)
+    tex6.SetNDC()
+    tex6.SetTextFont(42)
+    tex6.SetTextSize(0.055)
+    tex6.SetLineWidth(2)
+    tex6.Draw()
+
+    tex7 = r.TLatex(leftMargin+0.05, 0.68, "s/#sqrt{b} = %6.2f"%L_best)
+    tex7.SetNDC()
+    tex7.SetTextFont(42)
+    tex7.SetTextSize(0.055)
+    tex7.SetLineWidth(2)
+    tex7.Draw()
+
+    #draw vertical line indcating best cut
+
+    pad1.cd()
+    line1 = r.TLine(c_best,0.001,c_best,0.9*maxY1)
+    line1.SetLineStyle(7)
+    line1.Draw("same")
+    pad2.cd()
+    line2 = r.TLine(c_best,0.0,c_best,1.2*maxY2)
+    line2.SetLineStyle(7)
+    line2.Draw("same")
+
+    outFile = dir_name_
+    if output_name_:
+        outFile = outFile + "/" +output_name_
+    else:
+        outFile = outFile + "/" + hist_name_
+
+    stack.SetMaximum(maxY1*1.3)
+
+    #print everything into txt file
+    text_file = open(outFile+"_linY.txt", "w")
+    text_file.write("bin    |   x    ")
+    for idx in range(len(bkg_legends_)):
+        text_file.write(" | %21s"%bkg_legends_[idx])
+    text_file.write(" | %21s"%("total B"))
+    for idx in range(len(sig_legends_)):
+        text_file.write(" | %25s"%sig_legends_[idx])
+    text_file.write(" | %21s"%("S/sqrt(B)"))
+    text_file.write("\n-------------")
+    for idx in range(24*(len(bkg_legends_) + 2)+ 29*len(sig_legends_)):
+        text_file.write("-")
+    text_file.write("\n")
+    for ibin in range(0,h1_sig[0].GetNbinsX()+1):
+        text_file.write("%3d"%ibin+"   ")
+        text_file.write(" | %6.3f"%ratio.GetBinCenter(ibin)+" ")
+        for idx in range(len(bkg_legends_)):
+            text_file.write(" | %7.3f "%h1_bkg[idx].GetBinContent(ibin)+"$\\pm$"+ " %7.3f"%h1_bkg[idx].GetBinError(ibin))
+        text_file.write(" | %7.3f "%hist_b.GetBinContent(ibin)+"$\\pm$"+ " %7.3f"%hist_b.GetBinError(ibin))
+        for idx in range(len(sig_legends_)):
+            text_file.write(" | %9.3f "%h1_sig[idx].GetBinContent(ibin)+"$\\pm$"+ " %9.3f"%h1_sig[idx].GetBinError(ibin))
+        text_file.write(" | %9.3f "%ratio.GetBinContent(ibin))
+        text_file.write("\n")
+    text_file.close()
+    os.system("cp "+outFile+"_linY.txt "+outFile+"_logY.txt")
+
+    myC.SaveAs(outFile+"_linY.png")
+    myC.SaveAs(outFile+"_linY.pdf")
+    myC.SaveAs(outFile+"_linY.C")
+    pad1.cd()
+    stack.SetMaximum(maxY1*100.0)
+    stack.SetMinimum(0.1)
+    pad1.SetLogy()
+    myC.SaveAs(outFile+"_logY.png")
+    myC.SaveAs(outFile+"_logY.pdf")
+    myC.SaveAs(outFile+"_logY.C")
+
+
+
+
+
+    
 

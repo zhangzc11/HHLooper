@@ -14,12 +14,15 @@ parser.add_argument('-xt', '--xaxis_title'            , dest='xaxis_title'     ,
 parser.add_argument('-y' , '--yaxis_range'            , dest='yaxis_range'     , help='Y-axis range set by user'               , default=None                                                    )
 parser.add_argument('-l' , '--yaxis_log'              , dest='yaxis_log'       , help='Y-axis set to log'                      , default=False                              , action='store_true')
 parser.add_argument('-s' , '--sig_scale'              , dest='sig_scale'       , help='Signal scale'                           , default=1                                                       )
+parser.add_argument('-b' , '--bkg_scale'              , dest='bkg_scale'       , help='Background scale'                       , default=1                                                       )
 parser.add_argument('-u' , '--rm_udflow'              , dest='rm_udflow'       , help='Remove underflow'                       , default=False                              , action='store_true')
 parser.add_argument('-ov' , '--rm_ovflow'              , dest='rm_ovflow'       , help='Remove overflow'                       , default=False                              , action='store_true')
 parser.add_argument('-d' , '--draw_data'              , dest='draw_data'       , help='Draw data'                              , default=False                              , action='store_true')
 parser.add_argument('-1' , '--stack_signal'           , dest='stack_signal'    , help='stack signal'                           , default=False                              , action='store_true')
 parser.add_argument('-O' , '--output_name'            , dest='output_name'     , help='output file name when plot single hist' , default=None                                                    )
 parser.add_argument('-w' , '--whatSR'                 , dest='whatSR'          , help='what selecton for the nine bins'        , default="FatJetsSDMassCut"                                      )
+parser.add_argument('-R' , '--right_hand'             , dest='right_hand'      , help='remove right side (<)'                , default=False                      , action='store_true')
+parser.add_argument('-OP' , '--do_optimize'           , dest='do_optimize'     , help='do cut optimization'                , default=False                      , action='store_true')
 
 parser.add_argument('hist_name', metavar='<histogram_names>=(e.g. FatJetsSDMassCut__hh_pt)', type=str, nargs='*', help='patterns to use to filter histograms to dump')
 
@@ -38,12 +41,23 @@ if len(args.hist_name) == 0:
 else:
     hist_name = ','.join(args.hist_name)
 
+
+sig_scale = float(args.sig_scale)
+bkg_scale = float(args.bkg_scale)
+right_hand = args.right_hand
+output_name = args.output_name
+do_optimize = args.do_optimize
+
 input_dir = args.input_dir
 if input_dir[-1] != "/":
     input_dir += "/"
 
 output_dir = args.output_dir + "/" + input_dir.split("/")[-2]
+if do_optimize:
+    output_dir = args.output_dir + "/" + input_dir.split("/")[-2]+"_cutOptimize"
+
 os.system("mkdir -p "+output_dir)
+os.system("cp index.php "+output_dir)
 
 year = -1
 lumi = -1
@@ -74,30 +88,54 @@ if float(args.sig_scale) != 1:
 
 
 if hist_name:
-    print("plotting "+hist_name)
-    p.makeplot_single(
-        sig_fnames_=sig_fnames,
-        bkg_fnames_=bkg_fnames,
-        data_fname_=data_fname if args.draw_data else None,
-        sig_legends_=sig_legends,
-        bkg_legends_=bkg_legends,
-        sig_colors_=sig_colors,
-        bkg_colors_=bkg_colors,
-        hist_name_=hist_name, 
-        sig_scale_=float(args.sig_scale),
-        dir_name_=output_dir, 
-        output_name_=args.output_name,
-        extraoptions={ 
-            "nbins":int(args.nbins),
-            "yaxis_range":args.yaxis_range.split(',') if args.yaxis_range else [],
-            "remove_underflow":args.rm_udflow,
-            "remove_overflow":args.rm_ovflow,
-            "lumi_value": lumi,
-            "ratio_range": [0., 2.],
-            "xaxis_label": args.xaxis_title,
-            "stack_signal": args.stack_signal
-            },
-        )
+    if do_optimize:
+        print("optimize cut for "+hist_name)
+        p.makeplot_cutOptimize(
+            sig_fnames_=sig_fnames,
+            bkg_fnames_=bkg_fnames,
+            sig_legends_=sig_legends,
+            bkg_legends_=bkg_legends,
+            sig_colors_=sig_colors,
+            bkg_colors_=bkg_colors,
+            hist_name_=hist_name,
+            sig_scale_=sig_scale,
+            bkg_scale_=bkg_scale,
+            dir_name_=output_dir,
+            right_hand_=right_hand,
+            output_name_=args.output_name,
+            extraoptions={
+                "remove_underflow":args.rm_udflow,
+                "remove_overflow":args.rm_ovflow,
+                "lumi_value": lumi,
+                "xaxis_label": args.xaxis_title,
+                },
+            )
+
+    else:
+        print("plotting "+hist_name)
+        p.makeplot_single(
+            sig_fnames_=sig_fnames,
+            bkg_fnames_=bkg_fnames,
+            data_fname_=data_fname if args.draw_data else None,
+            sig_legends_=sig_legends,
+            bkg_legends_=bkg_legends,
+            sig_colors_=sig_colors,
+            bkg_colors_=bkg_colors,
+            hist_name_=hist_name, 
+            sig_scale_=float(args.sig_scale),
+            dir_name_=output_dir, 
+            output_name_=args.output_name,
+            extraoptions={ 
+                "nbins":int(args.nbins),
+                "yaxis_range":args.yaxis_range.split(',') if args.yaxis_range else [],
+                "remove_underflow":args.rm_udflow,
+                "remove_overflow":args.rm_ovflow,
+                "lumi_value": lumi,
+                "ratio_range": [0., 2.],
+                "xaxis_label": args.xaxis_title,
+                "stack_signal": args.stack_signal
+                },
+            )
             
 else:
     print("plotting everything in "+args.whatSR)
