@@ -176,8 +176,9 @@ histograms.addHistogram("ptj2_over_mj2",       "; p_{T}^{j2}/m_{j2}; Events",   
 //************define cuts**********//
 //const float CUT_j1_pt = 300.0, CUT_j2_pt = 300.0, CUT_j1_DDB = 0.9, CUT_j2_DDB = 0.9, CUT_j1_mass_low = 110.0, CUT_j1_mass_high = 150.0, CUT_j2_mass_low = 110.0, CUT_j2_mass_high = 150.0; // baseline selection
 //const float CUT_j1_pt = 350.0, CUT_j2_pt = 300.0, CUT_j1_DDB = 0.905, CUT_j2_DDB = 0.905, CUT_j1_mass_low = 115.5, CUT_j1_mass_high = 141.5, CUT_j2_mass_low = 110.5, CUT_j2_mass_high = 150.0; //optimal cut, 1 signal region
-const float CUT_j1_pt = 350.0, CUT_j2_pt = 300.0, CUT_j1_DDB = 0.94, CUT_j2_DDB = 0.92, CUT_j1_mass_low = 115.5, CUT_j1_mass_high = 141.5, CUT_j2_mass_low = 110.5, CUT_j2_mass_high = 150.0; //optimal cut
-const float CUT2_j1_DDB = 0.905, CUT2_j2_DDB = 0.905, CUT3_j1_DDB = 0.865, CUT3_j2_DDB = 0.895; //additional SR
+const float CUT_j1_pt = 350.0, CUT_j2_pt = 300.0, CUT_j1_DDB = 0.905, CUT_j2_DDB = 0.905, CUT_j1_mass_low = 115.5, CUT_j1_mass_high = 137.5, CUT_j2_mass_low = 110.5, CUT_j2_mass_high = 144.5; //optimal cut
+const float CUT2_j1_DDB = 0.860, CUT2_j2_DDB = 0.905, CUT3_j1_DDB = 0.905, CUT3_j2_DDB = 0.860; //additional SR
+const float CUTCR_j1_DDB = 0.800, CUTCR_j2_DDB = 0.800; // cut for CR
 
 cutflow.setTFile(outfile);
 cutflow.addCut("CutWeight", [&](){ return 1; },   [&](){ return isData ?  lumi : lumi*hh.weight(); });
@@ -216,6 +217,23 @@ cutflow.addCutToLastActiveCut("SideBandSR3J1MassFatJetsSDMassCut",   [&](){ retu
 cutflow.getCut("FatJetsPtCutSR3");
 cutflow.addCutToLastActiveCut("SideBandSR3J2MassFatJetsSDMassCut",   [&](){ return hh.FatJet_msoftdrop()[FatJet1_idx] > CUT_j1_mass_low && hh.FatJet_msoftdrop()[FatJet1_idx] < CUT_j1_mass_high && (hh.FatJet_msoftdrop()[FatJet2_idx] < CUT_j2_mass_low || hh.FatJet_msoftdrop()[FatJet2_idx] > CUT_j2_mass_high); },   UNITY);
 
+
+//control regions
+cutflow.getCut("TwoFatJets");
+cutflow.addCutToLastActiveCut("preCRFatJetsPtCut",       [&](){ return hh.FatJet_pt()[FatJet1_idx] > CUT_j1_pt && hh.FatJet_pt()[FatJet2_idx] > CUT_j2_pt; },   UNITY);
+cutflow.addCutToLastActiveCut("preCRFatJetsSDMassCut",   [&](){ return hh.FatJet_msoftdrop()[FatJet1_idx] > CUT_j1_mass_low && hh.FatJet_msoftdrop()[FatJet1_idx] < CUT_j1_mass_high && hh.FatJet_msoftdrop()[FatJet2_idx] > CUT_j2_mass_low && hh.FatJet_msoftdrop()[FatJet2_idx] < CUT_j2_mass_high; },   UNITY);
+
+cutflow.addCutToLastActiveCut("ControlRegionD",          [&](){ return hh.FatJet_btagDDBvL()[FatJet1_idx] > CUT2_j1_DDB && hh.FatJet_btagDDBvL()[FatJet1_idx] < CUT3_j1_DDB && hh.FatJet_btagDDBvL()[FatJet2_idx] > CUT3_j2_DDB && hh.FatJet_btagDDBvL()[FatJet2_idx] < CUT2_j2_DDB; },   UNITY);
+
+cutflow.getCut("preCRFatJetsSDMassCut");
+cutflow.addCutToLastActiveCut("ControlRegionN1",          [&](){ return hh.FatJet_btagDDBvL()[FatJet1_idx] > CUT2_j1_DDB && hh.FatJet_btagDDBvL()[FatJet1_idx] < CUT3_j1_DDB && hh.FatJet_btagDDBvL()[FatJet2_idx] > CUTCR_j2_DDB && hh.FatJet_btagDDBvL()[FatJet2_idx] < CUT3_j2_DDB; },   UNITY);
+cutflow.getCut("preCRFatJetsSDMassCut");
+cutflow.addCutToLastActiveCut("ControlRegionM1",          [&](){ return hh.FatJet_btagDDBvL()[FatJet1_idx] > CUT3_j1_DDB && hh.FatJet_btagDDBvL()[FatJet2_idx] > CUTCR_j2_DDB && hh.FatJet_btagDDBvL()[FatJet2_idx] < CUT3_j2_DDB; },   UNITY);
+
+cutflow.getCut("preCRFatJetsSDMassCut");
+cutflow.addCutToLastActiveCut("ControlRegionN2",          [&](){ return hh.FatJet_btagDDBvL()[FatJet1_idx] > CUTCR_j1_DDB && hh.FatJet_btagDDBvL()[FatJet1_idx] < CUT2_j1_DDB && hh.FatJet_btagDDBvL()[FatJet2_idx] > CUT3_j2_DDB && hh.FatJet_btagDDBvL()[FatJet2_idx] < CUT2_j2_DDB; },   UNITY);
+cutflow.getCut("preCRFatJetsSDMassCut");
+cutflow.addCutToLastActiveCut("ControlRegionM2",          [&](){ return hh.FatJet_btagDDBvL()[FatJet1_idx] > CUTCR_j1_DDB && hh.FatJet_btagDDBvL()[FatJet1_idx] < CUT2_j1_DDB && hh.FatJet_btagDDBvL()[FatJet2_idx] > CUT2_j2_DDB; },   UNITY);
 
 ////histograms for N-1 cuts
 //N-1 for JetsSDMass:
@@ -296,7 +314,7 @@ for(int idx = 0; idx < list_chain.size(); idx++)
   {
 	hh.GetEntry(iEntry_this);
         //selectTwoFatJets(CUT_j1_DDB, CUT_j2_DDB);
-        selectTwoFatJets(0.85, 0.85);
+        selectTwoFatJets(0.80, 0.80);
         //selectTwoFatJetsSortDDB();
 	cutflow.fill();
 	if(iEntry%10000 == 0) cout<<"[INFO] processing event "<<iEntry<<" / "<<nEntries<<endl;
