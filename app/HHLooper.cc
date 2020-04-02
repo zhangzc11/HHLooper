@@ -235,6 +235,9 @@ cutflow.addCutToLastActiveCut("ControlRegionN2",          [&](){ return hh.FatJe
 cutflow.getCut("preCRFatJetsSDMassCut");
 cutflow.addCutToLastActiveCut("ControlRegionM2",          [&](){ return hh.FatJet_btagDDBvL()[FatJet1_idx] > CUTCR_j1_DDB && hh.FatJet_btagDDBvL()[FatJet1_idx] < CUT2_j1_DDB && hh.FatJet_btagDDBvL()[FatJet2_idx] > CUT2_j2_DDB; },   UNITY);
 
+cutflow.getCut("preCRFatJetsSDMassCut");
+cutflow.addCutToLastActiveCut("ControlRegionE",          [&](){ return hh.FatJet_btagDDBvL()[FatJet1_idx] > CUTCR_j1_DDB && hh.FatJet_btagDDBvL()[FatJet1_idx] < CUT2_j1_DDB && hh.FatJet_btagDDBvL()[FatJet2_idx] > CUTCR_j2_DDB && hh.FatJet_btagDDBvL()[FatJet2_idx] < CUT3_j2_DDB; },   UNITY);
+
 ////histograms for N-1 cuts
 //N-1 for JetsSDMass:
 cutflow.addCut("preNm1CutWeight", [&](){ return 1; },    [&](){ return isData ?  lumi : lumi*hh.weight(); });
