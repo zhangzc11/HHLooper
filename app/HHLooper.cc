@@ -174,9 +174,9 @@ histograms.addHistogram("ptj1_over_mj1",       "; p_{T}^{j1}/m_{j1}; Events",   
 histograms.addHistogram("ptj2_over_mj2",       "; p_{T}^{j2}/m_{j2}; Events",         200,   0.,   10.,   [&]() { return (FatJet1_idx>=0 && FatJet2_idx>=0) ? hh.FatJet_pt()[FatJet2_idx] / hh.FatJet_msoftdrop()[FatJet2_idx] :-999; } );
 
 //************define cuts**********//
-//const float CUT_j1_pt = 300.0, CUT_j2_pt = 300.0, CUT_j1_DDB = 0.9, CUT_j2_DDB = 0.9, CUT_j1_mass_low = 110.0, CUT_j1_mass_high = 150.0, CUT_j2_mass_low = 110.0, CUT_j2_mass_high = 150.0; // baseline selection
+const float CUT_j1_pt = 300.0, CUT_j2_pt = 250.0, CUT_j1_DDB = 0.9, CUT_j2_DDB = 0.9, CUT_j1_mass_low = 100.0, CUT_j1_mass_high = 150.0, CUT_j2_mass_low = 90.0, CUT_j2_mass_high = 140.0; // baseline selection
 //const float CUT_j1_pt = 350.0, CUT_j2_pt = 300.0, CUT_j1_DDB = 0.905, CUT_j2_DDB = 0.905, CUT_j1_mass_low = 115.5, CUT_j1_mass_high = 141.5, CUT_j2_mass_low = 110.5, CUT_j2_mass_high = 150.0; //optimal cut, 1 signal region
-const float CUT_j1_pt = 350.0, CUT_j2_pt = 300.0, CUT_j1_DDB = 0.905, CUT_j2_DDB = 0.905, CUT_j1_mass_low = 112.5, CUT_j1_mass_high = 142.5, CUT_j2_mass_low = 110.5, CUT_j2_mass_high = 144.5; //optimal cut
+//const float CUT_j1_pt = 350.0, CUT_j2_pt = 300.0, CUT_j1_DDB = 0.905, CUT_j2_DDB = 0.905, CUT_j1_mass_low = 112.5, CUT_j1_mass_high = 142.5, CUT_j2_mass_low = 110.5, CUT_j2_mass_high = 144.5; //optimal cut
 const float CUT2_j1_DDB = 0.860, CUT2_j2_DDB = 0.905, CUT3_j1_DDB = 0.905, CUT3_j2_DDB = 0.860; //additional SR
 const float CUTCR_j1_DDB = 0.800, CUTCR_j2_DDB = 0.800; // cut for CR
 
