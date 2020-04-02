@@ -176,8 +176,8 @@ histograms.addHistogram("ptj2_over_mj2",       "; p_{T}^{j2}/m_{j2}; Events",   
 //************define cuts**********//
 //const float CUT_j1_pt = 300.0, CUT_j2_pt = 300.0, CUT_j1_DDB = 0.9, CUT_j2_DDB = 0.9, CUT_j1_mass_low = 110.0, CUT_j1_mass_high = 150.0, CUT_j2_mass_low = 110.0, CUT_j2_mass_high = 150.0; // baseline selection
 //const float CUT_j1_pt = 350.0, CUT_j2_pt = 300.0, CUT_j1_DDB = 0.905, CUT_j2_DDB = 0.905, CUT_j1_mass_low = 115.5, CUT_j1_mass_high = 141.5, CUT_j2_mass_low = 110.5, CUT_j2_mass_high = 150.0; //optimal cut, 1 signal region
-const float CUT_j1_pt = 375.0, CUT_j2_pt = 315.0, CUT_j1_DDB = 0.905, CUT_j2_DDB = 0.900, CUT_j1_mass_low = 112.5, CUT_j1_mass_high = 142.5, CUT_j2_mass_low = 110.5, CUT_j2_mass_high = 144.5; //optimal cut
-const float CUT2_j1_DDB = 0.850, CUT2_j2_DDB = 0.900, CUT3_j1_DDB = 0.905, CUT3_j2_DDB = 0.845; //additional SR
+const float CUT_j1_pt = 350.0, CUT_j2_pt = 300.0, CUT_j1_DDB = 0.905, CUT_j2_DDB = 0.905, CUT_j1_mass_low = 112.5, CUT_j1_mass_high = 142.5, CUT_j2_mass_low = 110.5, CUT_j2_mass_high = 144.5; //optimal cut
+const float CUT2_j1_DDB = 0.860, CUT2_j2_DDB = 0.905, CUT3_j1_DDB = 0.905, CUT3_j2_DDB = 0.860; //additional SR
 const float CUTCR_j1_DDB = 0.800, CUTCR_j2_DDB = 0.800; // cut for CR
 
 cutflow.setTFile(outfile);
