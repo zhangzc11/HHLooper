@@ -17,9 +17,19 @@ if __name__ == "__main__":
 		print("qcd,  "+region+", (before scale) "+str(h_qcd_SR.Integral()))
 		print("qcd,  "+region+", (after scale) "+str(h_qcd_SR.Integral() * h_data_sideband.Integral() / h_qcd_sideband.Integral() ))
 		print("qcd,  "+region+", (scale) "+str(h_data_sideband.Integral() / h_qcd_sideband.Integral() ))
+		print("qcd,  "+region+", sideband, "+str(h_qcd_sideband.Integral() ))
+		print("data,  "+region+", sideband, "+str(h_data_sideband.Integral() ))
 	
 	for ifile in ["bbbb.root", "qcd.root", "data.root"]:
 		fin = r.TFile(inputDir+"/"+ifile)
+		events = []
 		for ih in ["M1", "N1", "M2", "N2", "D", "E"]:
 			h1 = fin.Get("ControlRegion"+ih+"__yield")
+			events.append(h1.Integral())
 			print(ifile+", "+ih+", "+str(h1.Integral()))
+		if ifile == "data.root":
+			TF1=events[0]/events[1]
+			TF2=events[2]/events[3]
+			print("bkg prediction, A = "+str(events[4]*TF1*TF2))
+			print("bkg prediction, B = "+str(events[4]*TF2))
+			print("bkg prediction, C = "+str(events[4]*TF1))

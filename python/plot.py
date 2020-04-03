@@ -8,7 +8,7 @@ from colors import *
 
 parser = argparse.ArgumentParser(description="plot settings")
 parser.add_argument('-i' , '--input_dir'              , dest='input_dir'       , help='input dir path '                        , required=True      )
-parser.add_argument('-o' , '--output_dir'             , dest='output_dir'      , help='output dir path'                        , default='plots'                                                 )
+parser.add_argument('-o' , '--output_dir'             , dest='output_dir'      , help='output dir path'                        , default='/eos/user/z/zhicaiz/www/sharebox/HH'                                                 )
 parser.add_argument('-n' , '--nbins'                  , dest='nbins'           , help='number of bins for the histograms'      , default=30                                                      )
 parser.add_argument('-xt', '--xaxis_title'            , dest='xaxis_title'     , help='X-axis title'                           , default=None                                                    )
 parser.add_argument('-y' , '--yaxis_range'            , dest='yaxis_range'     , help='Y-axis range set by user'               , default=None                                                    )
