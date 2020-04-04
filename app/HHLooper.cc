@@ -160,12 +160,12 @@ histograms.addHistogram("hh_pt",               "; p_{T}^{HH} (GeV); Events",    
 histograms.addHistogram("hh_eta",               "; #eta^{HH}; Events",                 200,   -5.0,  5.0,  [&]() { return hh.hh_eta(); } );
 histograms.addHistogram("hh_phi",               "; #Phi^{HH}; Events",                 200,   -3.2,  3.2,  [&]() { return hh.hh_phi(); } );
 histograms.addHistogram("hh_mass",             "; m_{HH} (GeV); Events",               200,   0.,  1500.,  [&]() { return hh.hh_mass(); } );
-histograms.addHistogram("FatJet1_area",        "; fat j_{1} area; Events",             200,   1.5,   2.5,  [&]() { return (FatJet1_idx>=0) ? hh.FatJet_area()[FatJet1_idx] : -999; } );
-histograms.addHistogram("FatJet2_area",        "; fat j_{2} area; Events",             200,   1.5,   2.5,  [&]() { return (FatJet1_idx>=0 && FatJet2_idx>=0) ? hh.FatJet_area()[FatJet2_idx] : -999; } );
+histograms.addHistogram("FatJet1_area",        "; fat j_{1} area; Events",             200,   1.85, 2.15,  [&]() { return (FatJet1_idx>=0) ? hh.FatJet_area()[FatJet1_idx] : -999; } );
+histograms.addHistogram("FatJet2_area",        "; fat j_{2} area; Events",             200,   1.85, 2.15,  [&]() { return (FatJet1_idx>=0 && FatJet2_idx>=0) ? hh.FatJet_area()[FatJet2_idx] : -999; } );
 histograms.addHistogram("FatJet1_msoftdrop",   "; j_{1} soft drop mass (GeV); Events", 200,   0.,   200.,  [&]() { return (FatJet1_idx>=0) ? hh.FatJet_msoftdrop()[FatJet1_idx] : -999; } );
 histograms.addHistogram("FatJet2_msoftdrop",   "; j_{2} soft drop mass (GeV); Events", 200,   0.,   200.,  [&]() { return (FatJet1_idx>=0 && FatJet2_idx>=0) ? hh.FatJet_msoftdrop()[FatJet2_idx] : -999; } );
-histograms.addHistogram("FatJet1_btagDDBvL",   "; j_{1} DDB tagger; Events",           200,   0.7,  1.0,   [&]() { return (FatJet1_idx>=0) ? hh.FatJet_btagDDBvL()[FatJet1_idx] : -999; } );
-histograms.addHistogram("FatJet2_btagDDBvL",   "; j_{2} DDB tagger; Events",           200,   0.7,  1.0,   [&]() { return (FatJet1_idx>=0 && FatJet2_idx>=0) ? hh.FatJet_btagDDBvL()[FatJet2_idx] : -999; } );
+histograms.addHistogram("FatJet1_btagDDBvL",   "; j_{1} DDB tagger; Events",           200,   0.78,  1.0,   [&]() { return (FatJet1_idx>=0) ? hh.FatJet_btagDDBvL()[FatJet1_idx] : -999; } );
+histograms.addHistogram("FatJet2_btagDDBvL",   "; j_{2} DDB tagger; Events",           200,   0.78,  1.0,   [&]() { return (FatJet1_idx>=0 && FatJet2_idx>=0) ? hh.FatJet_btagDDBvL()[FatJet2_idx] : -999; } );
 //histograms.addHistogram("FatJet1_btagHbb",     "; j_{1} Hbb tagger; Events",           200,  -1.,   1.0,   [&]() { return (FatJet1_idx>=0) ? hh.FatJet_btagHbb()[FatJet1_idx] : -999; } );
 //histograms.addHistogram("FatJet2_btagHbb",     "; j_{2} Hbb tagger; Events",           200,  -1.,   1.0,   [&]() { return (FatJet1_idx>=0 && FatJet2_idx>=0) ? hh.FatJet_btagHbb()[FatJet2_idx] : -999; } );
 //histograms.addHistogram("FatJet1_deepTagHbb",  "; j_{1} deepTagHbb tagger; Events",    200,   0.,   1.0,   [&]() { return (FatJet1_idx>=0) ? hh.FatJet_deepTagHbb()[FatJet1_idx] : -999; } );
@@ -181,12 +181,14 @@ histograms.addHistogram("FatJet2_phi",          "; #Phi^{j2}; Events",          
 //histograms.addHistogram("FatJet1_HminDR",      "; min DR(j_{1}, H); Events",           200,   0.,   5.,    [&]() { return (FatJet1_idx>=0) ? hh.FatJet_HminDR()[FatJet1_idx] : -999; } );
 //histograms.addHistogram("FatJet2_HminDR",      "; min DR(j_{2}, H); Events",           200,   0.,   5.,    [&]() { return (FatJet1_idx>=0 && FatJet2_idx>=0) ? hh.FatJet_HminDR()[FatJet2_idx] : -999; } );
 histograms.addHistogram("abs_dEta_j1j2",       "; #Delta#eta(j_{1}, j_{2}); Events",   200,   0.,   5.,    [&]() { return (FatJet1_idx>=0 && FatJet2_idx>=0) ? fabs(hh.FatJet_eta()[FatJet1_idx] - hh.FatJet_eta()[FatJet2_idx]): -999; } );
-histograms.addHistogram("abs_dPhi_j1j2",       "; #Delta#Phi(j_{1}, j_{2}); Events",   200,   0.,   5.,    [&]() { return (FatJet1_idx>=0 && FatJet2_idx>=0) ? fabs(hh.FatJet_phi()[FatJet1_idx] - hh.FatJet_phi()[FatJet2_idx]): -999; } );
+histograms.addHistogram("abs_dPhi_j1j2",       "; #Delta#Phi(j_{1}, j_{2}); Events",   200,   2.,   4.5,    [&]() { return (FatJet1_idx>=0 && FatJet2_idx>=0) ? fabs(hh.FatJet_phi()[FatJet1_idx] - hh.FatJet_phi()[FatJet2_idx]): -999; } );
 histograms.addHistogram("abs_dR_j1j2",       "; #DeltaR(j_{1}, j_{2}); Events",        200,   0.,   5.,    [&]() { return (FatJet1_idx>=0 && FatJet2_idx>=0) ? sqrt((hh.FatJet_eta()[FatJet1_idx] - hh.FatJet_eta()[FatJet2_idx])*(hh.FatJet_eta()[FatJet1_idx] - hh.FatJet_eta()[FatJet2_idx])  + (hh.FatJet_phi()[FatJet1_idx] - hh.FatJet_phi()[FatJet2_idx])*(hh.FatJet_phi()[FatJet1_idx] - hh.FatJet_phi()[FatJet2_idx])): -999; } );
 histograms.addHistogram("ptj1_over_mhh",       "; p_{T}^{j1}/m_{HH}; Events",         200,   0.,   1.,    [&]() { return (FatJet1_idx>=0) ? hh.FatJet_pt()[FatJet1_idx] / hh.hh_mass() :-999; } );
-histograms.addHistogram("ptj2_over_mhh",       "; p_{T}^{j2}/m_{HH}; Events",         200,   0.,   1.,    [&]() { return (FatJet1_idx>=0 && FatJet2_idx>=0) ? hh.FatJet_pt()[FatJet2_idx] / hh.hh_mass() :-999; } );
+histograms.addHistogram("ptj2_over_mhh",       "; p_{T}^{j2}/m_{HH}; Events",         200,   0.,  0.7,    [&]() { return (FatJet1_idx>=0 && FatJet2_idx>=0) ? hh.FatJet_pt()[FatJet2_idx] / hh.hh_mass() :-999; } );
 histograms.addHistogram("ptj1_over_mj1",       "; p_{T}^{j1}/m_{j1}; Events",         200,   0.,   10.,   [&]() { return (FatJet1_idx>=0) ? hh.FatJet_pt()[FatJet1_idx] / hh.FatJet_msoftdrop()[FatJet1_idx] :-999; } );
 histograms.addHistogram("ptj2_over_mj2",       "; p_{T}^{j2}/m_{j2}; Events",         200,   0.,   10.,   [&]() { return (FatJet1_idx>=0 && FatJet2_idx>=0) ? hh.FatJet_pt()[FatJet2_idx] / hh.FatJet_msoftdrop()[FatJet2_idx] :-999; } );
+histograms.addHistogram("ptj2_over_ptj1",      "; p_{T}^{j2}/p_{T}^{j1}; Events",     200,   0.5,  1.,    [&]() { return (FatJet1_idx>=0 && FatJet2_idx>=0) ? hh.FatJet_pt()[FatJet2_idx] / hh.FatJet_pt()[FatJet1_idx] :-999; } );
+histograms.addHistogram("mj2_over_mj1",      "; m^{j2}/m^{j1}; Events",               200,   0.0,  1.5,   [&]() { return (FatJet1_idx>=0 && FatJet2_idx>=0) ? hh.FatJet_msoftdrop()[FatJet2_idx] / hh.FatJet_msoftdrop()[FatJet1_idx] :-999; } );
 
 //************define cuts**********//
 //const float CUT_j1_pt = 300.0, CUT_j2_pt = 250.0, CUT_j1_DDB = 0.9, CUT_j2_DDB = 0.9, CUT_j1_mass_low = 100.0, CUT_j1_mass_high = 150.0, CUT_j2_mass_low = 90.0, CUT_j2_mass_high = 140.0; // baseline selection
@@ -343,6 +345,8 @@ float ptj2_over_mj2;
 float abs_dEta_j1j2;
 float abs_dPhi_j1j2;
 float abs_dR_j1j2;
+float ptj2_over_ptj1;
+float mj2_over_mj1;
 float hh_pt;
 float hh_eta;
 float hh_phi;
@@ -371,6 +375,8 @@ tree_out->Branch("ptj2_over_mj2", &ptj2_over_mj2, "ptj2_over_mj2/F");
 tree_out->Branch("abs_dEta_j1j2", &abs_dEta_j1j2, "abs_dEta_j1j2/F");
 tree_out->Branch("abs_dPhi_j1j2", &abs_dPhi_j1j2, "abs_dPhi_j1j2/F");
 tree_out->Branch("abs_dR_j1j2", &abs_dR_j1j2, "abs_dR_j1j2/F");
+tree_out->Branch("ptj2_over_ptj1", &ptj2_over_ptj1, "ptj2_over_ptj1/F");
+tree_out->Branch("mj2_over_mj1", &mj2_over_mj1, "mj2_over_mj1/F");
 tree_out->Branch("hh_pt", &hh_pt, "hh_pt/F");
 tree_out->Branch("hh_eta", &hh_eta, "hh_eta/F");
 tree_out->Branch("hh_phi", &hh_phi, "hh_phi/F");
@@ -416,6 +422,8 @@ for(int idx = 0; idx < list_chain.size(); idx++)
 	  abs_dEta_j1j2 = fabs(hh.FatJet_eta()[FatJet1_idx] - hh.FatJet_eta()[FatJet2_idx]);
 	  abs_dPhi_j1j2 = fabs(hh.FatJet_phi()[FatJet1_idx] - hh.FatJet_phi()[FatJet2_idx]);
 	  abs_dR_j1j2 = sqrt((hh.FatJet_eta()[FatJet1_idx] - hh.FatJet_eta()[FatJet2_idx])*(hh.FatJet_eta()[FatJet1_idx] - hh.FatJet_eta()[FatJet2_idx])  + (hh.FatJet_phi()[FatJet1_idx] - hh.FatJet_phi()[FatJet2_idx])*(hh.FatJet_phi()[FatJet1_idx] - hh.FatJet_phi()[FatJet2_idx]));
+	  ptj2_over_ptj1 = hh.FatJet_pt()[FatJet2_idx] / hh.FatJet_pt()[FatJet1_idx];
+	  mj2_over_mj1 = hh.FatJet_msoftdrop()[FatJet2_idx] / hh.FatJet_msoftdrop()[FatJet1_idx];
 	  hh_pt = hh.hh_pt();
 	  hh_eta = hh.hh_eta();
 	  hh_phi = hh.hh_phi();
