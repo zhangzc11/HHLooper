@@ -245,7 +245,7 @@ cutflow.getCut("FatJetsPtCutSR1");
 cutflow.addCutToLastActiveCut("SideBandSR1J2MassFatJetsSDMassCut",   [&](){ return hh.FatJet_msoftdrop()[FatJet1_idx] > CUT_j1_mass_low && hh.FatJet_msoftdrop()[FatJet1_idx] < CUT_j1_mass_high && (hh.FatJet_msoftdrop()[FatJet2_idx] < CUT_j2_mass_low || hh.FatJet_msoftdrop()[FatJet2_idx] > CUT_j2_mass_high); },   UNITY);
 
 //BDT SR
-//cutflow.getCut("TwoFatJets");
+cutflow.getCut("TwoFatJets");
 cutflow.addCutToLastActiveCut("SR1BDTSelection",         [&](){ return VarXGBBDT() > CUT_evt_BDT;  },   UNITY);
 
 //2nd signal region
