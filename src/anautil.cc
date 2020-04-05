@@ -554,22 +554,23 @@ void RooUtil::Cutflow::bookVecHistogram(TString cut, std::pair<TString, std::tup
 }
 
 //_______________________________________________________________________________________________________
-void RooUtil::Cutflow::book2DHistogram(TString cut, std::pair<std::pair<TString, TString>, std::tuple<unsigned, float, float, unsigned, float, float, std::function<float()>, std::function<float()>>> key, TString syst)
+void RooUtil::Cutflow::book2DHistogram(TString cut, std::pair<std::pair<TString, TString>, std::tuple<TString, unsigned, float, float, unsigned, float, float, std::function<float()>, std::function<float()>>> key, TString syst)
 {
     TString varname = key.first.first;
     TString varnamey = key.first.second;
-    unsigned int nbin = std::get<0>(key.second);
-    float min = std::get<1>(key.second);
-    float max = std::get<2>(key.second);
-    unsigned int nbiny = std::get<3>(key.second);
-    float miny = std::get<4>(key.second);
-    float maxy = std::get<5>(key.second);
-    std::function<float()> varxdef = std::get<6>(key.second);
-    std::function<float()> varydef = std::get<7>(key.second);
+    TString title = std::get<0>(key.second);
+    unsigned int nbin = std::get<1>(key.second);
+    float min = std::get<2>(key.second);
+    float max = std::get<3>(key.second);
+    unsigned int nbiny = std::get<4>(key.second);
+    float miny = std::get<5>(key.second);
+    float maxy = std::get<6>(key.second);
+    std::function<float()> varxdef = std::get<7>(key.second);
+    std::function<float()> varydef = std::get<8>(key.second);
     TString histname = cut + syst + "__" + varname+"_v_"+varnamey;
     if (booked_2dhistograms.find(std::make_tuple(cut.Data(), syst.Data(), varname.Data(), varnamey.Data())) == booked_2dhistograms.end())
     {
-        booked_2dhistograms[std::make_tuple(cut.Data(), syst.Data(), varname.Data(), varnamey.Data())] = new TH2F(histname, "", nbin, min, max, nbiny, miny, maxy);
+        booked_2dhistograms[std::make_tuple(cut.Data(), syst.Data(), varname.Data(), varnamey.Data())] = new TH2F(histname, title, nbin, min, max, nbiny, miny, maxy);
         booked_2dhistograms[std::make_tuple(cut.Data(), syst.Data(), varname.Data(), varnamey.Data())]->SetDirectory(0);
         booked_2dhistograms[std::make_tuple(cut.Data(), syst.Data(), varname.Data(), varnamey.Data())]->Sumw2();
         if (syst.IsNull())
@@ -770,11 +771,11 @@ void RooUtil::Histograms::addVecHistogram(TString name, std::vector<float> bound
 }
 
 //_______________________________________________________________________________________________________
-void RooUtil::Histograms::add2DHistogram(TString name, unsigned int n, float min, float max, TString namey, unsigned int ny, float miny, float maxy, std::function<float()> varxdef, std::function<float()> varydef)
+void RooUtil::Histograms::add2DHistogram(TString title, TString name, unsigned int n, float min, float max, TString namey, unsigned int ny, float miny, float maxy, std::function<float()> varxdef, std::function<float()> varydef)
 {
     if (th2fs.find(std::make_pair(name, namey)) == th2fs.end())
     {
-        th2fs[std::make_pair(name, namey)] = std::make_tuple(n, min, max, ny, miny, maxy, varxdef, varydef);
+        th2fs[std::make_pair(name, namey)] = std::make_tuple(title, n, min, max, ny, miny, maxy, varxdef, varydef);
     }
     else
     {

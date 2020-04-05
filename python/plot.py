@@ -11,7 +11,9 @@ parser.add_argument('-i' , '--input_dir'              , dest='input_dir'       ,
 parser.add_argument('-o' , '--output_dir'             , dest='output_dir'      , help='output dir path'                        , default='/eos/user/z/zhicaiz/www/sharebox/HH'                                                 )
 parser.add_argument('-n' , '--nbins'                  , dest='nbins'           , help='number of bins for the histograms'      , default=30                                                      )
 parser.add_argument('-xt', '--xaxis_title'            , dest='xaxis_title'     , help='X-axis title'                           , default=None                                                    )
+parser.add_argument('-yt', '--yaxis_title'            , dest='yaxis_title'     , help='X-axis title'                           , default=None                                                    )
 parser.add_argument('-y' , '--yaxis_range'            , dest='yaxis_range'     , help='Y-axis range set by user'               , default=None                                                    )
+parser.add_argument('-x' , '--xaxis_range'            , dest='xaxis_range'     , help='X-axis range set by user'               , default=None                                                    )
 parser.add_argument('-l' , '--yaxis_log'              , dest='yaxis_log'       , help='Y-axis set to log'                      , default=False                              , action='store_true')
 parser.add_argument('-s' , '--sig_scale'              , dest='sig_scale'       , help='Signal scale'                           , default=1                                                       )
 parser.add_argument('-b' , '--bkg_scale'              , dest='bkg_scale'       , help='Background scale'                       , default=1                                                       )
@@ -128,6 +130,9 @@ if hist_name:
             extraoptions={ 
                 "nbins":int(args.nbins),
                 "yaxis_range":args.yaxis_range.split(',') if args.yaxis_range else [],
+                "xaxis_range":args.xaxis_range.split(',') if args.xaxis_range else [],
+                "xaxis_label": args.xaxis_title,
+                "yaxis_label": args.yaxis_title,
                 "remove_underflow":args.rm_udflow,
                 "remove_overflow":args.rm_ovflow,
                 "lumi_value": lumi,
@@ -154,6 +159,9 @@ else:
         extraoptions={ 
             "nbins":int(args.nbins),
             "yaxis_range":args.yaxis_range.split(',') if args.yaxis_range else [],
+            "xaxis_range":args.xaxis_range.split(',') if args.xaxis_range else [],
+            "xaxis_label": args.xaxis_title,
+            "yaxis_label": args.yaxis_title,
             "remove_underflow":args.rm_udflow,
             "remove_overflow":args.rm_ovflow,
             "lumi_value": lumi,

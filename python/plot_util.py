@@ -43,6 +43,152 @@ def remove_overflow(hists):
         func(hists)
     return hists
 
+def makeplot_single_2d(
+    sig_fnames_=None,
+    bkg_fnames_=None,
+    data_fname_=None,
+    sig_legends_=None,
+    bkg_legends_=None,
+    sig_colors_=None,
+    bkg_colors_=None,
+    hist_name_=None,
+    dir_name_="plots",
+    output_name_=None,
+    extraoptions=None
+    ):
+
+    if sig_fnames_ == None or bkg_fnames_ == None or hist_name_ == None or sig_legends_ == None or bkg_legends_ == None:
+        print("nothing to plot....")
+        return
+    print("making plot for "+hist_name_)
+   
+    s_color = [632, 617, 839, 800, 1]
+    b_color = [920, 2007, 2005, 2003, 2001, 2011]
+    if sig_colors_:
+        s_color = sig_colors_
+    if bkg_colors_:
+        b_color = bkg_colors_
+    
+    tfs_sig = {}
+    h2_sig = []
+    maxY = 0.0
+    for idx in range(len(sig_fnames_)): 
+        fn = sig_fnames_[idx]
+        n = os.path.basename(fn.replace(".root", ""))
+        tfs_sig[n] = r.TFile(fn)
+        h2 = tfs_sig[n].Get(hist_name_)
+        h2.SetName(hist_name_+"_sig_"+str(idx))
+        h2.SetMarkerColor(s_color[idx])
+        h2.SetMarkerStyle(7)
+        #h2.SetMarkerSize(0.1)
+        #print(h2.Integral())
+        h2_sig.append(h2)
+     
+    tfs_bkg = {}
+    h2_bkg = []
+    for idx in range(len(bkg_fnames_)): 
+        fn = bkg_fnames_[idx]
+        n = os.path.basename(fn.replace(".root", ""))
+        tfs_bkg[n] = r.TFile(fn)
+        h2 = tfs_bkg[n].Get(hist_name_)
+        h2.SetName(hist_name_+"_bkg_"+str(idx))
+        h2.SetMarkerColor(b_color[idx])
+        h2.SetMarkerStyle(7)
+        #h2.SetMarkerSize(0.1)
+        #print(h2.Integral())
+        h2_bkg.append(h2)
+    h2_data = None 
+
+    tfs_data = {}
+    if data_fname_:
+        tfs_data["fdata"] = r.TFile(data_fname_)
+        h2_data = tfs_data["fdata"].Get(hist_name_)
+        h2_data.SetName(hist_name_+"_data")
+        h2_data.SetMarkerColor(1)
+        h2_data.SetMarkerStyle(7)
+        #print(h2_data.Integral())
+    myC = r.TCanvas("myC","myC", 600, 600)
+    myC.SetTicky(1)
+    myC.SetRightMargin( 0.05 )
+    myC.SetLeftMargin( leftMargin ) 
+
+    
+    h2_sig[0].Draw("")
+    for idx in range(1,len(h2_sig)):
+        h2_sig[idx].Draw("same")
+    for idx in range(len(h2_bkg)):
+        h2_bkg[idx].Draw("same")
+
+    h2_sig[0].SetTitle("")
+   
+    if h2_data:
+        h2_data.Draw("same")
+    #h2_sig[0].GetZaxis().SetTitle("Events")
+    h2_sig[0].GetYaxis().SetTitleOffset(1.1)
+    h2_sig[0].GetYaxis().SetTitleSize(0.055)
+    h2_sig[0].GetYaxis().SetLabelSize(0.045)
+    h2_sig[0].GetYaxis().CenterTitle()
+
+    leg = r.TLegend(leftMargin, 0.7, leftMargin+0.20, 0.9)
+    #leg.SetFillStyle(1)
+    leg.SetFillColor(0)
+    leg.SetBorderSize(1)
+    leg.SetTextFont(42)
+    for idx in range(len(h2_sig)):
+        leg.AddEntry(h2_sig[idx], sig_legends_[idx], "p")
+    for idx in range(len(h2_bkg)):
+        leg.AddEntry(h2_bkg[idx], bkg_legends_[idx], "p")
+    if h2_data:
+        leg.AddEntry(h2_data, "Data", "p")
+    leg.Draw()
+    h2_sig[0].GetXaxis().SetTitleOffset(0.8)
+    h2_sig[0].GetXaxis().SetTitleSize(0.055)
+    h2_sig[0].GetXaxis().SetLabelSize(0.045)
+    h2_sig[0].GetXaxis().CenterTitle()
+
+    if "xaxis_label" in extraoptions and extraoptions["xaxis_label"] != None:
+        x_title = extraoptions["xaxis_label"]
+        h2_sig[0].GetXaxis().SetTitle(x_title)
+    if "yaxis_label" in extraoptions and extraoptions["yaxis_label"] != None:
+        y_title = extraoptions["yaxis_label"]
+        h2_sig[0].GetYaxis().SetTitle(y_title)
+
+    ##########draw CMS preliminary
+    tex1 = r.TLatex(leftMargin, 0.91, "CMS")
+    tex1.SetNDC()
+    tex1.SetTextFont(61)
+    tex1.SetTextSize(0.070)
+    tex1.SetLineWidth(2)
+    tex1.Draw()
+    tex2 = r.TLatex(leftMargin+0.15,0.912,"Preliminary")
+    tex2.SetNDC()
+    tex2.SetTextFont(52)
+    tex2.SetTextSize(0.055)
+    tex2.SetLineWidth(2)
+    tex2.Draw()
+    
+    lumi_value = 137
+    if "lumi_value" in extraoptions:
+        lumi_value = extraoptions["lumi_value"]
+    tex3 = r.TLatex(0.6,0.912,"%d"%lumi_value+" fb^{-1} (13 TeV)")
+    tex3.SetNDC()
+    tex3.SetTextFont(42)
+    tex3.SetTextSize(0.055)
+    tex3.SetLineWidth(2)
+    tex3.Draw()
+
+
+    outFile = dir_name_
+    if output_name_:
+        outFile = outFile + "/" +output_name_
+    else:
+        outFile = outFile + "/" + hist_name_
+
+    
+    myC.SaveAs(outFile+".png")
+    myC.SaveAs(outFile+".pdf")
+    myC.SaveAs(outFile+".C")
+   
 def makeplot_single(
     sig_fnames_=None,
     bkg_fnames_=None,
@@ -61,6 +207,11 @@ def makeplot_single(
     if sig_fnames_ == None or bkg_fnames_ == None or hist_name_ == None or sig_legends_ == None or bkg_legends_ == None:
         print("nothing to plot....")
         return
+
+    if "_v_" in hist_name_:
+        makeplot_single_2d(sig_fnames_=sig_fnames_, bkg_fnames_ = bkg_fnames_, data_fname_=data_fname_, sig_legends_=sig_legends_, bkg_legends_=bkg_legends_, sig_colors_=sig_colors_, bkg_colors_=bkg_colors_, hist_name_=hist_name_, dir_name_=dir_name_, extraoptions=extraoptions)
+        return
+
     print("making plot for "+hist_name_)
    
     s_color = [632, 617, 839, 800, 1]
@@ -371,7 +522,10 @@ def makeplot_all(
     print("find the following histgrams to plot:")
     print(hist_names)
     for hist_name in hist_names:
-        makeplot_single(sig_fnames_=sig_fnames_, bkg_fnames_ = bkg_fnames_, data_fname_=data_fname_, sig_legends_=sig_legends_, bkg_legends_=bkg_legends_, sig_colors_=sig_colors_, bkg_colors_=bkg_colors_, hist_name_=hist_name, sig_scale_=sig_scale_, dir_name_=dir_name_, extraoptions=extraoptions)
+        if "_v_" in hist_name:
+            makeplot_single(sig_fnames_=sig_fnames_, bkg_fnames_ = bkg_fnames_, data_fname_=data_fname_, sig_legends_=sig_legends_, bkg_legends_=bkg_legends_, sig_colors_=sig_colors_, bkg_colors_=bkg_colors_, hist_name_=hist_name, sig_scale_=sig_scale_, dir_name_=dir_name_, extraoptions=extraoptions)
+        else:
+            makeplot_single_2d(sig_fnames_=sig_fnames_, bkg_fnames_ = bkg_fnames_, data_fname_=data_fname_, sig_legends_=sig_legends_, bkg_legends_=bkg_legends_, sig_colors_=sig_colors_, bkg_colors_=bkg_colors_, hist_name_=hist_name, dir_name_=dir_name_, extraoptions=extraoptions)
 
 def makeplot_cutOptimize(
     sig_fnames_=None,
