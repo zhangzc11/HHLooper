@@ -61,6 +61,10 @@ def makeplot_single_2d(
         print("nothing to plot....")
         return
     print("making plot for "+hist_name_)
+    for idx in range(len(sig_legends_)):
+        sig_legends_[idx] = sig_legends_[idx].split(" x ")[0]
+    for idx in range(len(bkg_legends_)):
+        bkg_legends_[idx] = bkg_legends_[idx].split(" x ")[0]
    
     s_color = [632, 617, 839, 800, 1]
     b_color = [920, 2007, 2005, 2003, 2001, 2011]
@@ -523,9 +527,9 @@ def makeplot_all(
     print(hist_names)
     for hist_name in hist_names:
         if "_v_" in hist_name:
-            makeplot_single(sig_fnames_=sig_fnames_, bkg_fnames_ = bkg_fnames_, data_fname_=data_fname_, sig_legends_=sig_legends_, bkg_legends_=bkg_legends_, sig_colors_=sig_colors_, bkg_colors_=bkg_colors_, hist_name_=hist_name, sig_scale_=sig_scale_, dir_name_=dir_name_, extraoptions=extraoptions)
-        else:
             makeplot_single_2d(sig_fnames_=sig_fnames_, bkg_fnames_ = bkg_fnames_, data_fname_=data_fname_, sig_legends_=sig_legends_, bkg_legends_=bkg_legends_, sig_colors_=sig_colors_, bkg_colors_=bkg_colors_, hist_name_=hist_name, dir_name_=dir_name_, extraoptions=extraoptions)
+        else:
+            makeplot_single(sig_fnames_=sig_fnames_, bkg_fnames_ = bkg_fnames_, data_fname_=data_fname_, sig_legends_=sig_legends_, bkg_legends_=bkg_legends_, sig_colors_=sig_colors_, bkg_colors_=bkg_colors_, hist_name_=hist_name, sig_scale_=sig_scale_, dir_name_=dir_name_, extraoptions=extraoptions)
 
 def makeplot_cutOptimize(
     sig_fnames_=None,

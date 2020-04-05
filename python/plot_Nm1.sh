@@ -7,7 +7,6 @@ python plot.py -OP -i ../hists/${TAG}/ Nm1FatJet1Pt__FatJet1_pt -s 100 -b 0.85
 python plot.py -OP -i ../hists/${TAG}/ Nm1FatJet1DDB__FatJet1_btagDDBvL -s 100 -b 0.85
 python plot.py -OP -i ../hists/${TAG}/ Nm1SR2FatJet1DDB__FatJet1_btagDDBvL -s 100 -b 0.85
 #python plot.py -OP -i ../hists/${TAG}/ Nm1SR3FatJet1DDB__FatJet1_btagDDBvL -s 100 -b 0.85
-python plot.py -OP -i ../hists/${TAG}/ FatJet2SDMassCut__XGBBDT -s 100 -b 3.0
 
 python plot.py -OP -i ../hists/${TAG}/ Nm1FatJet2SDMassLeft__FatJet2_msoftdrop -s 100 -b 0.85
 python plot.py -OP -i ../hists/${TAG}/ Nm1FatJet2SDMassRight__FatJet2_msoftdrop -s 100 -b 0.85 -R
