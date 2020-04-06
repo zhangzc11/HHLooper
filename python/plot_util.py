@@ -117,16 +117,16 @@ def makeplot_single_2d(
     myC.SetLeftMargin( leftMargin ) 
 
     
-    h2_sig[0].Draw("")
-    for idx in range(1,len(h2_sig)):
-        h2_sig[idx].Draw("same")
+    h2_sig[0].Draw("scat=10.0")
+    for idx in range(1, len(h2_sig)):
+        h2_sig[idx].Draw("same scat=10.0")
     for idx in range(len(h2_bkg)):
-        h2_bkg[idx].Draw("same")
+        h2_bkg[idx].Draw("same scat=10.0")
 
     h2_sig[0].SetTitle("")
    
     if h2_data:
-        h2_data.Draw("same")
+        h2_data.Draw("same scat=10.0")
     #h2_sig[0].GetZaxis().SetTitle("Events")
     h2_sig[0].GetYaxis().SetTitleOffset(1.1)
     h2_sig[0].GetYaxis().SetTitleSize(0.055)
@@ -134,6 +134,7 @@ def makeplot_single_2d(
     h2_sig[0].GetYaxis().CenterTitle()
 
     leg = r.TLegend(leftMargin, 0.7, leftMargin+0.20, 0.9)
+    #leg.SetNColumns(2)
     #leg.SetFillStyle(1)
     leg.SetFillColor(0)
     leg.SetBorderSize(1)
@@ -217,6 +218,8 @@ def makeplot_single(
         return
 
     print("making plot for "+hist_name_)
+    print(sig_fnames_)
+    print(bkg_fnames_)
    
     s_color = [632, 617, 839, 800, 1]
     b_color = [920, 2007, 2005, 2003, 2001, 2011]
@@ -351,7 +354,8 @@ def makeplot_single(
     stack.GetYaxis().SetLabelSize(0.045)
     stack.GetYaxis().CenterTitle()
 
-    leg = r.TLegend(0.65, 0.65, 0.95, 0.88)
+    leg = r.TLegend(0.45, 0.65, 0.95, 0.88)
+    leg.SetNColumns(2)
     leg.SetFillStyle(0)
     leg.SetBorderSize(0)
     leg.SetTextFont(42)
@@ -489,8 +493,8 @@ def makeplot_single(
     myC.SaveAs(outFile+"_linY.pdf")
     myC.SaveAs(outFile+"_linY.C")
     pad1.cd()
-    stack.SetMaximum(maxY*100.0)
-    stack.SetMinimum(0.1)
+    stack.SetMaximum(maxY*1000.0)
+    stack.SetMinimum(0.01)
     pad1.SetLogy()
     myC.SaveAs(outFile+"_logY.png")
     myC.SaveAs(outFile+"_logY.pdf")
@@ -685,7 +689,7 @@ def makeplot_cutOptimize(
     stack.GetYaxis().SetLabelSize(0.045)
     stack.GetYaxis().CenterTitle()
 
-    leg = r.TLegend(0.65, 0.65, 0.95, 0.88)
+    leg = r.TLegend(0.45, 0.65, 0.95, 0.88)
     leg.SetFillStyle(0)
     leg.SetBorderSize(0)
     leg.SetTextFont(42)
@@ -831,8 +835,8 @@ def makeplot_cutOptimize(
     myC.SaveAs(outFile+"_linY.pdf")
     myC.SaveAs(outFile+"_linY.C")
     pad1.cd()
-    stack.SetMaximum(maxY1*100.0)
-    stack.SetMinimum(0.1)
+    stack.SetMaximum(maxY1*1000.0)
+    stack.SetMinimum(0.01)
     pad1.SetLogy()
     myC.SaveAs(outFile+"_logY.png")
     myC.SaveAs(outFile+"_logY.pdf")

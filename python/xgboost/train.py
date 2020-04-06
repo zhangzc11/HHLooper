@@ -23,11 +23,11 @@ plt.rcParams["axes.unicode_minus"] = False
 plt.rcParams["text.usetex"] = False
 plt.rcParams["mathtext.fontset"] = "cm"
 
-test_name = 'bbbb_vs_qcd'
+test_name = 'bbbb_vs_bkg'
 
 plotDir = "/eos/user/z/zhicaiz/www/sharebox/HH/BDT/"
 pwd = os.getcwd()
-dataDir = pwd.replace("python/xgboost", "hists/v_1p0_0403_skim_v1/")
+dataDir = pwd.replace("python/xgboost", "hists/v_1p0_0405_skim_deepTagHbb/")
 
 os.system("mkdir -p "+plotDir)
 os.system("mkdir -p "+plotDir+"training")
@@ -54,7 +54,7 @@ signalHisto = root.gDirectory.Get('tmp1')
 signalEvents = lumi*signalHisto.Integral()
 
 #bkg
-bkgFileName    = dataDir + 'qcd_skim.root'
+bkgFileName    = dataDir + 'bkg_skim.root'
 bkgFile = root.TFile(bkgFileName)
 bkgTree = bkgFile.Get('hh')
 bkgTree.Draw('hh_mass>>tmp2', "weight")
