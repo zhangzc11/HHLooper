@@ -27,7 +27,7 @@ test_name = 'bbbb_vs_bkg'
 
 plotDir = "/eos/user/z/zhicaiz/www/sharebox/HH/BDT/"
 pwd = os.getcwd()
-dataDir = pwd.replace("python/xgboost", "hists/v_1p0_0405_skim_deepTagHbb/")
+dataDir = pwd.replace("python/xgboost", "hists/v_1p0_0413_skim_sortPt_v2/")
 
 os.system("mkdir -p "+plotDir)
 os.system("mkdir -p "+plotDir+"training")
@@ -67,8 +67,8 @@ variables =   [	['hh_pt', 'hh_pt', '$p_{T}^{HH}$ (GeV)', 40, 0, 900],
                 ['hh_eta', 'hh_eta', '$\eta^{HH}$', 40, -5.0, 5.0],
                 ['hh_phi', 'hh_phi', '$\phi^{HH}$', 40, -3.2, 3.2],
                 ['hh_mass', 'hh_mass', '$m_{HH}$ (GeV)', 40, 0, 1500],
-                ['FatJet1_area', 'j1_area', 'fat j1 area', 40, 1.85, 2.15],
-                ['FatJet2_area', 'j2_area', 'fat j2 area', 40,  1.85, 2.15],
+#                ['FatJet1_area', 'j1_area', 'fat j1 area', 40, 1.85, 2.15],
+#                ['FatJet2_area', 'j2_area', 'fat j2 area', 40,  1.85, 2.15],
                 ['FatJet1_msoftdrop', 'j1_m', 'j1 soft drop mass (GeV)', 40,  0.,   200.],
 #                ['FatJet2_msoftdrop', 'j2_m', 'j2 soft drop mass (GeV)', 40,  0.,   200.],
                 ['FatJet1_btagDDBvL', 'j1_DDB', 'j1 DDB tagger', 40,  0.78,  1.0],
@@ -81,7 +81,7 @@ variables =   [	['hh_pt', 'hh_pt', '$p_{T}^{HH}$ (GeV)', 40, 0, 900],
                 ['FatJet2_phi', 'j2_phi', '$\phi^{j2}$', 40,  -3.2,   3.2],
                 ['abs_dEta_j1j2', 'dEta_j1j2', '$\Delta\eta(j_{1}, j_{2})$', 40,  0.,   5.],
                 ['abs_dPhi_j1j2', 'dPhi_j1j2', '$\Delta\phi(j_{1}, j_{2})$', 40,  2.,   4.5],
-                ['abs_dR_j1j2', 'dR_j1j2', '$\Delta R(j_{1}, j_{2})$', 40,  0.,   5.],
+#                ['abs_dR_j1j2', 'dR_j1j2', '$\Delta R(j_{1}, j_{2})$', 40,  0.,   5.],
                 ['ptj1_over_mhh', 'ptj1Omhh', '$p_{T}^{j1}/m_{HH}$', 40,   0.,   1.],
                 ['ptj2_over_mhh', 'ptj2Omhh', '$p_{T}^{j2}/m_{HH}$', 40,  0.,  0.7],
                 ['ptj1_over_mj1', 'ptj1Omj1', '$p_{T}^{j1}/m_{j1}$', 40,  0.,   10.],
@@ -108,8 +108,6 @@ y = np.concatenate([np.zeros(len(df_bkg)), np.ones(len(df_signal))])
 
 print("signal sample size: "+str(len(df_signal.values)))
 print("bkg sample size: "+str(len(df_bkg.values)))
-
-'''
 ###plot correlation
 file_sig = root.TFile(signalFileName)
 tree_sig = file_sig.Get("hh")
@@ -169,12 +167,13 @@ myC.SaveAs(plotDir+'variables/'+test_name + '_correlation_matrix_bkg.png')
 myC.SaveAs(plotDir+'variables/'+test_name + '_correlation_matrix_bkg.C')
 ####Plot input variables######
 
+'''
 for idx in range(len(variables)-1):
         f = plt.figure()
         ax = f.add_subplot(111)
         plt.subplots_adjust(top=0.9, bottom=0.15, left=0.15, right=0.95)
         plt.hist(df_signal[df_signal[variables[idx][0]] > -999][variables[idx][0]], density=True, alpha=1.0, histtype="step", lw=3, label="signal", bins=variables[idx][3], range=(variables[idx][4], variables[idx][5]), weights=df_signal[df_signal[variables[idx][0]] > -999][variables[-1][0]])
-        plt.hist(df_bkg[df_bkg[variables[idx][0]] > -999][variables[idx][0]], density=True, alpha=1.0, histtype="step", lw=3, label="qcd", bins=variables[idx][3], range=(variables[idx][4], variables[idx][5]), weights=df_bkg[df_bkg[variables[idx][0]] > -999][variables[-1][0]])
+        plt.hist(df_bkg[df_bkg[variables[idx][0]] > -999][variables[idx][0]], density=True, alpha=1.0, histtype="step", lw=3, label="bkg", bins=variables[idx][3], range=(variables[idx][4], variables[idx][5]), weights=df_bkg[df_bkg[variables[idx][0]] > -999][variables[-1][0]])
         plt.legend(loc="upper right", fontsize = 50)
         plt.xlabel(variables[idx][2], fontsize=50,horizontalalignment='right', x=1.0)
         plt.ylabel('Events', fontsize=30,horizontalalignment='right', y=1.0)
@@ -188,9 +187,8 @@ for idx in range(len(variables)-1):
         plt.draw()
         plt.savefig(plotDir+'variables/'+test_name + '_' + variables[idx][0]+'.pdf')#, bbox_inches='tight')
         plt.savefig(plotDir+'variables/'+test_name + '_' + variables[idx][0]+'.png')#, bbox_inches='tight')
-
-
 '''
+
 # split data into train and test sets
 seed = 7
 test_size = 0.4
@@ -316,8 +314,8 @@ ax = f.add_subplot(111)
 plt.subplots_adjust(top=0.9, bottom=0.15, left=0.15, right=0.95)
 plt.hist(disc_signal, density=True, bins=100, alpha=1.0, histtype="step", lw=2, label="signal - test", weights=weight_signal)
 plt.hist(disc_signal_train, density=True, bins=100, alpha=1.0, histtype="step", lw=2, label="signal  - train", weights=weight_signal_train)
-plt.hist(disc_bkg, density=True, bins=100, alpha=1.0, histtype="step", lw=2, label="qcd - test", weights=weight_bkg)
-plt.hist(disc_bkg_train, density=True, bins=100, alpha=1.0, histtype="step", lw=2, label="qcd - train", weights=weight_bkg_train)
+plt.hist(disc_bkg, density=True, bins=100, alpha=1.0, histtype="step", lw=2, label="bkg - test", weights=weight_bkg)
+plt.hist(disc_bkg_train, density=True, bins=100, alpha=1.0, histtype="step", lw=2, label="bkg - train", weights=weight_bkg_train)
 plt.yscale("log")
 plt.xlim([0.0, 1.0])
 plt.ylim([0.001, 1000.0])
@@ -343,8 +341,8 @@ ax = f.add_subplot(111)
 plt.subplots_adjust(top=0.9, bottom=0.15, left=0.15, right=0.95)
 plt.hist(disc_signal, density=True, bins=100, alpha=1.0, histtype="step", lw=2, label="signal - test", weights=weight_signal)
 plt.hist(disc_signal_train, density=True, bins=100, alpha=1.0, histtype="step", lw=2, label="signal  - train", weights=weight_signal_train)
-plt.hist(disc_bkg, density=True, bins=100, alpha=1.0, histtype="step", lw=2, label="qcd - test", weights=weight_bkg)
-plt.hist(disc_bkg_train, density=True, bins=100, alpha=1.0, histtype="step", lw=2, label="qcd - train", weights=weight_bkg_train)
+plt.hist(disc_bkg, density=True, bins=100, alpha=1.0, histtype="step", lw=2, label="bkg - test", weights=weight_bkg)
+plt.hist(disc_bkg_train, density=True, bins=100, alpha=1.0, histtype="step", lw=2, label="bkg - train", weights=weight_bkg_train)
 plt.yscale("linear")
 plt.xlim([0.0, 1.0])
 #plt.ylim([0.001, 100.0])

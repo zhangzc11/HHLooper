@@ -12,7 +12,10 @@ topMargin    = 0.07
 bottomMargin = 0.12
 r.gStyle.SetOptStat(0)
 r.gStyle.SetOptFit(111)
-
+r.gStyle.SetStatX(0.99)
+r.gStyle.SetStatY(0.9)
+r.gStyle.SetStatW(0.2)
+r.gStyle.SetStatH(0.15)
 r.gROOT.SetBatch(1)
 
 def rebin(hists, nbin):
@@ -193,7 +196,113 @@ def makeplot_single_2d(
     myC.SaveAs(outFile+".png")
     myC.SaveAs(outFile+".pdf")
     myC.SaveAs(outFile+".C")
+ 
+def makeplot_fitmass(
+    data_fname_=None,
+    hist_name_=None,
+    dir_name_="plots",
+    output_name_=None,
+    extraoptions=None
+    ):
+
+    if data_fname_ == None or hist_name_ == None: 
+        print("nothing to plot....")
+        return
+    if "msoft" not in hist_name_:
+        return
+    print("making plot for "+hist_name_)
+    print(data_fname_)
    
+    tfs_data = r.TFile(data_fname_)
+    h1_data = tfs_data.Get(hist_name_)
+    h1_data.SetName(hist_name_+"_data")
+    h1_data.SetBinErrorOption(1)
+    h1_data.SetLineColor(1)
+    h1_data.SetLineWidth(2)
+    h1_data.SetMarkerColor(1)
+    h1_data.SetMarkerStyle(20)
+    #print(h1_data.Integral())
+    if "nbins" in extraoptions:
+        rebin([h1_data], extraoptions["nbins"])   
+    if "remove_underflow" in extraoptions:
+        if extraoptions["remove_underflow"]:
+            remove_underflow([h1_data])
+    if "remove_overflow" in extraoptions:
+        if extraoptions["remove_overflow"]:
+            remove_overflow([h1_data])
+    myC = r.TCanvas("myC","myC", 600, 600)
+    myC.SetTicky(1)
+    myC.SetRightMargin( rightMargin )
+    myC.SetLeftMargin( leftMargin ) 
+    myC.SetBottomMargin(0.14)
+
+   
+    h1_data.SetTitle("")
+    maxY = h1_data.GetMaximum()
+    h1_data.Draw("PEX0")
+    h1_data.GetYaxis().SetTitle("Events")
+    h1_data.GetYaxis().SetTitleOffset(0.85)
+    h1_data.GetYaxis().SetTitleSize(0.07)
+    h1_data.GetYaxis().SetLabelSize(0.045)
+    h1_data.GetYaxis().CenterTitle()
+
+    h1_data.GetXaxis().SetTitleOffset(0.94)
+    h1_data.GetXaxis().SetTitleSize(0.06)
+    h1_data.GetXaxis().SetLabelSize(0.045)
+    h1_data.GetXaxis().SetLabelOffset(0.013)
+
+    if "xaxis_label" in extraoptions and extraoptions["xaxis_label"] != None:
+        x_title = extraoptions["xaxis_label"]
+        h1_data.GetXaxis().SetTitle(x_title)
+
+    f1 = r.TF1("gaus", "gaus(0)", 50, 170)
+    f1.SetLineColor(r.kRed)
+    h1_data.Fit(f1, "", "", 50, 170)
+   
+    N_bkg = f1.Integral(95.0, 135.0)/h1_data.GetBinWidth(2)
+    tex_nb = r.TLatex(0.20,0.80,"N_{b} = #int_{95}^{135} = %6.2f"%N_bkg)
+    tex_nb.SetNDC()
+    tex_nb.SetTextFont(42)
+    tex_nb.SetTextSize(0.035)
+    tex_nb.SetLineWidth(2)
+    tex_nb.Draw()
+
+    ##########draw CMS preliminary
+    tex1 = r.TLatex(leftMargin, 0.91, "CMS")
+    tex1.SetNDC()
+    tex1.SetTextFont(61)
+    tex1.SetTextSize(0.070)
+    tex1.SetLineWidth(2)
+    tex1.Draw()
+    tex2 = r.TLatex(leftMargin+0.15,0.912,"Preliminary")
+    tex2.SetNDC()
+    tex2.SetTextFont(52)
+    tex2.SetTextSize(0.055)
+    tex2.SetLineWidth(2)
+    tex2.Draw()
+    
+    lumi_value = 137
+    if "lumi_value" in extraoptions:
+        lumi_value = extraoptions["lumi_value"]
+    tex3 = r.TLatex(0.63,0.912,"%d"%lumi_value+" fb^{-1} (13 TeV)")
+    tex3.SetNDC()
+    tex3.SetTextFont(42)
+    tex3.SetTextSize(0.055)
+    tex3.SetLineWidth(2)
+    tex3.Draw()
+
+    outFile = dir_name_
+    if output_name_:
+        outFile = outFile + "/" +output_name_
+    else:
+        outFile = outFile + "/" + hist_name_
+    #print("maxY = "+str(maxY))
+    h1_data.SetMaximum(maxY*1.5)
+    
+    myC.SaveAs(outFile+"_fit.png")
+    myC.SaveAs(outFile+"_fit.pdf")
+    myC.SaveAs(outFile+"_fit.C")
+  
 def makeplot_single(
     sig_fnames_=None,
     bkg_fnames_=None,

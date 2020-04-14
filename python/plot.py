@@ -25,6 +25,7 @@ parser.add_argument('-O' , '--output_name'            , dest='output_name'     ,
 parser.add_argument('-w' , '--whatSR'                 , dest='whatSR'          , help='what selecton for the nine bins'        , default="FatJetsSDMassCut"                                      )
 parser.add_argument('-R' , '--right_hand'             , dest='right_hand'      , help='remove right side (<)'                , default=False                      , action='store_true')
 parser.add_argument('-OP' , '--do_optimize'           , dest='do_optimize'     , help='do cut optimization'                , default=False                      , action='store_true')
+parser.add_argument('-F' , '--do_fit'           , dest='do_fit'     , help='do fit'                , default=False                      , action='store_true')
 
 parser.add_argument('hist_name', metavar='<histogram_names>=(e.g. FatJetsSDMassCut__hh_pt)', type=str, nargs='*', help='patterns to use to filter histograms to dump')
 
@@ -49,6 +50,7 @@ bkg_scale = float(args.bkg_scale)
 right_hand = args.right_hand
 output_name = args.output_name
 do_optimize = args.do_optimize
+do_fit = args.do_fit
 
 input_dir = args.input_dir
 if input_dir[-1] != "/":
@@ -118,6 +120,21 @@ if hist_name:
                 },
             )
 
+    elif do_fit:
+        print("fit for "+hist_name)
+        p.makeplot_fitmass(
+            data_fname_=data_fname,
+            hist_name_=hist_name,
+            dir_name_=output_dir,
+            output_name_=args.output_name,
+            extraoptions={
+                "nbins":int(args.nbins),
+                "remove_underflow":args.rm_udflow,
+                "remove_overflow":args.rm_ovflow,
+                "lumi_value": lumi,
+                "xaxis_label": args.xaxis_title,
+                },
+            )
     else:
         print("plotting "+hist_name)
         p.makeplot_single(
