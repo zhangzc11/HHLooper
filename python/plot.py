@@ -79,17 +79,20 @@ else:
     lumi = 137
 
 sig_fnames = [input_dir+"bbbb.root"]
-bkg_fnames = [input_dir+"ggH.root", input_dir+"WH.root", input_dir+"ZH.root",input_dir+"VBFH.root",input_dir+"qcd.root"]
+bkg_fnames = [input_dir+"ggH.root", input_dir+"WH.root", input_dir+"ZH.root",input_dir+"VBFH.root", input_dir+"ttH.root", input_dir+"qcd.root", input_dir+"ttJets.root"]
 sig_legends = ["HH#rightarrowbbbb"]
-bkg_legends = ["ggH","WH", "ZH", "VBF", "QCD (MC)"]
+bkg_legends = ["ggH","WH", "ZH", "VBF", "t#bar{t}H", "QCD", "t#bar{t}+jets"]
+
+
 if hist_name and "FatJet1_msoftdrop_v_FatJet2_msoftdrop" in hist_name:
     sig_fnames = [input_dir+"WH.root"]
     bkg_fnames = [input_dir+"ZH.root"]
     sig_legends = ["WH"]
     bkg_legends = ["ZH"]
+
 data_fname = input_dir+"data.root"
 sig_colors = [617, 839, 800, 1, 632]
-bkg_colors = [2001, 2003, 2011, 920, 2007, 2005]
+bkg_colors = [2001, 2003, 2011, 920, 2007, 839, 800, 2005]
 
 if float(args.sig_scale) != 1:
     for idx in range(len(sig_legends)):

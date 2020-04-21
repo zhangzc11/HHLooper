@@ -235,6 +235,7 @@ system(("mkdir -p hists/"+label).c_str());
 bool isData = false;
 if(isData_ == "1" || isData_ == "true" || isData_ == "yes" || isData_ == "True" || isData_ == "Yes") isData = true;
 if(isData) lumi = 137.0/42.0; //scale 2017 to full run2
+if(input.find("ttJets") != std::string::npos) lumi = lumi*1794.4529;
 
 std::vector<std::string> list_chain;
 
