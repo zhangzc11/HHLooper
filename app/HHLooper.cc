@@ -235,7 +235,7 @@ system(("mkdir -p hists/"+label).c_str());
 bool isData = false;
 if(isData_ == "1" || isData_ == "true" || isData_ == "yes" || isData_ == "True" || isData_ == "Yes") isData = true;
 if(isData) lumi = 137.0/42.0; //scale 2017 to full run2
-if(input.find("ttJets") != std::string::npos) lumi = lumi*1794.4529;
+//if(input.find("ttJets") != std::string::npos) lumi = lumi*1794.4529;
 
 std::vector<std::string> list_chain;
 
@@ -336,7 +336,7 @@ const float CUTCR_j1_DDB = 0.800, CUTCR_j2_DDB = 0.800; // cut for CR
 const float CUT_evt_BDT = 0.889, CUT_evt_BDT2 = 0.927;
 
 cutflow.setTFile(outfile);
-cutflow.addCut("CutWeight", [&](){ return 1; },   [&](){ return isData ?  lumi : lumi*hh.weight(); });
+cutflow.addCut("CutWeight", [&](){ return 1; },   [&](){ return isData ?  lumi : lumi*hh.weight()*hh.genWeight(); });
 cutflow.addCutToLastActiveCut("HLTCut",             [&](){ return hh.HLT_PFHT1050() || hh.HLT_AK8PFJet360_TrimMass30() || hh.HLT_AK8PFJet380_TrimMass30() || hh.HLT_AK8PFJet400_TrimMass30() || hh.HLT_AK8PFJet420_TrimMass30() || hh.HLT_AK8PFHT800_TrimMass50() || hh.HLT_PFJet500() || hh.HLT_AK8PFJet500() || hh.HLT_AK8PFJet330_TrimMass30_PFAK8BTagDeepCSV_p17() || hh.HLT_AK8PFJet330_TrimMass30_PFAK8BTagDeepCSV_p1() || hh.HLT_AK8PFJet330_PFAK8BTagCSV_p17(); },              UNITY);
 cutflow.addCutToLastActiveCut("TwoFatJets",         [&](){ return FatJet1_idx>=0 && FatJet2_idx>=0;  },   UNITY);
 cutflow.addCutToLastActiveCut("FatJetsDDBCut1",      [&](){ return hh.FatJet_btagDDBvL()[FatJet1_idx] > CUT_j1_DDB && hh.FatJet_btagDDBvL()[FatJet2_idx] > CUT_j2_DDB; },   UNITY);
@@ -433,7 +433,7 @@ cutflow.addCutToLastActiveCut("ControlRegionE",          [&](){ return hh.FatJet
 
 ////histograms for N-1 cuts
 //N-1 for JetsSDMass:
-cutflow.addCut("preNm1CutWeight", [&](){ return 1; },    [&](){ return isData ?  lumi : lumi*hh.weight(); });
+cutflow.addCut("preNm1CutWeight", [&](){ return 1; },    [&](){ return isData ?  lumi : lumi*hh.weight()*hh.genWeight(); });
 cutflow.addCutToLastActiveCut("preNm1HLTCut",            [&](){ return hh.HLT_PFHT1050() || hh.HLT_AK8PFJet360_TrimMass30() || hh.HLT_AK8PFJet380_TrimMass30() || hh.HLT_AK8PFJet400_TrimMass30() || hh.HLT_AK8PFJet420_TrimMass30() || hh.HLT_AK8PFHT800_TrimMass50() || hh.HLT_PFJet500() || hh.HLT_AK8PFJet500() || hh.HLT_AK8PFJet330_TrimMass30_PFAK8BTagDeepCSV_p17() || hh.HLT_AK8PFJet330_TrimMass30_PFAK8BTagDeepCSV_p1() || hh.HLT_AK8PFJet330_PFAK8BTagCSV_p17(); },              UNITY);
 cutflow.addCutToLastActiveCut("preNm1TwoFatJets",         [&](){ return FatJet1_idx>=0 && FatJet2_idx>=0;  },   UNITY);
 cutflow.addCutToLastActiveCut("preNm1FatJetsDDBCut",      [&](){ return hh.FatJet_btagDDBvL()[FatJet1_idx] > CUT_j1_DDB && hh.FatJet_btagDDBvL()[FatJet2_idx] > CUT_j2_DDB; },   UNITY);
@@ -580,7 +580,7 @@ for(int idx = 0; idx < list_chain.size(); idx++)
 	if(saveSkim && cutflow.getCut("BDTTrainPreSelection").pass)
 	{
 	  outfile_skim->cd();	
-	  weight = isData ?  1.0 : hh.weight();
+	  weight = isData ?  1.0 : hh.weight()*hh.genWeight();
 	  FatJet1_area = hh.FatJet_area()[FatJet1_idx];
 	  FatJet1_msoftdrop = hh.FatJet_msoftdrop()[FatJet1_idx];
 	  FatJet1_btagDDBvL = hh.FatJet_btagDDBvL()[FatJet1_idx];

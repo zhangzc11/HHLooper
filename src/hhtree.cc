@@ -10,6 +10,8 @@ void hhtree::Init(TTree *tree)
  if(luminosityBlock_branch) luminosityBlock_branch->SetAddress(&luminosityBlock_);
  event_branch = tree->GetBranch("event");
  if(event_branch) event_branch->SetAddress(&event_);
+ genWeight_branch = tree->GetBranch("genWeight");
+ if(genWeight_branch) genWeight_branch->SetAddress(&genWeight_);
  ChsMET_phi_branch = tree->GetBranch("ChsMET_phi");
  if(ChsMET_phi_branch) ChsMET_phi_branch->SetAddress(&ChsMET_phi_);
  ChsMET_pt_branch = tree->GetBranch("ChsMET_pt");
@@ -201,6 +203,7 @@ void hhtree::GetEntry(unsigned int idx)
  run_isLoaded = false;
  luminosityBlock_isLoaded = false;
  event_isLoaded = false;
+ genWeight_isLoaded = false;
  ChsMET_phi_isLoaded = false;
  ChsMET_pt_isLoaded = false;
  ChsMET_sumEt_isLoaded = false;
@@ -337,6 +340,22 @@ exit(1);
    event_isLoaded = true;
  }
  return event_;
+}
+
+const float &hhtree::genWeight() 
+{
+ if(not genWeight_isLoaded)
+ {
+   if(genWeight_branch != 0) genWeight_branch->GetEntry(index);
+   else
+   {
+     //printf("branch genWeight_branch does not exist!\n");
+//exit(1);
+    genWeight_ =  1.0;
+   }
+   genWeight_isLoaded = true;
+ }
+ return genWeight_;
 }
 
 const float &hhtree::ChsMET_phi() 

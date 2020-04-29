@@ -21,6 +21,9 @@ class hhtree{
    unsigned long int event_;
    TBranch *event_branch;
    bool event_isLoaded;
+   float genWeight_;
+   TBranch *genWeight_branch;
+   bool genWeight_isLoaded;
    float ChsMET_phi_;
    TBranch *ChsMET_phi_branch;
    bool ChsMET_phi_isLoaded;
@@ -303,6 +306,7 @@ class hhtree{
    const unsigned int &run();
    const unsigned int &luminosityBlock();
    const unsigned long int &event();
+   const float &genWeight();
    const float &ChsMET_phi();
    const float &ChsMET_pt();
    const float &ChsMET_sumEt();
