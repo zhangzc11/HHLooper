@@ -15,6 +15,7 @@ inputBase=data/
  (set -x ;./HHLooper ${inputBase}WH/ WH.root ${TAG} 0 >&1) &
  (set -x ;./HHLooper ${inputBase}ZH/ ZH.root ${TAG} 0 >&1) &
  (set -x ;./HHLooper ${inputBase}ttH_powheg/ ttH.root ${TAG} 0 >&1) &
+ (set -x ;./HHLooper ${inputBase}ttH_amcnlo/ ttH_amcnlo.root ${TAG} 0 >&1) &
  (set -x ;./HHLooper ${inputBase}ttJets/ ttJets.root ${TAG} 0 >&1) &
 
 sleep 1

@@ -2,7 +2,7 @@
 
 void makeClass()
 {
- TFile * file = new TFile("/mnt/hadoop/store/group/phys_susy/razor/Run2Analysis/HHBoost/ntuple_v1.0/bbbb/ggHH_toBBBB_cit_tier_1pb_weighted.root");
+ TFile * file = new TFile("../data/ttJets/TTJets_TuneCP5_13TeV-amcatnloFXFX-pythia8_MC_Fall17_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14_1pb_weighted_v0.root");
  TTree * tree = (TTree*)file->Get("hh");
  
 

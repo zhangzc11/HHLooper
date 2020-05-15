@@ -192,6 +192,38 @@ void hhtree::Init(TTree *tree)
  if(hh_gen_phi_branch) hh_gen_phi_branch->SetAddress(&hh_gen_phi_);
  hh_gen_mass_branch = tree->GetBranch("hh_gen_mass");
  if(hh_gen_mass_branch) hh_gen_mass_branch->SetAddress(&hh_gen_mass_);
+ nElectron_branch = tree->GetBranch("nElectron");
+ if(nElectron_branch) nElectron_branch->SetAddress(&nElectron_);
+ Electron_pt_branch = tree->GetBranch("Electron_pt");
+ if(Electron_pt_branch) Electron_pt_branch->SetAddress(Electron_pt_);
+ Electron_eta_branch = tree->GetBranch("Electron_eta");
+ if(Electron_eta_branch) Electron_eta_branch->SetAddress(Electron_eta_);
+ Electron_phi_branch = tree->GetBranch("Electron_phi");
+ if(Electron_phi_branch) Electron_phi_branch->SetAddress(Electron_phi_);
+ Electron_charge_branch = tree->GetBranch("Electron_charge");
+ if(Electron_charge_branch) Electron_charge_branch->SetAddress(Electron_charge_);
+ Electron_mvaFall17V2Iso_WP80_branch = tree->GetBranch("Electron_mvaFall17V2Iso_WP80");
+ if(Electron_mvaFall17V2Iso_WP80_branch) Electron_mvaFall17V2Iso_WP80_branch->SetAddress(Electron_mvaFall17V2Iso_WP80_);
+ Electron_mvaFall17V2Iso_WP90_branch = tree->GetBranch("Electron_mvaFall17V2Iso_WP90");
+ if(Electron_mvaFall17V2Iso_WP90_branch) Electron_mvaFall17V2Iso_WP90_branch->SetAddress(Electron_mvaFall17V2Iso_WP90_);
+ Electron_mvaFall17V2Iso_WPL_branch = tree->GetBranch("Electron_mvaFall17V2Iso_WPL");
+ if(Electron_mvaFall17V2Iso_WPL_branch) Electron_mvaFall17V2Iso_WPL_branch->SetAddress(Electron_mvaFall17V2Iso_WPL_);
+ nMuon_branch = tree->GetBranch("nMuon");
+ if(nMuon_branch) nMuon_branch->SetAddress(&nMuon_);
+ Muon_pt_branch = tree->GetBranch("Muon_pt");
+ if(Muon_pt_branch) Muon_pt_branch->SetAddress(Muon_pt_);
+ Muon_eta_branch = tree->GetBranch("Muon_eta");
+ if(Muon_eta_branch) Muon_eta_branch->SetAddress(Muon_eta_);
+ Muon_phi_branch = tree->GetBranch("Muon_phi");
+ if(Muon_phi_branch) Muon_phi_branch->SetAddress(Muon_phi_);
+ Muon_charge_branch = tree->GetBranch("Muon_charge");
+ if(Muon_charge_branch) Muon_charge_branch->SetAddress(Muon_charge_);
+ Muon_looseId_branch = tree->GetBranch("Muon_looseId");
+ if(Muon_looseId_branch) Muon_looseId_branch->SetAddress(Muon_looseId_);
+ Muon_mediumId_branch = tree->GetBranch("Muon_mediumId");
+ if(Muon_mediumId_branch) Muon_mediumId_branch->SetAddress(Muon_mediumId_);
+ Muon_tightId_branch = tree->GetBranch("Muon_tightId");
+ if(Muon_tightId_branch) Muon_tightId_branch->SetAddress(Muon_tightId_);
  weight_branch = tree->GetBranch("weight");
  if(weight_branch) weight_branch->SetAddress(&weight_);
 }
@@ -294,6 +326,22 @@ void hhtree::GetEntry(unsigned int idx)
  hh_gen_eta_isLoaded = false;
  hh_gen_phi_isLoaded = false;
  hh_gen_mass_isLoaded = false;
+ nElectron_isLoaded = false;
+ Electron_pt_isLoaded = false;
+ Electron_eta_isLoaded = false;
+ Electron_phi_isLoaded = false;
+ Electron_charge_isLoaded = false;
+ Electron_mvaFall17V2Iso_WP80_isLoaded = false;
+ Electron_mvaFall17V2Iso_WP90_isLoaded = false;
+ Electron_mvaFall17V2Iso_WPL_isLoaded = false;
+ nMuon_isLoaded = false;
+ Muon_pt_isLoaded = false;
+ Muon_eta_isLoaded = false;
+ Muon_phi_isLoaded = false;
+ Muon_charge_isLoaded = false;
+ Muon_looseId_isLoaded = false;
+ Muon_mediumId_isLoaded = false;
+ Muon_tightId_isLoaded = false;
  weight_isLoaded = false;
 }
 
@@ -350,8 +398,8 @@ const float &hhtree::genWeight()
    else
    {
      //printf("branch genWeight_branch does not exist!\n");
-//exit(1);
-    genWeight_ =  1.0;
+    //exit(1);
+    genWeight_ = 1.0;
    }
    genWeight_isLoaded = true;
  }
@@ -1706,6 +1754,246 @@ exit(1);
    hh_gen_mass_isLoaded = true;
  }
  return hh_gen_mass_;
+}
+
+const unsigned int &hhtree::nElectron() 
+{
+ if(not nElectron_isLoaded)
+ {
+   if(nElectron_branch != 0) nElectron_branch->GetEntry(index);
+   else
+   {
+     printf("branch nElectron_branch does not exist!\n");
+exit(1);
+   }
+   nElectron_isLoaded = true;
+ }
+ return nElectron_;
+}
+
+const float * hhtree::Electron_pt() 
+{
+ if(not Electron_pt_isLoaded)
+ {
+   if(Electron_pt_branch != 0) Electron_pt_branch->GetEntry(index);
+   else
+   {
+     printf("branch Electron_pt_branch does not exist!\n");
+exit(1);
+   }
+   Electron_pt_isLoaded = true;
+ }
+ return Electron_pt_;
+}
+
+const float * hhtree::Electron_eta() 
+{
+ if(not Electron_eta_isLoaded)
+ {
+   if(Electron_eta_branch != 0) Electron_eta_branch->GetEntry(index);
+   else
+   {
+     printf("branch Electron_eta_branch does not exist!\n");
+exit(1);
+   }
+   Electron_eta_isLoaded = true;
+ }
+ return Electron_eta_;
+}
+
+const float * hhtree::Electron_phi() 
+{
+ if(not Electron_phi_isLoaded)
+ {
+   if(Electron_phi_branch != 0) Electron_phi_branch->GetEntry(index);
+   else
+   {
+     printf("branch Electron_phi_branch does not exist!\n");
+exit(1);
+   }
+   Electron_phi_isLoaded = true;
+ }
+ return Electron_phi_;
+}
+
+const int * hhtree::Electron_charge() 
+{
+ if(not Electron_charge_isLoaded)
+ {
+   if(Electron_charge_branch != 0) Electron_charge_branch->GetEntry(index);
+   else
+   {
+     printf("branch Electron_charge_branch does not exist!\n");
+exit(1);
+   }
+   Electron_charge_isLoaded = true;
+ }
+ return Electron_charge_;
+}
+
+const bool * hhtree::Electron_mvaFall17V2Iso_WP80() 
+{
+ if(not Electron_mvaFall17V2Iso_WP80_isLoaded)
+ {
+   if(Electron_mvaFall17V2Iso_WP80_branch != 0) Electron_mvaFall17V2Iso_WP80_branch->GetEntry(index);
+   else
+   {
+     printf("branch Electron_mvaFall17V2Iso_WP80_branch does not exist!\n");
+exit(1);
+   }
+   Electron_mvaFall17V2Iso_WP80_isLoaded = true;
+ }
+ return Electron_mvaFall17V2Iso_WP80_;
+}
+
+const bool * hhtree::Electron_mvaFall17V2Iso_WP90() 
+{
+ if(not Electron_mvaFall17V2Iso_WP90_isLoaded)
+ {
+   if(Electron_mvaFall17V2Iso_WP90_branch != 0) Electron_mvaFall17V2Iso_WP90_branch->GetEntry(index);
+   else
+   {
+     printf("branch Electron_mvaFall17V2Iso_WP90_branch does not exist!\n");
+exit(1);
+   }
+   Electron_mvaFall17V2Iso_WP90_isLoaded = true;
+ }
+ return Electron_mvaFall17V2Iso_WP90_;
+}
+
+const bool * hhtree::Electron_mvaFall17V2Iso_WPL() 
+{
+ if(not Electron_mvaFall17V2Iso_WPL_isLoaded)
+ {
+   if(Electron_mvaFall17V2Iso_WPL_branch != 0) Electron_mvaFall17V2Iso_WPL_branch->GetEntry(index);
+   else
+   {
+     printf("branch Electron_mvaFall17V2Iso_WPL_branch does not exist!\n");
+exit(1);
+   }
+   Electron_mvaFall17V2Iso_WPL_isLoaded = true;
+ }
+ return Electron_mvaFall17V2Iso_WPL_;
+}
+
+const unsigned int &hhtree::nMuon() 
+{
+ if(not nMuon_isLoaded)
+ {
+   if(nMuon_branch != 0) nMuon_branch->GetEntry(index);
+   else
+   {
+     printf("branch nMuon_branch does not exist!\n");
+exit(1);
+   }
+   nMuon_isLoaded = true;
+ }
+ return nMuon_;
+}
+
+const float * hhtree::Muon_pt() 
+{
+ if(not Muon_pt_isLoaded)
+ {
+   if(Muon_pt_branch != 0) Muon_pt_branch->GetEntry(index);
+   else
+   {
+     printf("branch Muon_pt_branch does not exist!\n");
+exit(1);
+   }
+   Muon_pt_isLoaded = true;
+ }
+ return Muon_pt_;
+}
+
+const float * hhtree::Muon_eta() 
+{
+ if(not Muon_eta_isLoaded)
+ {
+   if(Muon_eta_branch != 0) Muon_eta_branch->GetEntry(index);
+   else
+   {
+     printf("branch Muon_eta_branch does not exist!\n");
+exit(1);
+   }
+   Muon_eta_isLoaded = true;
+ }
+ return Muon_eta_;
+}
+
+const float * hhtree::Muon_phi() 
+{
+ if(not Muon_phi_isLoaded)
+ {
+   if(Muon_phi_branch != 0) Muon_phi_branch->GetEntry(index);
+   else
+   {
+     printf("branch Muon_phi_branch does not exist!\n");
+exit(1);
+   }
+   Muon_phi_isLoaded = true;
+ }
+ return Muon_phi_;
+}
+
+const int * hhtree::Muon_charge() 
+{
+ if(not Muon_charge_isLoaded)
+ {
+   if(Muon_charge_branch != 0) Muon_charge_branch->GetEntry(index);
+   else
+   {
+     printf("branch Muon_charge_branch does not exist!\n");
+exit(1);
+   }
+   Muon_charge_isLoaded = true;
+ }
+ return Muon_charge_;
+}
+
+const bool * hhtree::Muon_looseId() 
+{
+ if(not Muon_looseId_isLoaded)
+ {
+   if(Muon_looseId_branch != 0) Muon_looseId_branch->GetEntry(index);
+   else
+   {
+     printf("branch Muon_looseId_branch does not exist!\n");
+exit(1);
+   }
+   Muon_looseId_isLoaded = true;
+ }
+ return Muon_looseId_;
+}
+
+const bool * hhtree::Muon_mediumId() 
+{
+ if(not Muon_mediumId_isLoaded)
+ {
+   if(Muon_mediumId_branch != 0) Muon_mediumId_branch->GetEntry(index);
+   else
+   {
+     printf("branch Muon_mediumId_branch does not exist!\n");
+exit(1);
+   }
+   Muon_mediumId_isLoaded = true;
+ }
+ return Muon_mediumId_;
+}
+
+const bool * hhtree::Muon_tightId() 
+{
+ if(not Muon_tightId_isLoaded)
+ {
+   if(Muon_tightId_branch != 0) Muon_tightId_branch->GetEntry(index);
+   else
+   {
+     printf("branch Muon_tightId_branch does not exist!\n");
+exit(1);
+   }
+   Muon_tightId_isLoaded = true;
+ }
+ return Muon_tightId_;
 }
 
 const float &hhtree::weight() 
