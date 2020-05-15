@@ -22,5 +22,5 @@ sleep 1
 wait
 
 hadd -k -f hists/${TAG}/singleH.root hists/${TAG}/*H.root
-hadd -k -f hists/${TAG}/bkg.root hists/${TAG}/qcd.root hists/${TAG}/singleH.root
+hadd -k -f hists/${TAG}/bkg.root hists/${TAG}/qcd.root hists/${TAG}/singleH.root hists/${TAG}/ttJets.root
 
