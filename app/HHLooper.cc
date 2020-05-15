@@ -347,6 +347,23 @@ cutflow.getCut("FatJetsPtCutSR1");
 cutflow.addCutToLastActiveCut("SideBandSR1J1MassFatJetsSDMassCut",   [&](){ return (hh.FatJet_msoftdrop()[FatJet1_idx] < CUT_j1_mass_low || hh.FatJet_msoftdrop()[FatJet1_idx] > CUT_j1_mass_high) && hh.FatJet_msoftdrop()[FatJet2_idx] > CUT_j2_mass_low && hh.FatJet_msoftdrop()[FatJet2_idx] < CUT_j2_mass_high; },   UNITY);
 cutflow.getCut("FatJetsPtCutSR1");
 cutflow.addCutToLastActiveCut("SideBandSR1J2MassFatJetsSDMassCut",   [&](){ return hh.FatJet_msoftdrop()[FatJet1_idx] > CUT_j1_mass_low && hh.FatJet_msoftdrop()[FatJet1_idx] < CUT_j1_mass_high && (hh.FatJet_msoftdrop()[FatJet2_idx] < CUT_j2_mass_low || hh.FatJet_msoftdrop()[FatJet2_idx] > CUT_j2_mass_high); },   UNITY);
+
+cutflow.getCut("TwoFatJets");
+cutflow.addCutToLastActiveCut("SideBandTwoFatJetsJ1MassFatJetsSDMassCut",   [&](){ return (hh.FatJet_msoftdrop()[FatJet1_idx] < CUT_j1_mass_low || hh.FatJet_msoftdrop()[FatJet1_idx] > CUT_j1_mass_high) && hh.FatJet_msoftdrop()[FatJet2_idx] > CUT_j2_mass_low && hh.FatJet_msoftdrop()[FatJet2_idx] < CUT_j2_mass_high; },   UNITY);
+cutflow.getCut("TwoFatJets");
+cutflow.addCutToLastActiveCut("SideBandTwoFatJetsJ2MassFatJetsSDMassCut",   [&](){ return hh.FatJet_msoftdrop()[FatJet1_idx] > CUT_j1_mass_low && hh.FatJet_msoftdrop()[FatJet1_idx] < CUT_j1_mass_high && (hh.FatJet_msoftdrop()[FatJet2_idx] < CUT_j2_mass_low || hh.FatJet_msoftdrop()[FatJet2_idx] > CUT_j2_mass_high); },   UNITY);
+//emu control region
+cutflow.getCut("SideBandSR1J1MassFatJetsSDMassCut");
+cutflow.addCutToLastActiveCut("SideBandSR1J1MassEMu",       [&](){ return hh.nElectron() > 0 && hh.Electron_pt()[0] > 10 && hh.Electron_mvaFall17V2Iso_WP90()[0] && hh.nMuon() > 0 && hh.Muon_pt()[0] > 10 && hh.Muon_looseId()[0]; },   UNITY);
+cutflow.getCut("SideBandSR1J2MassFatJetsSDMassCut");
+cutflow.addCutToLastActiveCut("SideBandSR1J2MassEMu",       [&](){ return hh.nElectron() > 0 && hh.Electron_pt()[0] > 10 && hh.Electron_mvaFall17V2Iso_WP90()[0] && hh.nMuon() > 0 && hh.Muon_pt()[0] > 10 && hh.Muon_looseId()[0]; },   UNITY);
+
+cutflow.getCut("SideBandTwoFatJetsJ1MassFatJetsSDMassCut");
+cutflow.addCutToLastActiveCut("SideBandTwoFatJetsJ1MassEMu",       [&](){ return hh.nElectron() > 0 && hh.Electron_pt()[0] > 10 && hh.Electron_mvaFall17V2Iso_WP90()[0] && hh.nMuon() > 0 && hh.Muon_pt()[0] > 10 && hh.Muon_looseId()[0]; },   UNITY);
+cutflow.getCut("SideBandTwoFatJetsJ2MassFatJetsSDMassCut");
+cutflow.addCutToLastActiveCut("SideBandTwoFatJetsJ2MassEMu",       [&](){ return hh.nElectron() > 0 && hh.Electron_pt()[0] > 10 && hh.Electron_mvaFall17V2Iso_WP90()[0] && hh.nMuon() > 0 && hh.Muon_pt()[0] > 10 && hh.Muon_looseId()[0]; },   UNITY);
+
+
 //BDT training Preselection
 
 cutflow.getCut("TwoFatJets");
