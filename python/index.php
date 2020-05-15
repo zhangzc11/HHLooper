@@ -37,7 +37,7 @@ a:hover { text-decoration: underline; color: rgb(255,80,80); }
 <p><form>Filter: <input type="text" name="match" size="30" value="<?php if (isset($_GET['match'])) print htmlspecialchars($_GET['match']);  ?>" /><input type="Submit" value="Go" /></form></p>
 <h2><a name="directories">Directories</a></h2>
 <ul>
-<?
+<?php
 foreach (glob("*") as $filename) {
     if ($_GET['noplots'] || !in_array($filename, $displayed)) {
         if (isset($_GET['match']) && !fnmatch('*'.$_GET['match'].'*', $filename)) continue;
@@ -61,7 +61,7 @@ if ($_GET['noplots']) {
     foreach ($filenames as $filename) {
         if (isset($_GET['match']) && !fnmatch('*'.$_GET['match'].'*', $filename)) continue;
         array_push($displayed, $filename);
-        print "<div class='pic' style=\"width: 30%;\">\n";
+        print "<div class='pic' style=\"width: 22%;\">\n";
         print "<h3><a href=\"$filename\">$filename</a></h3>";
         print "<a href=\"$filename\"><img src=\"$filename\" style=\"border: none; width: 100%; \"></a>";
         $others = array();
@@ -81,7 +81,7 @@ if ($_GET['noplots']) {
 <div style="display: block; clear:both;">
 <h2><a name="files">Other files</a></h2>
 <ul>
-<?
+<?php
 foreach (glob("*") as $filename) {
     if ($_GET['noplots'] || !in_array($filename, $displayed)) {
         if (isset($_GET['match']) && !fnmatch('*'.$_GET['match'].'*', $filename)) continue;

@@ -79,9 +79,9 @@ else:
     lumi = 137
 
 sig_fnames = [input_dir+"bbbb.root"]
-bkg_fnames = [input_dir+"ggH.root", input_dir+"WH.root", input_dir+"ZH.root",input_dir+"VBFH.root", input_dir+"ttH.root", input_dir+"qcd.root", input_dir+"ttJets.root"]
+bkg_fnames = [input_dir+"WH.root", input_dir+"ZH.root", input_dir+"ggH.root", input_dir+"VBFH.root", input_dir+"ttH.root", input_dir+"qcd.root", input_dir+"ttJets.root"]
 sig_legends = ["HH#rightarrowbbbb"]
-bkg_legends = ["ggH","WH", "ZH", "VBF", "t#bar{t}H", "QCD", "t#bar{t}+jets"]
+bkg_legends = ["WH", "ZH", "ggH", "VBF", "t#bar{t}H", "QCD", "t#bar{t}+jets"]
 
 
 if hist_name and "FatJet1_msoftdrop_v_FatJet2_msoftdrop" in hist_name:
