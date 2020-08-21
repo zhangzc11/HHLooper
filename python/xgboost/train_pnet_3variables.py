@@ -23,13 +23,14 @@ plt.rcParams["axes.unicode_minus"] = False
 plt.rcParams["text.usetex"] = False
 plt.rcParams["mathtext.fontset"] = "cm"
 
-test_name = 'bbbb_vs_bkg'
+test_name = 'bbbb_vs_bkg_3_variables'
 
 #plotDir = "/eos/user/z/zhicaiz/www/sharebox/HH/BDT/"
 plotDir = "/Users/cmorgoth/git/HHLooper/python/xgboost/data/HH/BDT/"
 pwd = os.getcwd()
 #dataDir = pwd.replace("python/xgboost", "hists/v_1p0_0413_skim_sortPt_v2/")
-dataDir = '/Users/cmorgoth/git/HHLooper/python/xgboost/data/zhicai/v_1p0_0413_skim_sortPt_v2/'
+#dataDir = '/Users/cmorgoth/git/HHLooper/python/xgboost/data/signal_skim/skimmed/'
+dataDir = '/Users/cmorgoth/git/HHLooper/python/xgboost/data/signal_skim/trigger_and_mass_sd_skim/'
 
 os.system("mkdir -p "+plotDir)
 os.system("mkdir -p "+plotDir+"training")
@@ -50,47 +51,30 @@ lumi_sf_bkg = 1.0
 #signal
 signalFileName =  dataDir + 'bbbb_skim.root'
 signalFile = root.TFile(signalFileName)
-signalTree = signalFile.Get('hh')
+signalTree = signalFile.Get('tree')
 signalTree.Draw('hh_mass>>tmp1', "weight")
 signalHisto = root.gDirectory.Get('tmp1')
 signalEvents = lumi*signalHisto.Integral()
 
 #bkg
-bkgFileName    = dataDir + 'bkg_skim.root'
+bkgFileName    = dataDir + 'all_bkg_skim.root'
 bkgFile = root.TFile(bkgFileName)
-bkgTree = bkgFile.Get('hh')
+bkgTree = bkgFile.Get('tree')
 bkgTree.Draw('hh_mass>>tmp2', "weight")
 bkgHisto = root.gDirectory.Get('tmp2')
 bkgEvents = lumi*bkgHisto.Integral()
 
 print('[INFO]: S =' + str(signalEvents) + '; B =' + str(bkgEvents) +"; S/sqrt(B) = " + str(signalEvents/math.sqrt(bkgEvents)))
 
-variables =   [	['hh_pt', 'hh_pt', '$p_{T}^{HH}$ (GeV)', 40, 0, 900],
-                ['hh_eta', 'hh_eta', '$\eta^{HH}$', 40, -5.0, 5.0],
-                ['hh_phi', 'hh_phi', '$\phi^{HH}$', 40, -3.2, 3.2],
-                ['hh_mass', 'hh_mass', '$m_{HH}$ (GeV)', 40, 0, 1500],
-#                ['FatJet1_area', 'j1_area', 'fat j1 area', 40, 1.85, 2.15],
-#                ['FatJet2_area', 'j2_area', 'fat j2 area', 40,  1.85, 2.15],
-                ['FatJet1_msoftdrop', 'j1_m', 'j1 soft drop mass (GeV)', 40,  0.,   200.],
-#                ['FatJet2_msoftdrop', 'j2_m', 'j2 soft drop mass (GeV)', 40,  0.,   200.],
-                ['FatJet1_btagDDBvL', 'j1_DDB', 'j1 DDB tagger', 40,  0.78,  1.0],
-                ['FatJet2_btagDDBvL', 'j2_DDB', 'j2 DDB tagger', 40,  0.78,  1.0],
-                ['FatJet1_pt', 'j1_pt', '$p_{T}^{j1}$ (GeV)', 40,  0.,   900.],
-                ['FatJet1_eta', 'j1_eta', '$\eta^{j1}$', 40,  -2.5,  2.5],
-                ['FatJet1_phi', 'j1_phi', '$\phi^{j1}$', 40,  -3.2,   3.2],
-                ['FatJet2_pt', 'j2_pt', '$p_{T}^{j2}$ (GeV)', 40,  0.,   900.],
-                ['FatJet2_eta', 'j2_eta', '$\eta^{j2}$', 40,  -2.5,  2.5],
-                ['FatJet2_phi', 'j2_phi', '$\phi^{j2}$', 40,  -3.2,   3.2],
-                ['abs_dEta_j1j2', 'dEta_j1j2', '$\Delta\eta(j_{1}, j_{2})$', 40,  0.,   5.],
-                ['abs_dPhi_j1j2', 'dPhi_j1j2', '$\Delta\phi(j_{1}, j_{2})$', 40,  2.,   4.5],
-#                ['abs_dR_j1j2', 'dR_j1j2', '$\Delta R(j_{1}, j_{2})$', 40,  0.,   5.],
-                ['ptj1_over_mhh', 'ptj1Omhh', '$p_{T}^{j1}/m_{HH}$', 40,   0.,   1.],
-                ['ptj2_over_mhh', 'ptj2Omhh', '$p_{T}^{j2}/m_{HH}$', 40,  0.,  0.7],
-                ['ptj1_over_mj1', 'ptj1Omj1', '$p_{T}^{j1}/m_{j1}$', 40,  0.,   10.],
-#                ['ptj2_over_mj2', 'ptj2Omj2', '$p_{T}^{j2}/m_{j2}$', 40,  0.5,  10.],
-                ['ptj2_over_ptj1', 'ptj2Optj1', '$p_{T}^{j2}/p_{T}^{j1}$', 40,  0.5,  1.],
-#                ['mj2_over_mj1', 'mj2Omj1', '$m^{j2}/m^{j1}$', 40,  0.0,  1.5],
-                ['weight', 'weight', 'weight', 100, -1.0, 1.0]
+variables =   [
+                 ['fatJet1MassSD', 'j1_m', 'j1 soft drop mass (GeV)', 40,  0.,   200.],
+#                ['fatJet1Mass', 'j2_m', 'j2 soft drop mass (GeV)', 40,  0.,   200.],
+                 ['fatJet1Pt', 'j1_pt', '$p_{T}^{j1}$ (GeV)', 40,  0.,   900.],
+                 ['fatJet1PNetXbb', 'fatJet1PNetXbb', 'fatJet1PNetXbb', 40,  -100,   100],
+
+                 ['fatJet2Pt', 'j2_pt', '$p_{T}^{j2}$ (GeV)', 40,  0.,   900.],
+                 ['fatJet2PNetXbb', 'fatJet2PNetXbb', 'fatJet2PNetXbb', 40,  -100,   100],
+                 ['weight', 'weight', 'weight', 100, -1.0, 1.0]
               ]
 
 
@@ -98,8 +82,8 @@ variables =   [	['hh_pt', 'hh_pt', '$p_{T}^{HH}$ (GeV)', 40, 0, 900],
 print(len(variables))
 
 ##Getting ROOT files into pandas
-df_signal = uproot.open(signalFileName)['hh'].pandas.df([row[0] for row in variables], flatten=False)
-df_bkg = uproot.open(bkgFileName)['hh'].pandas.df([row[0] for row in variables], flatten=False)
+df_signal = uproot.open(signalFileName)['tree'].pandas.df([row[0] for row in variables], flatten=False)
+df_bkg = uproot.open(bkgFileName)['tree'].pandas.df([row[0] for row in variables], flatten=False)
 
 ##Getting a numpy array out of two pandas data frame
 
@@ -112,9 +96,9 @@ print("signal sample size: "+str(len(df_signal.values)))
 print("bkg sample size: "+str(len(df_bkg.values)))
 ###plot correlation
 file_sig = root.TFile(signalFileName)
-tree_sig = file_sig.Get("hh")
+tree_sig = file_sig.Get("tree")
 file_bkg = root.TFile(bkgFileName)
-tree_bkg = file_sig.Get("hh")
+tree_bkg = file_sig.Get("tree")
 h2_corr_sig = root.TH2F("h2_corr_sig", "h2_corr_sig", len(variables)-1, 0, len(variables)-1, len(variables)-1, 0, len(variables)-1)
 h2_corr_bkg = root.TH2F("h2_corr_bkg", "h2_corr_bkg", len(variables)-1, 0, len(variables)-1, len(variables)-1, 0, len(variables)-1)
 
@@ -372,7 +356,7 @@ lw = 2
 plt.plot(fpr, tpr, color='darkorange',
          lw=lw, label='ROC curve')
 plt.plot([0, 1], [0, 1], color='navy', lw=lw, linestyle='--')
-plt.xlim([0.0, 1.0])
+plt.xlim([1e-5, 1.0])
 plt.ylim([0.0, 1.05])
 plt.ylabel('Signal Efficiency',horizontalalignment='right', y=1.0, fontsize=15)
 plt.xlabel('Background Efficiency',horizontalalignment='right', x=1.0, fontsize=15)
@@ -387,9 +371,11 @@ plt.text(0.5,0.3,'AUC = %.4f'%AUC, fontsize=12)
 #plt.title('Receiver operating characteristic example')
 #plt.legend(loc="lower right")
 #plt.show()
+
 plt.text(0.0, 1.01, "CMS", ha='left', va='bottom', transform=ax.transAxes, weight='bold', fontsize=17)
 plt.text(0.12, 1.01, "Simulation Preliminary", ha='left', va='bottom', transform=ax.transAxes, style='italic', fontsize=16)
 plt.text(1.0, 1.01, "13 TeV", ha='right', va='bottom', transform=ax.transAxes, fontsize=16)
+plt.xscale("log")
 plt.savefig(plotDir+'training/myroc_' + test_name + '.pdf')
 plt.savefig(plotDir+'training/myroc_' + test_name + '.png')
 
