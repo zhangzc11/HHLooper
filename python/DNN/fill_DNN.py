@@ -23,6 +23,10 @@ variables = ['fatJet1Pt', 'fatJet1Eta', 'fatJet1MassSD', 'fatJet1PNetXbb', 'fatJ
              'fatJet2Tau3OverTau2', 'hh_pt','hh_eta','hh_mass','MET','NJets','deltaR_j1j2','deltaEta_j1j2','fatJet3Pt', 'fatJet3Eta', 'fatJet3MassSD', 'fatJet3PNetXbb', 'fatJet3Tau3OverTau2', 
             #'fatJet1HasElectron','fatJet1HasMuon','fatJet2HasElectron','fatJet2HasMuon'
             ]
+variables_DNN = ['fatJet1Pt', 'fatJet1Eta', 'fatJet1MassSD', 'fatJet1PNetXbb', 'fatJet1Tau3OverTau2', 'fatJet2Pt', 'fatJet2Eta',# 'fatJet2MassSD', 'fatJet2PNetXbb',
+             'fatJet2Tau3OverTau2', 'hh_pt','hh_eta','hh_mass','MET','NJets','deltaR_j1j2','deltaEta_j1j2','fatJet3Pt', 'fatJet3Eta_abs', 'fatJet3MassSD', 'fatJet3PNetXbb', 'fatJet3Tau3OverTau2', 
+            #'fatJet1HasElectron','fatJet1HasMuon','fatJet2HasElectron','fatJet2HasMuon'
+            ]
 id_variables = ['run','lumi','event']
 wt_variables = ['weight']
 mass_variables= ['fatJet2MassSD']
@@ -99,30 +103,34 @@ def open_root_ntuples():
 
     # This is a temporary fix to some branches; should be incorporated directly in the ntuples in the future    
     for i in range(len(signp)):
-        #signp[i]["fatJet3Eta"][signp[i]["fatJet3Pt"] == 0] =-99.
-        #signp[i]["fatJet3PNetXbb"][signp[i]["fatJet3PNetXbb"] == 0] =-99.
-        #signp[i]["fatJet3Tau3OverTau2"][signp[i]["fatJet3Tau3OverTau2"] == 0] =-99.
+        temp = -1.*np.ones_like(signp[i]['fatJet3Eta'])
+        signp[i] = append_fields(signp[i], 'fatJet3Eta_abs', temp, usemask=False)
+        signp[i]['fatJet3Eta_abs'] = np.abs(signp[i]['fatJet3Eta'])
+        signp[i]["fatJet3Eta_abs"][signp[i]["fatJet3Pt"] == 0] =-1.
+        signp[i]["fatJet3PNetXbb"][signp[i]["fatJet3Pt"] == 0] =-1.
+        signp[i]["fatJet3Tau3OverTau2"][signp[i]["fatJet3Pt"] == 0] =-1.
         signp[i]['NJets'] = signp[i]['NJets']+1
-
-        temp = -1.*np.ones_like(signp[i]['NJets'])
         signp[i] = append_fields(signp[i], 'ttHkill', temp, usemask=False)
     
     for i in range(len(bkgnp)):
-        #bkgnp[i]["fatJet3Eta"][bkgnp[i]["fatJet3Pt"] == 0] =-99.
-        #bkgnp[i]["fatJet3PNetXbb"][bkgnp[i]["fatJet3PNetXbb"] == 0] =-99.
-        #bkgnp[i]["fatJet3Tau3OverTau2"][bkgnp[i]["fatJet3Tau3OverTau2"] == 0] =-99.
-        bkgnp[i]['NJets'] = bkgnp[i]['NJets']+1
-        
         temp = -1.*np.ones_like(bkgnp[i]['NJets'])
+        bkgnp[i] = append_fields(bkgnp[i], 'fatJet3Eta_abs', temp, usemask=False)
+        bkgnp[i]['fatJet3Eta_abs'] = np.abs(bkgnp[i]['fatJet3Eta'])
+        bkgnp[i]["fatJet3Eta_abs"][bkgnp[i]["fatJet3Pt"] == 0] =-1.
+        bkgnp[i]["fatJet3PNetXbb"][bkgnp[i]["fatJet3Pt"] == 0] =-1.
+        bkgnp[i]["fatJet3Tau3OverTau2"][bkgnp[i]["fatJet3Pt"] == 0] =-1.
+        bkgnp[i]['NJets'] = bkgnp[i]['NJets']+1
         bkgnp[i] = append_fields(bkgnp[i], 'ttHkill', temp, usemask=False)
 
     for i in range(len(allnp)):
-        #allnp[i]["fatJet3Eta"][allnp[i]["fatJet3Pt"] == 0] =-99.
-        #allnp[i]["fatJet3PNetXbb"][allnp[i]["fatJet3PNetXbb"] == 0] =-99.
-        #allnp[i]["fatJet3Tau3OverTau2"][allnp[i]["fatJet3Tau3OverTau2"] == 0] =-99.
-        allnp[i]['NJets'] = allnp[i]['NJets']+1
 
         temp = -1.*np.ones_like(allnp[i]['NJets'])
+        allnp[i] = append_fields(allnp[i], 'fatJet3Eta_abs', temp, usemask=False)
+        allnp[i]['fatJet3Eta_abs'] = np.abs(allnp[i]['fatJet3Eta'])
+        allnp[i]["fatJet3Eta_abs"][allnp[i]["fatJet3Pt"] == 0] =-1.
+        allnp[i]["fatJet3PNetXbb"][allnp[i]["fatJet3Pt"] == 0] =-1.
+        allnp[i]["fatJet3Tau3OverTau2"][allnp[i]["fatJet3Pt"] == 0] =-1.
+        allnp[i]['NJets'] = allnp[i]['NJets']+1
         allnp[i] = append_fields(allnp[i], 'ttHkill', temp, usemask=False)
     return bkgnp, signp, allnp, sig_fn, bkg_fn, all_fn
 
@@ -137,7 +145,7 @@ def evalModel(dnn_model, dnn_normfactors, bkgnp, signp, allnp):
     
     for i in range(len(allnp)):
 
-        dnn_vars_others_arr = np.vstack([allnp[i][k] for k in variables]).T
+        dnn_vars_others_arr = np.vstack([allnp[i][k] for k in variables_DNN]).T
         #Normalize the DNN with the normalization factors from preprocessing in training 
         dnn_vars_others_arr -= dnn_normfactors[0]
         dnn_vars_others_arr /= dnn_normfactors[1]
@@ -147,7 +155,7 @@ def evalModel(dnn_model, dnn_normfactors, bkgnp, signp, allnp):
 
     for i in range(len(bkgnp)):
 
-        dnn_vars_others_arr = np.vstack([bkgnp[i][k] for k in variables]).T
+        dnn_vars_others_arr = np.vstack([bkgnp[i][k] for k in variables_DNN]).T
         #Normalize the DNN with the normalization factors from preprocessing in training                                                                                                                    
         dnn_vars_others_arr -= dnn_normfactors[0]
         dnn_vars_others_arr /= dnn_normfactors[1]
@@ -157,7 +165,7 @@ def evalModel(dnn_model, dnn_normfactors, bkgnp, signp, allnp):
 
     for i in range(len(signp)):
 
-        dnn_vars_others_arr = np.vstack([signp[i][k] for k in variables]).T
+        dnn_vars_others_arr = np.vstack([signp[i][k] for k in variables_DNN]).T
         #Normalize the DNN with the normalization factors from preprocessing in training
         dnn_vars_others_arr -= dnn_normfactors[0]
         dnn_vars_others_arr /= dnn_normfactors[1]
