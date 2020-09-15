@@ -34,7 +34,7 @@ QCD_bdt =['disc_qcd_and_ttbar_Run2_enhanced_v8p2']
 
 def convert(tree, target=0):
     feature = tree2array(tree,
-                        branches = id_variables+wt_variables+variables+mass_variables+QCD_bdt ,
+                         #branches = id_variables+wt_variables+variables+mass_variables+QCD_bdt ,
                         #branches = variables,
                          #selection = 'disc_qcd_and_ttbar_Run2_enhanced_v8p2>0.23'
                         )
@@ -104,6 +104,7 @@ def open_root_ntuples():
     # This is a temporary fix to some branches; should be incorporated directly in the ntuples in the future    
     for i in range(len(signp)):
         temp = -1.*np.ones_like(signp[i]['fatJet3Eta'])
+        temp = temp.astype('float32')
         signp[i] = append_fields(signp[i], 'fatJet3Eta_abs', temp, usemask=False)
         signp[i]['fatJet3Eta_abs'] = np.abs(signp[i]['fatJet3Eta'])
         signp[i]["fatJet3Eta_abs"][signp[i]["fatJet3Pt"] == 0] =-1.
@@ -114,6 +115,7 @@ def open_root_ntuples():
     
     for i in range(len(bkgnp)):
         temp = -1.*np.ones_like(bkgnp[i]['NJets'])
+        temp = temp.astype('float32')
         bkgnp[i] = append_fields(bkgnp[i], 'fatJet3Eta_abs', temp, usemask=False)
         bkgnp[i]['fatJet3Eta_abs'] = np.abs(bkgnp[i]['fatJet3Eta'])
         bkgnp[i]["fatJet3Eta_abs"][bkgnp[i]["fatJet3Pt"] == 0] =-1.
@@ -125,6 +127,7 @@ def open_root_ntuples():
     for i in range(len(allnp)):
 
         temp = -1.*np.ones_like(allnp[i]['NJets'])
+        temp = temp.astype('float32')
         allnp[i] = append_fields(allnp[i], 'fatJet3Eta_abs', temp, usemask=False)
         allnp[i]['fatJet3Eta_abs'] = np.abs(allnp[i]['fatJet3Eta'])
         allnp[i]["fatJet3Eta_abs"][allnp[i]["fatJet3Pt"] == 0] =-1.
