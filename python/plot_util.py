@@ -24,7 +24,7 @@ def rebin(hists, nbin):
         currnbin = hist.GetNbinsX()
         fac = currnbin / nbin
         if float(fac).is_integer() and fac > 0:
-            hist.Rebin(fac)
+            hist.Rebin(int(fac))
 def remove_underflow(hists):
     def func(hist):
         hist.SetBinContent(0, 0)

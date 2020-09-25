@@ -1,36 +1,11 @@
 
-TAG=$1 
+TAG=$1
 
 for region in \
-CutWeight \
-TwoFatJets 
+SRBin1 \
+SRBin2 \
+SRBin3 \
+SRBin4 
 do
-	python plot.py -i ../hists/${TAG}/ -s 5000 -w ${region} -n 40
-done
-
-
-for region in \
-FatJetsDDBCut1 \
-FatJetsPtCutSR1 
-do
-	python plot.py -i ../hists/${TAG}/ -s 500 -w ${region} -n 40
-done
-
-
-
-for region in \
-SR1FatJetsSDMassCut \
-SR2FatJetsSDMassCut \
-SR3FatJetsSDMassCut 
-do
-	python plot.py -i ../hists/${TAG}/ -s 100 -w ${region} -n 40
-done
-
-for region in \
-SideBandSR1J1MassFatJetsSDMassCut \
-SideBandSR2J1MassFatJetsSDMassCut \
-SideBandSR3J1MassFatJetsSDMassCut \
-FailFatJet2SDMassCut 
-do
-	python plot.py -i ../hists/${TAG}/ -s 100 -w ${region} -d -n 40
+    python plot.py -i ../hists/${TAG}/combine/ -s 10 -w ${region} -n 40
 done
