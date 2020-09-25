@@ -15,6 +15,10 @@ do
  (set -x ;./HHLooper ${inputBase}/${year}/qcd/  qcd.root ${TAG} 0 >&1) &
  (set -x ;./HHLooper ${inputBase}/${year}/ttbar/ ttbar.root ${TAG} 0 >&1) &
  (set -x ;./HHLooper ${inputBase}/${year}/HHSM/ HHSM.root ${TAG} 0 >&1) &
+ (set -x ;./HHLooper ${inputBase}/${year}/HHc0/ HHc0.root ${TAG} 0 >&1) &
+ (set -x ;./HHLooper ${inputBase}/${year}/HHc1/ HHc1.root ${TAG} 0 >&1) &
+ (set -x ;./HHLooper ${inputBase}/${year}/HHc2p45/ HHc2p45.root ${TAG} 0 >&1) &
+ (set -x ;./HHLooper ${inputBase}/${year}/HHc5/ HHc2p5.root ${TAG} 0 >&1) &
  (set -x ;./HHLooper ${inputBase}/${year}/VH/ VH.root ${TAG} 0 >&1) &
  (set -x ;./HHLooper ${inputBase}/${year}/Higgs/ Higgs.root ${TAG} 0 >&1) &
  (set -x ;./HHLooper ${inputBase}/${year}/ttH/ ttH.root ${TAG} 0 >&1) &
@@ -30,6 +34,10 @@ hadd -k -f hists/${TAG}/combine/data.root hists/${TAG}/2016/data.root hists/${TA
 hadd -k -f hists/${TAG}/combine/qcd.root hists/${TAG}/2016/qcd.root hists/${TAG}/2017/qcd.root hists/${TAG}/2018/qcd.root
 hadd -k -f hists/${TAG}/combine/ttbar.root hists/${TAG}/2016/ttbar.root hists/${TAG}/2017/ttbar.root hists/${TAG}/2018/ttbar.root
 hadd -k -f hists/${TAG}/combine/HHSM.root hists/${TAG}/2016/HHSM.root hists/${TAG}/2017/HHSM.root hists/${TAG}/2018/HHSM.root
+hadd -k -f hists/${TAG}/combine/HHc0.root hists/${TAG}/2016/HHc0.root hists/${TAG}/2017/HHc0.root hists/${TAG}/2018/HHc0.root
+hadd -k -f hists/${TAG}/combine/HHc1.root hists/${TAG}/2016/HHc1.root hists/${TAG}/2017/HHc1.root hists/${TAG}/2018/HHc1.root
+hadd -k -f hists/${TAG}/combine/HHc2p45.root hists/${TAG}/2016/HHc2p45.root hists/${TAG}/2017/HHc2p45.root hists/${TAG}/2018/HHc2p45.root
+hadd -k -f hists/${TAG}/combine/HHc5.root hists/${TAG}/2016/HHc5.root hists/${TAG}/2017/HHc5.root hists/${TAG}/2018/HHc5.root
 hadd -k -f hists/${TAG}/combine/VH.root hists/${TAG}/2016/VH.root hists/${TAG}/2017/VH.root hists/${TAG}/2018/VH.root
 hadd -k -f hists/${TAG}/combine/Higgs.root hists/${TAG}/2016/Higgs.root hists/${TAG}/2017/Higgs.root hists/${TAG}/2018/Higgs.root
 hadd -k -f hists/${TAG}/combine/ttH.root hists/${TAG}/2016/ttH.root hists/${TAG}/2017/ttH.root hists/${TAG}/2018/ttH.root

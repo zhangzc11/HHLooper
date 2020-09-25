@@ -83,9 +83,9 @@ else:
     year = 6051
     lumi = 137
 
-sig_fnames = [input_dir+"HHSM.root"]
+sig_fnames = [input_dir+"HHc1.root"]
 bkg_fnames = [input_dir+"others.root", input_dir+"Higgs.root", input_dir+"VH.root", input_dir+"ttH.root", input_dir+"qcd.root", input_dir+"ttbar.root"]
-sig_legends = ["HH#rightarrowbbbb"]
+sig_legends = ["HH (c_{hhh} = 1)"]
 bkg_legends = ["others", "ggH+VBFH", "VH", "t#bar{t}H", "QCD", "t#bar{t}+jets"]
 
 
