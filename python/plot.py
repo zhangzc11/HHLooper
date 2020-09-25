@@ -8,7 +8,8 @@ from colors import *
 
 parser = argparse.ArgumentParser(description="plot settings")
 parser.add_argument('-i' , '--input_dir'              , dest='input_dir'       , help='input dir path '                        , required=True      )
-parser.add_argument('-o' , '--output_dir'             , dest='output_dir'      , help='output dir path'                        , default='/var/www/html/sharebox/HH'                                                 )
+#parser.add_argument('-o' , '--output_dir'             , dest='output_dir'      , help='output dir path'                        , default='/var/www/html/sharebox/HH'                                                 )
+parser.add_argument('-o' , '--output_dir'             , dest='output_dir'      , help='output dir path'                        , default='plots/'                                                 )
 parser.add_argument('-n' , '--nbins'                  , dest='nbins'           , help='number of bins for the histograms'      , default=30                                                      )
 parser.add_argument('-xt', '--xaxis_title'            , dest='xaxis_title'     , help='X-axis title'                           , default=None                                                    )
 parser.add_argument('-yt', '--yaxis_title'            , dest='yaxis_title'     , help='X-axis title'                           , default=None                                                    )
@@ -60,6 +61,8 @@ output_dir = args.output_dir + "/" + input_dir.split("/")[-3] + "/" +input_dir.s
 if do_optimize:
     output_dir = args.output_dir + "/" + input_dir.split("/")[-3]+"_cutOptimize" + "/" + input_dir.split("/")[-2]
 
+os.system("mkdir -p "+args.output_dir)
+os.system("cp index.php "+args.output_dir)
 os.system("mkdir -p "+args.output_dir + "/" + input_dir.split("/")[-3] )
 os.system("cp index.php "+args.output_dir + "/" + input_dir.split("/")[-3] )
 os.system("mkdir -p "+output_dir)

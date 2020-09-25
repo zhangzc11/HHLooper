@@ -4,8 +4,8 @@ TAG=$1
 mkdir -p hists/${TAG}/
 rm -rf hists/${TAG}/*
 
-#inputBase=/eos/cms/store/group/phys_susy/razor/Run2Analysis/HHBoost/ntuple_v1p0/
-inputBase=data/Jet2Xbb0p8Skim/
+inputBase=/eos/cms/store/group/phys_susy/razor/Run2Analysis/HHBoost/HHTo4BNtupler_20200902_option5_combined_BDT_Jet2Xbb0p8Skim/ 
+#inputBase=data/Jet2Xbb0p8Skim/
 
 
 for year in 2016 2017 2018
