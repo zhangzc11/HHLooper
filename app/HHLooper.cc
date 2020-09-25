@@ -55,6 +55,7 @@ system(("mkdir -p hists/"+label+"/"+year_).c_str());
 bool isData = false;
 if(isData_ == "1" || isData_ == "true" || isData_ == "yes" || isData_ == "True" || isData_ == "Yes") isData = true;
 if(isData) lumi = 1.0;
+if(input.find("qcd") != std::string::npos) lumi = lumi*0.72;
 
 std::vector<std::string> list_chain;
 
@@ -139,7 +140,7 @@ cutflow.addCutToLastActiveCut("CutHLT",       [&](){ return isData ? ((year_ == 
 
 cutflow.addCutToLastActiveCut("CutfatJetsPt",       [&](){ return hh.fatJet1Pt() > 250.0 && hh.fatJet2Pt() > 250.0; },   UNITY);
 cutflow.addCutToLastActiveCut("CutfatJetsMassSD",       [&](){ return hh.fatJet1MassSD() > 50.0 && hh.fatJet2MassSD() > 50.0; },   UNITY);
-cutflow.addCut("CutBlindData", [&](){ return 1; },   [&](){ return isData ?  hh.fatJet2MassSD() <=95 || hh.fatJet2MassSD() >= 135.0: 1.0; });
+cutflow.addCutToLastActiveCut("CutBlindData", [&](){ return 1; },   [&](){ return isData ?  hh.fatJet2MassSD() <=95 || hh.fatJet2MassSD() >= 135.0: 1.0; });
 
 cutflow.addCutToLastActiveCut("SRBin1",       [&](){ return hh.disc_qcd_and_ttbar_Run2_enhanced_v24() > 0.028 && hh.fatJet1PNetXbb() > 0.985 && hh.fatJet2PNetXbb() >  0.985; },   UNITY);
 
