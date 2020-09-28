@@ -15,12 +15,12 @@ make
 # Run looper
 
 ```
-./process.sh v_1.0_0331
+./process.sh yield_0927_v0
 ```
 
 # make plots
 
 ```
 cd python
-./plot_all.sh v_1.0_0331
+./plot_all.sh yield_0927_v0
 ```
