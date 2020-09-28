@@ -8,7 +8,8 @@ from colors import *
 
 parser = argparse.ArgumentParser(description="plot settings")
 parser.add_argument('-i' , '--input_dir'              , dest='input_dir'       , help='input dir path '                        , required=True      )
-parser.add_argument('-o' , '--output_dir'             , dest='output_dir'      , help='output dir path'                        , default='/var/www/html/sharebox/HH'                                                 )
+#parser.add_argument('-o' , '--output_dir'             , dest='output_dir'      , help='output dir path'                        , default='/var/www/html/sharebox/HH'                                                 )
+parser.add_argument('-o' , '--output_dir'             , dest='output_dir'      , help='output dir path'                        , default='plots/'                                                 )
 parser.add_argument('-n' , '--nbins'                  , dest='nbins'           , help='number of bins for the histograms'      , default=30                                                      )
 parser.add_argument('-xt', '--xaxis_title'            , dest='xaxis_title'     , help='X-axis title'                           , default=None                                                    )
 parser.add_argument('-yt', '--yaxis_title'            , dest='yaxis_title'     , help='X-axis title'                           , default=None                                                    )
@@ -56,10 +57,14 @@ input_dir = args.input_dir
 if input_dir[-1] != "/":
     input_dir += "/"
 
-output_dir = args.output_dir + "/" + input_dir.split("/")[-2]
+output_dir = args.output_dir + "/" + input_dir.split("/")[-3] + "/" +input_dir.split("/")[-2]
 if do_optimize:
-    output_dir = args.output_dir + "/" + input_dir.split("/")[-2]+"_cutOptimize"
+    output_dir = args.output_dir + "/" + input_dir.split("/")[-3]+"_cutOptimize" + "/" + input_dir.split("/")[-2]
 
+os.system("mkdir -p "+args.output_dir)
+os.system("cp index.php "+args.output_dir)
+os.system("mkdir -p "+args.output_dir + "/" + input_dir.split("/")[-3] )
+os.system("cp index.php "+args.output_dir + "/" + input_dir.split("/")[-3] )
 os.system("mkdir -p "+output_dir)
 os.system("cp index.php "+output_dir)
 
@@ -78,21 +83,15 @@ else:
     year = 6051
     lumi = 137
 
-sig_fnames = [input_dir+"bbbb.root"]
-bkg_fnames = [input_dir+"WH.root", input_dir+"ZH.root", input_dir+"ggH.root", input_dir+"VBFH.root", input_dir+"ttH.root", input_dir+"qcd.root", input_dir+"ttJets.root"]
-sig_legends = ["HH#rightarrowbbbb"]
-bkg_legends = ["WH", "ZH", "ggH", "VBF", "t#bar{t}H", "QCD", "t#bar{t}+jets"]
+sig_fnames = [input_dir+"HHc1.root"]
+bkg_fnames = [input_dir+"others.root", input_dir+"Higgs.root", input_dir+"VH.root", input_dir+"ttH.root", input_dir+"qcd.root", input_dir+"ttbar.root"]
+sig_legends = ["HH (c_{hhh} = 1)"]
+bkg_legends = ["others", "ggH+VBFH", "VH", "t#bar{t}H", "QCD", "t#bar{t}+jets"]
 
-
-if hist_name and "FatJet1_msoftdrop_v_FatJet2_msoftdrop" in hist_name:
-    sig_fnames = [input_dir+"WH.root"]
-    bkg_fnames = [input_dir+"ZH.root"]
-    sig_legends = ["WH"]
-    bkg_legends = ["ZH"]
 
 data_fname = input_dir+"data.root"
 sig_colors = [617, 839, 800, 1, 632]
-bkg_colors = [2001, 2003, 2011, 920, 2007, 839, 800, 2005]
+bkg_colors = [2001, 2003, 2011, 920, 2007, 2005, 800, 839]
 
 if float(args.sig_scale) != 1:
     for idx in range(len(sig_legends)):
