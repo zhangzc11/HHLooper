@@ -7,7 +7,7 @@ HHLooper
 cmsrel CMSSW_9_4_2
 cd CMSSW_9_4_2/src
 cmsenv
-git clone git@github.com:zhangzc11/HHLooper.git
+git clone git@github.com:LPC-HH/HHLooper.git
 cd HHLooper
 make
 ```
