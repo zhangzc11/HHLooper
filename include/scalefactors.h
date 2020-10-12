@@ -26,11 +26,11 @@ class TTJetsScaleFactors
             file_sf_2018_bin2 = new  TFile("data/scale_factor/TTBarCR_hh_pt_2018_bin2.root");
 
             hist_sf_2016_bin1 =   (TH1F*)file_sf_2016_bin1->Get("ratio");
-            hist_sf_2016_bin2 =   (TH1F*)file_sf_2016_bin1->Get("ratio");
+            hist_sf_2016_bin2 =   (TH1F*)file_sf_2016_bin2->Get("ratio");
             hist_sf_2017_bin1 =   (TH1F*)file_sf_2017_bin1->Get("ratio");
-            hist_sf_2017_bin2 =   (TH1F*)file_sf_2017_bin1->Get("ratio");
+            hist_sf_2017_bin2 =   (TH1F*)file_sf_2017_bin2->Get("ratio");
             hist_sf_2018_bin1 =   (TH1F*)file_sf_2018_bin1->Get("ratio");
-            hist_sf_2018_bin2 =   (TH1F*)file_sf_2018_bin1->Get("ratio");
+            hist_sf_2018_bin2 =   (TH1F*)file_sf_2018_bin2->Get("ratio");
         }
         ~TTJetsScaleFactors()
         {
