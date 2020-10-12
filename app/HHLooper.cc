@@ -16,10 +16,12 @@
 #include "hhtree.hh"
 #include "anautil.h"
 #include "bbbb_vs_bkg.h"
+#include "scalefactors.h"
 
 using namespace std;
 
 int lumi = 137000.0;
+TopTagScaleFactors toptag_sf;
 
 int main ( int argc, char* argv[])
 {
@@ -56,6 +58,9 @@ bool isData = false;
 if(isData_ == "1" || isData_ == "true" || isData_ == "yes" || isData_ == "True" || isData_ == "Yes") isData = true;
 if(isData) lumi = 1.0;
 if(input.find("qcd") != std::string::npos) lumi = lumi*0.72;
+
+bool isTTJets =  false;
+if(input.find("ttbar") != std::string::npos) isTTJets = true;
 
 std::vector<std::string> list_chain;
 
@@ -108,14 +113,14 @@ RooUtil::Histograms histograms;
 //************define histograms**********//
 histograms.addHistogram("yield",               "; yield; Events",                      1,    0.,   1.,    [&]() { return 0; } );
 histograms.addHistogram("MET",           "; p_{T}^{miss} (GeV); Events",         200,   0.,   500.,  [&]() { return hh.MET(); } );
-histograms.addHistogram("hh_pt",               "; p_{T}^{HH} (GeV); Events",           200,   0.,   900.,  [&]() { return hh.hh_pt(); } );
+histograms.addHistogram("hh_pt",               "; p_{T}^{HH} (GeV); Events",           200,   0.,   1000.,  [&]() { return hh.hh_pt(); } );
 histograms.addHistogram("hh_eta",               "; #eta^{HH}; Events",                 200,   -5.0,  5.0,  [&]() { return hh.hh_eta(); } );
 histograms.addHistogram("hh_phi",               "; #Phi^{HH}; Events",                 200,   -3.2,  3.2,  [&]() { return hh.hh_phi(); } );
 histograms.addHistogram("hh_mass",             "; m_{HH} (GeV); Events",               200,   0.,  1500.,  [&]() { return hh.hh_mass(); } );
-histograms.addHistogram("fatJet1MassSD",   "; j_{1} soft drop mass (GeV); Events", 200,   0.,   200.,  [&]() { return  hh.fatJet1MassSD(); } );
-histograms.addHistogram("fatJet2MassSD",   "; j_{2} soft drop mass (GeV); Events", 200,   0.,   200.,  [&]() { return  hh.fatJet2MassSD(); } );
+histograms.addHistogram("fatJet1MassSD",   "; j_{1} soft drop mass (GeV); Events", 200,   0.,   300.,  [&]() { return  hh.fatJet1MassSD(); } );
+histograms.addHistogram("fatJet2MassSD",   "; j_{2} soft drop mass (GeV); Events", 200,   0.,   300.,  [&]() { return  hh.fatJet2MassSD(); } );
 histograms.addHistogram("fatJet1PNetXbb",   "; j_{1} PNet Xbb tagger; Events",           200,   0.78,  1.0,   [&]() { return  hh.fatJet1PNetXbb(); } );
-histograms.addHistogram("fatJet2PNetXbb",   "; j_{2} PNet Xbb tagger; Events",           200,   0.78,  1.0,   [&]() { return  hh.fatJet2PNetXbb(); } );
+histograms.addHistogram("fatJet2PNetXbb",   "; j_{2} PNet Xbb tagger; Events",           200,   0.5,  1.0,   [&]() { return  hh.fatJet2PNetXbb(); } );
 histograms.addHistogram("fatJet1Pt",          "; p_{T}^{j1} (GeV); Events",           200,   0.,   900.,  [&]() { return  hh.fatJet1Pt(); } );
 histograms.addHistogram("fatJet1Eta",          "; #eta^{j1}; Events",                 200,   -2.5,  2.5,  [&]() { return  hh.fatJet1Eta(); } );
 histograms.addHistogram("fatJet1Phi",          "; #Phi^{j1}; Events",                 200,  -3.2,   3.2,  [&]() { return  hh.fatJet1Phi(); } );
@@ -131,6 +136,7 @@ histograms.addHistogram("ptj1_over_mj1",       "; p_{T}^{j1}/m_{j1}; Events",   
 histograms.addHistogram("ptj2_over_mj2",       "; p_{T}^{j2}/m_{j2}; Events",         200,   0.,   10.,   [&]() { return  hh.fatJet2PtOverMSD(); } );
 histograms.addHistogram("ptj2_over_ptj1",      "; p_{T}^{j2}/p_{T}^{j1}; Events",     200,   0.5,  1.,    [&]() { return  hh.fatJet2Pt() / hh.fatJet1Pt(); } );
 histograms.addHistogram("mj2_over_mj1",      "; m^{j2}/m^{j1}; Events",               200,   0.0,  1.5,   [&]() { return  hh.fatJet2MassSD() / hh.fatJet1MassSD(); } );
+histograms.addHistogram("EventBDT",   "; Event BDT; Events",           200,   0.0,  0.2,   [&]() { return  hh.disc_qcd_and_ttbar_Run2_enhanced_v24(); } );
 
 //************define cuts**********//
 
@@ -165,6 +171,14 @@ cutflow.addCutToLastActiveCut("CutBin4",       [&](){ return (!(hh.disc_qcd_and_
 cutflow.addCutToLastActiveCut("SRBin4",       [&](){ return hh.fatJet2MassSD() > 95 && hh.fatJet2MassSD() < 135.0; },   UNITY);
 cutflow.getCut("CutBin4");
 cutflow.addCutToLastActiveCut("J2MassSideBandBin4",       [&](){ return hh.fatJet2MassSD() <= 95 || hh.fatJet2MassSD() >= 135.0; },   UNITY);
+
+
+//Top control region
+cutflow.getCut("CutfatJetsMassSD");
+//cutflow.addCutToLastActiveCut("TTBarCR",       [&](){ return hh.fatJet1Tau3OverTau2() < 0.46 && hh.fatJet2Tau3OverTau2() < 0.46 &&  hh.fatJet1HasBJetCSVLoose() && hh.fatJet2HasBJetCSVLoose(); },   [&]() {return isTTJets ? (TopTagSF("0.46", year_, hh.fatJet1Pt()) * TopTagSF("0.46", year_, hh.fatJet2Pt())) : 1.0;} );
+//cutflow.addCutToLastActiveCut("TTBarCR",       [&](){ return hh.fatJet1Tau3OverTau2() < 0.46 && hh.fatJet2Tau3OverTau2() < 0.46 &&  hh.fatJet1HasBJetCSVLoose() && hh.fatJet2HasBJetCSVLoose(); },  UNITY );
+cutflow.addCutToLastActiveCut("TTBarCR",       [&](){ return hh.fatJet1Tau3OverTau2() < 0.46 && hh.fatJet2Tau3OverTau2() < 0.46 &&  hh.fatJet1HasBJetCSVLoose() && hh.fatJet2HasBJetCSVLoose(); },   [&]() {return isTTJets ? (toptag_sf.getScaleFactors(year_, hh.hh_pt()) * TopTagSF("0.46", year_, hh.fatJet1Pt()) * TopTagSF("0.46", year_, hh.fatJet2Pt())) : 1.0;} );
+
 
 //book histograms for cuts
 cutflow.bookHistogramsForCutAndBelow(histograms, "CutWeight");
