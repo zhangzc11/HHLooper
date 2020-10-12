@@ -1,7 +1,7 @@
 #ifndef scalefactors_h
 #define scalefactors_h
 
-class TopTagScaleFactors
+class TTJetsScaleFactors
 {
     public: 
         TFile *file_sf_2016_bin1;//pt<300
@@ -16,7 +16,7 @@ class TopTagScaleFactors
         TH1F *hist_sf_2017_bin2;
         TH1F *hist_sf_2018_bin1;
         TH1F *hist_sf_2018_bin2;
-        TopTagScaleFactors()
+        TTJetsScaleFactors()
         {
             file_sf_2016_bin1 = new  TFile("data/scale_factor/TTBarCR_hh_pt_2016_bin1.root");
             file_sf_2016_bin2 = new  TFile("data/scale_factor/TTBarCR_hh_pt_2016_bin2.root");
@@ -32,7 +32,7 @@ class TopTagScaleFactors
             hist_sf_2018_bin1 =   (TH1F*)file_sf_2018_bin1->Get("ratio");
             hist_sf_2018_bin2 =   (TH1F*)file_sf_2018_bin1->Get("ratio");
         }
-        ~TopTagScaleFactors()
+        ~TTJetsScaleFactors()
         {
             file_sf_2016_bin1->Close();
             file_sf_2016_bin2->Close();
@@ -128,7 +128,7 @@ double TopTagSF( string workingPoint, string year, double pt ) {
 
 //#ifndef __CINT__
 //// Scale factors tools
-//extern TopTagScaleFactors toptag_sf; 
+//extern TTJetsScaleFactors toptag_sf; 
 //#endif
 
 #endif
