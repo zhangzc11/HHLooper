@@ -4,49 +4,31 @@
 class TTJetsScaleFactors
 {
     public: 
-        TFile *file_sf_2016_bin1;//pt<300
-        TFile *file_sf_2016_bin2;//pt>300
-        TFile *file_sf_2017_bin1;
-        TFile *file_sf_2017_bin2;
-        TFile *file_sf_2018_bin1;
-        TFile *file_sf_2018_bin2;
-        TH1F *hist_sf_2016_bin1;//pt<300
-        TH1F *hist_sf_2016_bin2;//pt>300
-        TH1F *hist_sf_2017_bin1;
-        TH1F *hist_sf_2017_bin2;
-        TH1F *hist_sf_2018_bin1;
-        TH1F *hist_sf_2018_bin2;
+        TFile *file_sf_2016;
+        TFile *file_sf_2017;
+        TFile *file_sf_2018;
+        TH1F *hist_sf_2016;
+        TH1F *hist_sf_2017;
+        TH1F *hist_sf_2018;
         TTJetsScaleFactors()
         {
-            file_sf_2016_bin1 = new  TFile("data/scale_factor/TTBarCR_hh_pt_2016_bin1.root");
-            file_sf_2016_bin2 = new  TFile("data/scale_factor/TTBarCR_hh_pt_2016_bin2.root");
-            file_sf_2017_bin1 = new  TFile("data/scale_factor/TTBarCR_hh_pt_2017_bin1.root");
-            file_sf_2017_bin2 = new  TFile("data/scale_factor/TTBarCR_hh_pt_2017_bin2.root");
-            file_sf_2018_bin1 = new  TFile("data/scale_factor/TTBarCR_hh_pt_2018_bin1.root");
-            file_sf_2018_bin2 = new  TFile("data/scale_factor/TTBarCR_hh_pt_2018_bin2.root");
+            file_sf_2016 = new  TFile("data/scale_factor/TTBarCR_hh_pt_2016.root");
+            file_sf_2017 = new  TFile("data/scale_factor/TTBarCR_hh_pt_2017.root");
+            file_sf_2018 = new  TFile("data/scale_factor/TTBarCR_hh_pt_2018.root");
 
-            hist_sf_2016_bin1 =   (TH1F*)file_sf_2016_bin1->Get("ratio");
-            hist_sf_2016_bin2 =   (TH1F*)file_sf_2016_bin2->Get("ratio");
-            hist_sf_2017_bin1 =   (TH1F*)file_sf_2017_bin1->Get("ratio");
-            hist_sf_2017_bin2 =   (TH1F*)file_sf_2017_bin2->Get("ratio");
-            hist_sf_2018_bin1 =   (TH1F*)file_sf_2018_bin1->Get("ratio");
-            hist_sf_2018_bin2 =   (TH1F*)file_sf_2018_bin2->Get("ratio");
+            hist_sf_2016 =   (TH1F*)file_sf_2016->Get("ratio_data_over_mc");
+            hist_sf_2017 =   (TH1F*)file_sf_2017->Get("ratio_data_over_mc");
+            hist_sf_2018 =   (TH1F*)file_sf_2018->Get("ratio_data_over_mc");
         }
         ~TTJetsScaleFactors()
         {
-            file_sf_2016_bin1->Close();
-            file_sf_2016_bin2->Close();
-            file_sf_2017_bin1->Close();
-            file_sf_2017_bin2->Close();
-            file_sf_2018_bin1->Close();
-            file_sf_2018_bin2->Close();
+            file_sf_2016->Close();
+            file_sf_2017->Close();
+            file_sf_2018->Close();
 
-            delete hist_sf_2016_bin1;
-            delete hist_sf_2016_bin2;
-            delete hist_sf_2017_bin1;
-            delete hist_sf_2017_bin2;
-            delete hist_sf_2018_bin1;
-            delete hist_sf_2018_bin2;
+            delete hist_sf_2016;
+            delete hist_sf_2017;
+            delete hist_sf_2018;
         }
         float getScaleFactors(string year, float pt)
         {
@@ -55,18 +37,15 @@ class TTJetsScaleFactors
             if(pt>999.9) pt =999.9;
             if(year ==  "2016")
             {
-                if(pt > 300.0 ) result = hist_sf_2016_bin2->GetBinContent(hist_sf_2016_bin2->GetXaxis()->FindFixBin(pt));
-                if(pt <= 300.0 ) result  = hist_sf_2016_bin1->GetBinContent(hist_sf_2016_bin1->GetXaxis()->FindFixBin(pt));
+                result  = hist_sf_2016->GetBinContent(hist_sf_2016->GetXaxis()->FindFixBin(pt));
             }
             if(year ==  "2017")
             {
-                if(pt > 300.0 ) result = hist_sf_2017_bin2->GetBinContent(hist_sf_2017_bin2->GetXaxis()->FindFixBin(pt));
-                if(pt <= 300.0 ) result  = hist_sf_2017_bin1->GetBinContent(hist_sf_2017_bin1->GetXaxis()->FindFixBin(pt));
+                result  = hist_sf_2017->GetBinContent(hist_sf_2017->GetXaxis()->FindFixBin(pt));
             }
             if(year ==  "2018")
             {
-                if(pt > 300.0 ) result = hist_sf_2018_bin2->GetBinContent(hist_sf_2018_bin2->GetXaxis()->FindFixBin(pt));
-                if(pt <= 300.0 ) result  = hist_sf_2018_bin1->GetBinContent(hist_sf_2018_bin1->GetXaxis()->FindFixBin(pt));
+                result  = hist_sf_2018->GetBinContent(hist_sf_2018->GetXaxis()->FindFixBin(pt));
             }
             if(result <0.01) result = 1.0;
             if(result >3.0) result = 1.0;
