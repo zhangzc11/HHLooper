@@ -28,10 +28,12 @@ TRandom3* r_nominal = new TRandom3(0);
 float FatJetMassCorrection(string year, float mass, int type=0)
 {
     //type=0: nominal
-    //type=1: jes down
-    //type=2: jes up
-    //type=3: jer down
-    //type=4: jer up
+    //type=-1: jms only
+    //type=-2: jmr only
+    //type=1: jms down
+    //type=2: jms up
+    //type=3: jmr down
+    //type=4: jmr up
     float* jmsValues;//{nominal, down, up}
     if(year == "2016")
       {
@@ -78,6 +80,8 @@ float FatJetMassCorrection(string year, float mass, int type=0)
 
     float  result = mass;
     if(type==0) result = jmsValues[0]*mass*( 1.0 + r_nominal->Gaus( 0.0, jmrValues[0] -1.0 ) );
+    if(type==-1) result = jmsValues[0]*mass;
+    if(type==-2) result = mass*( 1.0 + r_nominal->Gaus( 0.0, jmrValues[0] -1.0 ) );
     if(type==1) result = jmsValues[1]*mass*( 1.0 + r_nominal->Gaus( 0.0, jmrValues[0] -1.0 ) );
     if(type==2) result = jmsValues[2]*mass*( 1.0 + r_nominal->Gaus( 0.0, jmrValues[0] -1.0 ) );
     if(type==3) result = jmsValues[0]*mass*( 1.0 + r_nominal->Gaus( 0.0, jmrValues[1] -1.0 ) );
@@ -180,16 +184,20 @@ histograms.addHistogram("hh_pt",               "; p_{T}^{HH} (GeV); Events",    
 histograms.addHistogram("hh_eta",               "; #eta^{HH}; Events",                 200,   -5.0,  5.0,  [&]() { return hh.hh_eta(); } );
 histograms.addHistogram("hh_phi",               "; #Phi^{HH}; Events",                 200,   -3.2,  3.2,  [&]() { return hh.hh_phi(); } );
 histograms.addHistogram("hh_mass",             "; m_{HH} (GeV); Events",               200,   0.,  1500.,  [&]() { return hh.hh_mass(); } );
-histograms.addHistogram("fatJet1MassSD",   "; j_{1} soft drop mass (GeV); Events", 200,   0.,   300.,  [&]() { return  FatJetMassCorrection(year_, hh.fatJet1MassSD(), 0); } );
-histograms.addHistogram("fatJet2MassSD",   "; j_{2} soft drop mass (GeV); Events", 200,   0.,   300.,  [&]() { return  FatJetMassCorrection(year_, hh.fatJet2MassSD(), 0); } );
-histograms.addHistogram("fatJet1MassSD_JESUp",   "; j_{1} soft drop mass (GeV); Events", 200,   0.,   300.,  [&]() { return  FatJetMassCorrection(year_, hh.fatJet1MassSD(), 1); } );
-histograms.addHistogram("fatJet2MassSD_JESUp",   "; j_{2} soft drop mass (GeV); Events", 200,   0.,   300.,  [&]() { return  FatJetMassCorrection(year_, hh.fatJet2MassSD(), 1); } );
-histograms.addHistogram("fatJet1MassSD_JESDown",   "; j_{1} soft drop mass (GeV); Events", 200,   0.,   300.,  [&]() { return  FatJetMassCorrection(year_, hh.fatJet1MassSD(), 2); } );
-histograms.addHistogram("fatJet2MassSD_JESDown",   "; j_{2} soft drop mass (GeV); Events", 200,   0.,   300.,  [&]() { return  FatJetMassCorrection(year_, hh.fatJet2MassSD(), 2); } );
-histograms.addHistogram("fatJet1MassSD_JERUp",   "; j_{1} soft drop mass (GeV); Events", 200,   0.,   300.,  [&]() { return  FatJetMassCorrection(year_, hh.fatJet1MassSD(), 3); } );
-histograms.addHistogram("fatJet2MassSD_JERUp",   "; j_{2} soft drop mass (GeV); Events", 200,   0.,   300.,  [&]() { return  FatJetMassCorrection(year_, hh.fatJet2MassSD(), 3); } );
-histograms.addHistogram("fatJet1MassSD_JERDown",   "; j_{1} soft drop mass (GeV); Events", 200,   0.,   300.,  [&]() { return  FatJetMassCorrection(year_, hh.fatJet1MassSD(), 4); } );
-histograms.addHistogram("fatJet2MassSD_JERDown",   "; j_{2} soft drop mass (GeV); Events", 200,   0.,   300.,  [&]() { return  FatJetMassCorrection(year_, hh.fatJet2MassSD(), 4); } );
+histograms.addHistogram("fatJet1MassSD",   "; j_{1} soft drop mass (GeV); Events", 200,   0.,   300.,  [&]() { return  isData ? hh.fatJet1MassSD() : FatJetMassCorrection(year_, hh.fatJet1MassSD(), 0); } );
+histograms.addHistogram("fatJet2MassSD",   "; j_{2} soft drop mass (GeV); Events", 200,   0.,   300.,  [&]() { return  isData ? hh.fatJet2MassSD() : FatJetMassCorrection(year_, hh.fatJet2MassSD(), 0); } );
+histograms.addHistogram("fatJet1MassSD_JMSonly",   "; j_{1} soft drop mass (GeV); Events", 200,   0.,   300.,  [&]() { return  isData ? hh.fatJet1MassSD() : FatJetMassCorrection(year_, hh.fatJet1MassSD(), -1); } );
+histograms.addHistogram("fatJet2MassSD_JMSonly",   "; j_{2} soft drop mass (GeV); Events", 200,   0.,   300.,  [&]() { return  isData ? hh.fatJet2MassSD() : FatJetMassCorrection(year_, hh.fatJet2MassSD(), -1); } );
+histograms.addHistogram("fatJet1MassSD_JMRonly",   "; j_{1} soft drop mass (GeV); Events", 200,   0.,   300.,  [&]() { return  isData ? hh.fatJet1MassSD() : FatJetMassCorrection(year_, hh.fatJet1MassSD(), -2); } );
+histograms.addHistogram("fatJet2MassSD_JMRonly",   "; j_{2} soft drop mass (GeV); Events", 200,   0.,   300.,  [&]() { return  isData ? hh.fatJet2MassSD() : FatJetMassCorrection(year_, hh.fatJet2MassSD(), -2); } );
+histograms.addHistogram("fatJet1MassSD_JMSUp",   "; j_{1} soft drop mass (GeV); Events", 200,   0.,   300.,  [&]() { return  isData ? hh.fatJet1MassSD() : FatJetMassCorrection(year_, hh.fatJet1MassSD(), 1); } );
+histograms.addHistogram("fatJet2MassSD_JMSUp",   "; j_{2} soft drop mass (GeV); Events", 200,   0.,   300.,  [&]() { return  isData ? hh.fatJet2MassSD() : FatJetMassCorrection(year_, hh.fatJet2MassSD(), 1); } );
+histograms.addHistogram("fatJet1MassSD_JMSDown",   "; j_{1} soft drop mass (GeV); Events", 200,   0.,   300.,  [&]() { return  isData ? hh.fatJet1MassSD() : FatJetMassCorrection(year_, hh.fatJet1MassSD(), 2); } );
+histograms.addHistogram("fatJet2MassSD_JMSDown",   "; j_{2} soft drop mass (GeV); Events", 200,   0.,   300.,  [&]() { return  isData ? hh.fatJet2MassSD() : FatJetMassCorrection(year_, hh.fatJet2MassSD(), 2); } );
+histograms.addHistogram("fatJet1MassSD_JMRUp",   "; j_{1} soft drop mass (GeV); Events", 200,   0.,   300.,  [&]() { return  isData ? hh.fatJet1MassSD() : FatJetMassCorrection(year_, hh.fatJet1MassSD(), 3); } );
+histograms.addHistogram("fatJet2MassSD_JMRUp",   "; j_{2} soft drop mass (GeV); Events", 200,   0.,   300.,  [&]() { return  isData ? hh.fatJet2MassSD() : FatJetMassCorrection(year_, hh.fatJet2MassSD(), 3); } );
+histograms.addHistogram("fatJet1MassSD_JMRDown",   "; j_{1} soft drop mass (GeV); Events", 200,   0.,   300.,  [&]() { return  isData ? hh.fatJet1MassSD() : FatJetMassCorrection(year_, hh.fatJet1MassSD(), 4); } );
+histograms.addHistogram("fatJet2MassSD_JMRDown",   "; j_{2} soft drop mass (GeV); Events", 200,   0.,   300.,  [&]() { return  isData ? hh.fatJet2MassSD() : FatJetMassCorrection(year_, hh.fatJet2MassSD(), 4); } );
 histograms.addHistogram("fatJet1MassSD_raw",   "; j_{1} soft drop mass (GeV); Events", 200,   0.,   300.,  [&]() { return  hh.fatJet1MassSD(); } );
 histograms.addHistogram("fatJet2MassSD_raw",   "; j_{2} soft drop mass (GeV); Events", 200,   0.,   300.,  [&]() { return  hh.fatJet2MassSD(); } );
 histograms.addHistogram("fatJet1PNetXbb",   "; j_{1} PNet Xbb tagger; Events",           200,   0.78,  1.0,   [&]() { return  hh.fatJet1PNetXbb(); } );
@@ -219,7 +227,7 @@ cutflow.addCutToLastActiveCut("CutHLT",       [&](){ return isData ? ((year_ == 
 
 cutflow.addCutToLastActiveCut("CutfatJetsPt",       [&](){ return hh.fatJet1Pt() > 250.0 && hh.fatJet2Pt() > 250.0; },   UNITY);
 //cutflow.addCutToLastActiveCut("CutfatJetsMassSD",       [&](){ return hh.fatJet1MassSD() > 50.0 && hh.fatJet2MassSD() > 50.0; },   UNITY);
-cutflow.addCutToLastActiveCut("CutfatJetsMassSD",       [&](){ return FatJetMassCorrection(year_, hh.fatJet1MassSD(),0) > 50.0 && FatJetMassCorrection(year_, hh.fatJet2MassSD(), 0) > 50.0; },   UNITY);
+cutflow.addCutToLastActiveCut("CutfatJetsMassSD",       [&](){ return isData ? (hh.fatJet1MassSD() > 50.0 && hh.fatJet2MassSD() > 50.0) : (FatJetMassCorrection(year_, hh.fatJet1MassSD(),0) > 50.0 && FatJetMassCorrection(year_, hh.fatJet2MassSD(), 0) > 50.0); },   UNITY);
 //cutflow.addCutToLastActiveCut("CutBlindData", [&](){ return 1; },   [&](){ return isData ?  hh.fatJet2MassSD() <=95 || hh.fatJet2MassSD() >= 135.0: 1.0; });
 
 cutflow.addCutToLastActiveCut("CutBin1",       [&](){ return hh.disc_qcd_and_ttbar_Run2_enhanced_v24() > 0.028 && hh.fatJet1PNetXbb() > 0.985 && hh.fatJet2PNetXbb() >  0.985; },   UNITY);
