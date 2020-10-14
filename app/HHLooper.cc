@@ -12,6 +12,7 @@
 #include <TChain.h>
 #include <TFile.h>
 #include <TROOT.h>
+#include <TRandom3.h>
 //LOCAL INCLUDES
 #include "hhtree.hh"
 #include "anautil.h"
@@ -22,6 +23,68 @@ using namespace std;
 
 int lumi = 137000.0;
 TTJetsScaleFactors ttjets_sf;
+TRandom3* r_nominal = new TRandom3(0);
+
+float FatJetMassCorrection(string year, float mass, int type=0)
+{
+    //type=0: nominal
+    //type=1: jes down
+    //type=2: jes up
+    //type=3: jer down
+    //type=4: jer up
+    float* jmsValues;//{nominal, down, up}
+    if(year == "2016")
+      {
+        float tmp_jms[] = {1.00, 0.9906, 1.0094};
+        jmsValues = tmp_jms;
+      }
+    else if(year == "2017")
+      {
+        float tmp_jms[] = {0.982, 0.978, 0.986};
+        jmsValues = tmp_jms;
+      }
+    else if(year == "2018")
+      {
+        float tmp_jms[] = {0.997, 0.993, 1.001};
+        jmsValues = tmp_jms;
+      }
+    else
+      {
+        std::cout << "year is not acceptable! Use: 2016, 2017, 2018" << std::endl;
+        exit(EXIT_FAILURE);
+      }
+
+    float* jmrValues;//{nominal, down, up}
+    if(year == "2016")
+      {
+        float tmp_jmr[] = {1.00, 1.0, 1.2};
+        jmrValues = tmp_jmr;
+      }
+    else if(year == "2017")
+      {
+        float tmp_jmr[] = {1.09, 1.04, 1.14};
+        jmrValues = tmp_jmr;
+      }
+    else if(year == "2018")
+      {
+        float tmp_jmr[] = {1.24, 1.20, 1.28};
+        jmrValues = tmp_jmr;
+      }
+    else
+      {
+        std::cout << "year is not acceptable! Use: 2016, 2017, 2018" << std::endl;
+        exit(EXIT_FAILURE);
+      }
+
+    float  result = mass;
+    if(type==0) result = jmsValues[0]*mass*( 1.0 + r_nominal->Gaus( 0.0, jmrValues[0] -1.0 ) );
+    if(type==1) result = jmsValues[1]*mass*( 1.0 + r_nominal->Gaus( 0.0, jmrValues[0] -1.0 ) );
+    if(type==2) result = jmsValues[2]*mass*( 1.0 + r_nominal->Gaus( 0.0, jmrValues[0] -1.0 ) );
+    if(type==3) result = jmsValues[0]*mass*( 1.0 + r_nominal->Gaus( 0.0, jmrValues[1] -1.0 ) );
+    if(type==4) result = jmsValues[0]*mass*( 1.0 + r_nominal->Gaus( 0.0, jmrValues[2] -1.0 ) );
+    return result;
+}
+
 
 int main ( int argc, char* argv[])
 {
@@ -117,8 +180,18 @@ histograms.addHistogram("hh_pt",               "; p_{T}^{HH} (GeV); Events",    
 histograms.addHistogram("hh_eta",               "; #eta^{HH}; Events",                 200,   -5.0,  5.0,  [&]() { return hh.hh_eta(); } );
 histograms.addHistogram("hh_phi",               "; #Phi^{HH}; Events",                 200,   -3.2,  3.2,  [&]() { return hh.hh_phi(); } );
 histograms.addHistogram("hh_mass",             "; m_{HH} (GeV); Events",               200,   0.,  1500.,  [&]() { return hh.hh_mass(); } );
-histograms.addHistogram("fatJet1MassSD",   "; j_{1} soft drop mass (GeV); Events", 200,   0.,   300.,  [&]() { return  hh.fatJet1MassSD(); } );
-histograms.addHistogram("fatJet2MassSD",   "; j_{2} soft drop mass (GeV); Events", 200,   0.,   300.,  [&]() { return  hh.fatJet2MassSD(); } );
+histograms.addHistogram("fatJet1MassSD",   "; j_{1} soft drop mass (GeV); Events", 200,   0.,   300.,  [&]() { return  FatJetMassCorrection(year_, hh.fatJet1MassSD(), 0); } );
+histograms.addHistogram("fatJet2MassSD",   "; j_{2} soft drop mass (GeV); Events", 200,   0.,   300.,  [&]() { return  FatJetMassCorrection(year_, hh.fatJet2MassSD(), 0); } );
+histograms.addHistogram("fatJet1MassSD_JESUp",   "; j_{1} soft drop mass (GeV); Events", 200,   0.,   300.,  [&]() { return  FatJetMassCorrection(year_, hh.fatJet1MassSD(), 1); } );
+histograms.addHistogram("fatJet2MassSD_JESUp",   "; j_{2} soft drop mass (GeV); Events", 200,   0.,   300.,  [&]() { return  FatJetMassCorrection(year_, hh.fatJet2MassSD(), 1); } );
+histograms.addHistogram("fatJet1MassSD_JESDown",   "; j_{1} soft drop mass (GeV); Events", 200,   0.,   300.,  [&]() { return  FatJetMassCorrection(year_, hh.fatJet1MassSD(), 2); } );
+histograms.addHistogram("fatJet2MassSD_JESDown",   "; j_{2} soft drop mass (GeV); Events", 200,   0.,   300.,  [&]() { return  FatJetMassCorrection(year_, hh.fatJet2MassSD(), 2); } );
+histograms.addHistogram("fatJet1MassSD_JERUp",   "; j_{1} soft drop mass (GeV); Events", 200,   0.,   300.,  [&]() { return  FatJetMassCorrection(year_, hh.fatJet1MassSD(), 3); } );
+histograms.addHistogram("fatJet2MassSD_JERUp",   "; j_{2} soft drop mass (GeV); Events", 200,   0.,   300.,  [&]() { return  FatJetMassCorrection(year_, hh.fatJet2MassSD(), 3); } );
+histograms.addHistogram("fatJet1MassSD_JERDown",   "; j_{1} soft drop mass (GeV); Events", 200,   0.,   300.,  [&]() { return  FatJetMassCorrection(year_, hh.fatJet1MassSD(), 4); } );
+histograms.addHistogram("fatJet2MassSD_JERDown",   "; j_{2} soft drop mass (GeV); Events", 200,   0.,   300.,  [&]() { return  FatJetMassCorrection(year_, hh.fatJet2MassSD(), 4); } );
+histograms.addHistogram("fatJet1MassSD_raw",   "; j_{1} soft drop mass (GeV); Events", 200,   0.,   300.,  [&]() { return  hh.fatJet1MassSD(); } );
+histograms.addHistogram("fatJet2MassSD_raw",   "; j_{2} soft drop mass (GeV); Events", 200,   0.,   300.,  [&]() { return  hh.fatJet2MassSD(); } );
 histograms.addHistogram("fatJet1PNetXbb",   "; j_{1} PNet Xbb tagger; Events",           200,   0.78,  1.0,   [&]() { return  hh.fatJet1PNetXbb(); } );
 histograms.addHistogram("fatJet2PNetXbb",   "; j_{2} PNet Xbb tagger; Events",           200,   0.5,  1.0,   [&]() { return  hh.fatJet2PNetXbb(); } );
 histograms.addHistogram("fatJet1Pt",          "; p_{T}^{j1} (GeV); Events",           200,   0.,   900.,  [&]() { return  hh.fatJet1Pt(); } );
@@ -145,7 +218,8 @@ cutflow.addCut("CutWeight", [&](){ return 1; },   [&](){ return isData ?  lumi :
 cutflow.addCutToLastActiveCut("CutHLT",       [&](){ return isData ? ((year_ == "2016" && (hh.HLT_AK8DiPFJet280_200_TrimMass30_BTagCSV_p20() || hh.HLT_AK8PFHT600_TrimR0p1PT0p03Mass50_BTagCSV_p20() || hh.HLT_AK8DiPFJet250_200_TrimMass30_BTagCSV_p20())) || (year_ == "2017" && (hh.HLT_PFJet500() || hh.HLT_AK8PFJet500() || hh.HLT_AK8PFJet360_TrimMass30() || hh.HLT_AK8PFJet380_TrimMass30() || hh.HLT_AK8PFJet400_TrimMass30() || hh.HLT_AK8PFHT800_TrimMass50() || hh.HLT_AK8PFJet330_PFAK8BTagCSV_p17())) || (year_ == "2018" && (hh.HLT_AK8PFJet400_TrimMass30() || hh.HLT_AK8PFHT800_TrimMass50() || hh.HLT_AK8PFJet330_TrimMass30_PFAK8BoostedDoubleB_np4()))) : 1.0; },   UNITY);
 
 cutflow.addCutToLastActiveCut("CutfatJetsPt",       [&](){ return hh.fatJet1Pt() > 250.0 && hh.fatJet2Pt() > 250.0; },   UNITY);
-cutflow.addCutToLastActiveCut("CutfatJetsMassSD",       [&](){ return hh.fatJet1MassSD() > 50.0 && hh.fatJet2MassSD() > 50.0; },   UNITY);
+//cutflow.addCutToLastActiveCut("CutfatJetsMassSD",       [&](){ return hh.fatJet1MassSD() > 50.0 && hh.fatJet2MassSD() > 50.0; },   UNITY);
+cutflow.addCutToLastActiveCut("CutfatJetsMassSD",       [&](){ return FatJetMassCorrection(year_, hh.fatJet1MassSD(),0) > 50.0 && FatJetMassCorrection(year_, hh.fatJet2MassSD(), 0) > 50.0; },   UNITY);
 //cutflow.addCutToLastActiveCut("CutBlindData", [&](){ return 1; },   [&](){ return isData ?  hh.fatJet2MassSD() <=95 || hh.fatJet2MassSD() >= 135.0: 1.0; });
 
 cutflow.addCutToLastActiveCut("CutBin1",       [&](){ return hh.disc_qcd_and_ttbar_Run2_enhanced_v24() > 0.028 && hh.fatJet1PNetXbb() > 0.985 && hh.fatJet2PNetXbb() >  0.985; },   UNITY);
