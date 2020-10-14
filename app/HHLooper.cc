@@ -64,12 +64,14 @@ float FatJetMassCorrection(string year, float mass, int type=0)
       }
     else if(year == "2017")
       {
-        float tmp_jmr[] = {1.09, 1.04, 1.14};
+        //float tmp_jmr[] = {1.09, 1.04, 1.14}; // percent of resolution
+        float tmp_jmr[] = {1.043, 1.00, 1.09};
         jmrValues = tmp_jmr;
       }
     else if(year == "2018")
       {
-        float tmp_jmr[] = {1.24, 1.20, 1.28};
+        //float tmp_jmr[] = {1.24, 1.20, 1.28}; //percent of resolution
+        float tmp_jmr[] = {1.065, 1.031, 1.099};
         jmrValues = tmp_jmr;
       }
     else
