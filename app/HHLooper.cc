@@ -391,6 +391,7 @@ if(saveSkim)
  tree_out->Write();
  outfile_skim->Close();
 }
+cout<<"[INFO]: all  files successfully processed... ignore segfault below..."<<endl;
 
 return 0;
 }
