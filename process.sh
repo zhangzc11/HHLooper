@@ -18,7 +18,7 @@ do
  (set -x ;./HHLooper ${inputBase}/${year}/HHc0/ HHc0.root ${TAG} 0 >&1) &
  (set -x ;./HHLooper ${inputBase}/${year}/HHc1/ HHc1.root ${TAG} 0 >&1) &
  (set -x ;./HHLooper ${inputBase}/${year}/HHc2p45/ HHc2p45.root ${TAG} 0 >&1) &
- (set -x ;./HHLooper ${inputBase}/${year}/HHc5/ HHc2p5.root ${TAG} 0 >&1) &
+ (set -x ;./HHLooper ${inputBase}/${year}/HHc5/ HHc5.root ${TAG} 0 >&1) &
  (set -x ;./HHLooper ${inputBase}/${year}/VH/ VH.root ${TAG} 0 >&1) &
  (set -x ;./HHLooper ${inputBase}/${year}/Higgs/ Higgs.root ${TAG} 0 >&1) &
  (set -x ;./HHLooper ${inputBase}/${year}/ttH/ ttH.root ${TAG} 0 >&1) &
