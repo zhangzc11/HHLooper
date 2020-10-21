@@ -12,3 +12,7 @@ pip install uproot
 conda install -c conda-forge tensorflow
 conda install -c conda-forge keras
 pip instal graphviz
+
+#Below is for macOS
+conda create -c conda-forge --name train_xgboost_5 root xgboost matplotlib pandas uproot graphviz root_pandas
+conda activate train_xgboost_5
