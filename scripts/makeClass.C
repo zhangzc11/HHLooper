@@ -2,8 +2,9 @@
 
 void makeClass()
 {
- TFile * file = new TFile("../data/ttJets/TTJets_TuneCP5_13TeV-amcatnloFXFX-pythia8_MC_Fall17_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14_1pb_weighted_v0.root");
- TTree * tree = (TTree*)file->Get("hh");
+ //TFile * file = new TFile("../data_noskim/ttJets/TTJets_TuneCP5_13TeV-amcatnloFXFX-pythia8_MC_Fall17_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14_V2_1pb_weighted_v0.root");
+ TFile * file = new TFile("../data/Jet2Xbb0p8Skim/2016/HHSM/GluGluToHHTo4B_node_SM_13TeV-madgraph_1pb_weighted_BDTs_Jet2Xbb0p8Skim.root");
+ TTree * tree = (TTree*)file->Get("tree");
  
 
  ofstream headerf;
