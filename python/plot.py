@@ -20,6 +20,8 @@ parser.add_argument('-s' , '--sig_scale'              , dest='sig_scale'       ,
 parser.add_argument('-b' , '--bkg_scale'              , dest='bkg_scale'       , help='Background scale'                       , default=1                                                       )
 parser.add_argument('-u' , '--rm_udflow'              , dest='rm_udflow'       , help='Remove underflow'                       , default=False                              , action='store_true')
 parser.add_argument('-ov' , '--rm_ovflow'              , dest='rm_ovflow'       , help='Remove overflow'                       , default=False                              , action='store_true')
+parser.add_argument('-au' , '--add_udflow'              , dest='add_udflow'       , help='Add underflow'                       , default=False                              , action='store_true')
+parser.add_argument('-aov' , '--add_ovflow'              , dest='add_ovflow'       , help='Add overflow'                       , default=True                              , action='store_true')
 parser.add_argument('-d' , '--draw_data'              , dest='draw_data'       , help='Draw data'                              , default=False                              , action='store_true')
 parser.add_argument('-1' , '--stack_signal'           , dest='stack_signal'    , help='stack signal'                           , default=False                              , action='store_true')
 parser.add_argument('-O' , '--output_name'            , dest='output_name'     , help='output file name when plot single hist' , default=None                                                    )
@@ -84,14 +86,22 @@ else:
     lumi = 137
 
 sig_fnames = [input_dir+"HHc1.root"]
+#bkg_fnames = [input_dir+"others.root", input_dir+"Higgs.root", input_dir+"VH.root", input_dir+"ttH.root", input_dir+"tW.root", input_dir+"qcd.root", input_dir+"ttbar.root"]
 bkg_fnames = [input_dir+"others.root", input_dir+"Higgs.root", input_dir+"VH.root", input_dir+"ttH.root", input_dir+"qcd.root", input_dir+"ttbar.root"]
-sig_legends = ["HH (c_{hhh} = 1)"]
+#bkg_fnames = [input_dir+"others.root", input_dir+"Higgs.root", input_dir+"VH.root", input_dir+"ttH.root", input_dir+"ttbar.root", input_dir+"qcd.root"]
+
+sig_legends = ["HH"]
+#bkg_legends = ["others", "ggH+VBFH", "VH", "t#bar{t}H", "tW", "QCD", "t#bar{t}+jets"]
 bkg_legends = ["others", "ggH+VBFH", "VH", "t#bar{t}H", "QCD", "t#bar{t}+jets"]
+#bkg_legends = ["others", "ggH+VBFH", "VH", "t#bar{t}H", "t#bar{t}+jets", "QCD"]
 
 
 data_fname = input_dir+"data.root"
 sig_colors = [617, 839, 800, 1, 632]
+#bkg_colors = [2001, 2003, 2011, 920, 2007, 46, 2005, 800]
 bkg_colors = [2001, 2003, 2011, 920, 2007, 2005, 800, 839]
+#bkg_colors = [2001, 2003, 2011, 920, 2005, 2007, 800, 839]
+
 
 if float(args.sig_scale) != 1:
     for idx in range(len(sig_legends)):
@@ -159,6 +169,8 @@ if hist_name:
                 "yaxis_label": args.yaxis_title,
                 "remove_underflow":args.rm_udflow,
                 "remove_overflow":args.rm_ovflow,
+                "add_underflow":args.add_udflow,
+                "add_overflow":args.add_ovflow,
                 "lumi_value": lumi,
                 "ratio_range": [0., 2.],
                 "xaxis_label": args.xaxis_title,

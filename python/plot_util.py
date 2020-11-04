@@ -46,6 +46,29 @@ def remove_overflow(hists):
         func(hists)
     return hists
 
+def add_underflow(hists):
+    def func(hist):
+        hist.SetBinContent(1, hist.GetBinContent(0)+hist.GetBinContent(1))
+        hist.SetBinError(1, math.sqrt(hist.GetBinError(0)*hist.GetBinError(0)+hist.GetBinError(1)*hist.GetBinError(1)))
+    if isinstance(hists, list):
+        for hist in hists:
+            func(hist)
+    else:
+        func(hists)
+    return hists
+def add_overflow(hists):
+    def func(hist):
+        nx=hist.GetNbinsX()
+        hist.SetBinContent(nx, hist.GetBinContent(nx)+hist.GetBinContent(nx+1))
+        hist.SetBinError(nx, math.sqrt(hist.GetBinError(nx)*hist.GetBinError(nx)+hist.GetBinError(nx+1)*hist.GetBinError(nx+1)))
+    if isinstance(hists, list):
+        for hist in hists:
+            func(hist)
+    else:
+        func(hists)
+    return hists
+
+
 def makeplot_single_2d(
     sig_fnames_=None,
     bkg_fnames_=None,
@@ -402,6 +425,13 @@ def makeplot_single(
             remove_overflow(h1_bkg)
             if h1_data:
                 remove_overflow([h1_data])
+    if "add_overflow" in extraoptions:
+        if extraoptions["add_overflow"]:
+            add_overflow(h1_sig)
+            add_overflow(h1_bkg)
+            if h1_data:
+                add_overflow([h1_data])
+
     myC = r.TCanvas("myC","myC", 600, 600)
     myC.SetTicky(1)
     pad1 = r.TPad("pad1","pad1", 0.05, 0.33,0.95, 0.97) 
@@ -462,6 +492,8 @@ def makeplot_single(
     stack.GetYaxis().SetTitleSize(0.08)
     stack.GetYaxis().SetLabelSize(0.045)
     stack.GetYaxis().CenterTitle()
+    #if "xaxis_range" in extraoptions:
+    #    stack.GetXaxis().SetRangeUser(float(extraoptions["xaxis_range"][0]),float(extraoptions["xaxis_range"][1]))
 
     leg = r.TLegend(0.16, 0.60, 0.97, 0.88)
     leg.SetNColumns(3)
@@ -525,6 +557,8 @@ def makeplot_single(
     ratio.GetYaxis().SetLabelSize(0.13)
     ratio.GetYaxis().SetTickLength(0.01)
     ratio.GetYaxis().SetNdivisions(505)
+    #if "xaxis_range" in extraoptions:
+    #    ratio.GetXaxis().SetRangeUser(float(extraoptions["xaxis_range"][0]),float(extraoptions["xaxis_range"][1]))
 
     if "cutflow" in hist_name_:
         ratio.GetXaxis().SetTitle("")
@@ -603,8 +637,8 @@ def makeplot_single(
     myC.SaveAs(outFile+"_linY.pdf")
     myC.SaveAs(outFile+"_linY.C")
     pad1.cd()
-    stack.SetMaximum(maxY*1000.0)
-    stack.SetMinimum(0.01)
+    stack.SetMaximum(maxY*100.0)
+    stack.SetMinimum(0.5)
     pad1.SetLogy()
     myC.SaveAs(outFile+"_logY.png")
     myC.SaveAs(outFile+"_logY.pdf")
