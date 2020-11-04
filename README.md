@@ -12,7 +12,7 @@ cd HHLooper
 make
 ```
 
-# about  the looper:
+# About  the looper:
 
 All the selections are defined  in app/HHLooper.cc in the cutflow object
 
