@@ -40,6 +40,8 @@ Each output histogram will have the name of `CutName__HistogramName`, i.e. by de
 
 The first argument is a tag for the folder name of the output histograms, and the second argument tells the program to include all the systematic Up/Down histograms
 
+There will be segment fault error, just ignore it...
+
 # Make root file for datacard
 ```
 cd python
