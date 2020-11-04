@@ -17,8 +17,11 @@ make
 All the selections are defined  in app/HHLooper.cc in the cutflow object
 
 `cutflow.addCut`: start a cut
+
 `cutflow.addCutToLastActiveCut`:  add a cut on top of the cut in the previous line
+
 `cutflow.getCut`: get a cut in a cutflow
+
 To define a cut  in addCut or addCutToLastActiveCut, you need to give the cutname, a lambda function for a bool return, and a weight 
 
 For example, cut `SRBin2` contains the following cutflow: `CutWeight` -> `CutHLT` -> `CutfatJetsPt` -> `CutfatJetsMassSD` -> `SRBin2`
