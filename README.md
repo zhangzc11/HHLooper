@@ -38,11 +38,15 @@ Each output histogram will have the name of `CutName__HistogramName`, i.e. by de
 ./process.sh tag0 yes
 ```
 
+The first argument is a tag for the folder name of the output histograms, and the second argument tells the program to include all the systematic Up/Down histograms
+
 # Make root file for datacard
 ```
 cd python
 python prepare_card.py tag0
 ```
+
+The argument of the python script is the tag name you provided in the previous step
 
 # make plots
 
