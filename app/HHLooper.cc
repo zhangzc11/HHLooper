@@ -308,10 +308,10 @@ cutflow.addCutToLastActiveCut("TTBarCR2",       [&](){ return hh.fatJet1Tau3Over
 /****Systematics******/
 if(doSystematics)
 {
-    cutflow.addWgtSyst("BDTMassShapeUp",  [&](){return isTTJets ?  1.0 :1.06;});
-    cutflow.addWgtSyst("BDTMassShapeDown",  [&](){return isTTJets ? 1.0: 0.94;});
-    cutflow.addWgtSyst("BDTShapeUp",  [&](){return isTTJets ?  1.0 : (hh.disc_qcd_and_ttbar_Run2_enhanced_v24()  < 0.0117 ? 1.179 : (hh.disc_qcd_and_ttbar_Run2_enhanced_v24()< 0.028 ? 1.097 : 1.288));});
-    cutflow.addWgtSyst("BDTShapeDown",  [&](){return isTTJets ?  1.0 : (hh.disc_qcd_and_ttbar_Run2_enhanced_v24()  < 0.0117 ? 1.-0.179 : (hh.disc_qcd_and_ttbar_Run2_enhanced_v24()< 0.028 ? 1.-0.097 : 1.-0.288));});
+    cutflow.addWgtSyst("BDTMassShapeUp",  [&](){return (isTTJets && hh.disc_qcd_and_ttbar_Run2_enhanced_v24() > 0.028)?  1.06 :1.00;});
+    cutflow.addWgtSyst("BDTMassShapeDown",  [&](){return (isTTJets && hh.disc_qcd_and_ttbar_Run2_enhanced_v24() > 0.028)?  0.94 :1.00;});
+    cutflow.addWgtSyst("BDTShapeUp",  [&](){return isTTJets ? ( hh.disc_qcd_and_ttbar_Run2_enhanced_v24()  <  0.006 ?  1.02 : (hh.disc_qcd_and_ttbar_Run2_enhanced_v24()  < 0.009 ?   1.017 : (hh.disc_qcd_and_ttbar_Run2_enhanced_v24()  < 0.0117 ? 1.179 : (hh.disc_qcd_and_ttbar_Run2_enhanced_v24()< 0.028 ? 1.097 : 1.288)))) : 1.0;});
+    cutflow.addWgtSyst("BDTShapeDown",  [&](){return isTTJets ? ( hh.disc_qcd_and_ttbar_Run2_enhanced_v24()  <  0.006 ?  1.-0.02 : (hh.disc_qcd_and_ttbar_Run2_enhanced_v24()  < 0.009 ?   1.-0.017 : (hh.disc_qcd_and_ttbar_Run2_enhanced_v24()  < 0.0117 ? 1.-0.179 : (hh.disc_qcd_and_ttbar_Run2_enhanced_v24()< 0.028 ? 1.-0.097 : 1.-0.288)))) : 1.0;});
     cutflow.addWgtSyst("ttJetsCorrUp",  [&](){return isTTJets ?  ttjets_sf.getScaleFactorsFit(year_, hh.hh_pt(), 1)/ttjets_sf.getScaleFactorsFit(year_, hh.hh_pt(), 0) : 1.0;});
     cutflow.addWgtSyst("ttJetsCorrDown",  [&](){return isTTJets ? ttjets_sf.getScaleFactorsFit(year_, hh.hh_pt(), -1)/ttjets_sf.getScaleFactorsFit(year_, hh.hh_pt(), 0) : 1.0;});
 }
