@@ -194,6 +194,22 @@ void hhtree::Init(TTree *tree)
  if(ptj2_over_ptj1_branch) ptj2_over_ptj1_branch->SetAddress(&ptj2_over_ptj1_);
  mj2_over_mj1_branch = tree->GetBranch("mj2_over_mj1");
  if(mj2_over_mj1_branch) mj2_over_mj1_branch->SetAddress(&mj2_over_mj1_);
+ lep1Pt_branch = tree->GetBranch("lep1Pt");
+ if(lep1Pt_branch) lep1Pt_branch->SetAddress(&lep1Pt_);
+ lep1Eta_branch = tree->GetBranch("lep1Eta");
+ if(lep1Eta_branch) lep1Eta_branch->SetAddress(&lep1Eta_);
+ lep1Phi_branch = tree->GetBranch("lep1Phi");
+ if(lep1Phi_branch) lep1Phi_branch->SetAddress(&lep1Phi_);
+ lep1Id_branch = tree->GetBranch("lep1Id");
+ if(lep1Id_branch) lep1Id_branch->SetAddress(&lep1Id_);
+ lep2Pt_branch = tree->GetBranch("lep2Pt");
+ if(lep2Pt_branch) lep2Pt_branch->SetAddress(&lep2Pt_);
+ lep2Eta_branch = tree->GetBranch("lep2Eta");
+ if(lep2Eta_branch) lep2Eta_branch->SetAddress(&lep2Eta_);
+ lep2Phi_branch = tree->GetBranch("lep2Phi");
+ if(lep2Phi_branch) lep2Phi_branch->SetAddress(&lep2Phi_);
+ lep2Id_branch = tree->GetBranch("lep2Id");
+ if(lep2Id_branch) lep2Id_branch->SetAddress(&lep2Id_);
  HLT_PFHT1050_branch = tree->GetBranch("HLT_PFHT1050");
  if(HLT_PFHT1050_branch) HLT_PFHT1050_branch->SetAddress(&HLT_PFHT1050_);
  HLT_AK8PFJet360_TrimMass30_branch = tree->GetBranch("HLT_AK8PFJet360_TrimMass30");
@@ -353,6 +369,14 @@ void hhtree::GetEntry(unsigned int idx)
  deltaR_j1j2_isLoaded = false;
  ptj2_over_ptj1_isLoaded = false;
  mj2_over_mj1_isLoaded = false;
+ lep1Pt_isLoaded = false;
+ lep1Eta_isLoaded = false;
+ lep1Phi_isLoaded = false;
+ lep1Id_isLoaded = false;
+ lep2Pt_isLoaded = false;
+ lep2Eta_isLoaded = false;
+ lep2Phi_isLoaded = false;
+ lep2Id_isLoaded = false;
  HLT_PFHT1050_isLoaded = false;
  HLT_AK8PFJet360_TrimMass30_isLoaded = false;
  HLT_AK8PFJet380_TrimMass30_isLoaded = false;
@@ -1807,6 +1831,125 @@ exit(1);
    mj2_over_mj1_isLoaded = true;
  }
  return mj2_over_mj1_;
+}
+
+const float &hhtree::lep1Pt()
+{
+ if(not lep1Pt_isLoaded)
+ {
+   if(lep1Pt_branch != 0) lep1Pt_branch->GetEntry(index);
+   else
+   {
+     printf("branch lep1Pt_branch does not exist!\n");
+exit(1);
+   }
+   lep1Pt_isLoaded = true;
+ }
+ return lep1Pt_;
+}
+
+const float &hhtree::lep1Eta()
+{
+ if(not lep1Eta_isLoaded)
+ {
+   if(lep1Eta_branch != 0) lep1Eta_branch->GetEntry(index);
+   else
+   {
+     printf("branch lep1Eta_branch does not exist!\n");
+exit(1);
+   }
+   lep1Eta_isLoaded = true;
+ }
+ return lep1Eta_;
+}
+
+const float &hhtree::lep1Phi()
+{
+ if(not lep1Phi_isLoaded)
+ {
+   if(lep1Phi_branch != 0) lep1Phi_branch->GetEntry(index);
+   else
+   {
+     printf("branch lep1Phi_branch does not exist!\n");
+exit(1);
+   }
+   lep1Phi_isLoaded = true;
+ }
+ return lep1Phi_;
+}
+
+const int &hhtree::lep1Id()
+{
+ if(not lep1Id_isLoaded)
+ {
+   if(lep1Id_branch != 0) lep1Id_branch->GetEntry(index);
+   else
+   {
+     printf("branch lep1Id_branch does not exist!\n");
+exit(1);
+   }
+   lep1Id_isLoaded = true;
+ }
+ return lep1Id_;
+}
+
+const float &hhtree::lep2Pt()
+{
+ if(not lep2Pt_isLoaded)
+ {
+   if(lep2Pt_branch != 0) lep2Pt_branch->GetEntry(index);
+   else
+   {
+     printf("branch lep2Pt_branch does not exist!\n");
+exit(1);
+   }
+   lep2Pt_isLoaded = true;
+ }
+ return lep2Pt_;
+}
+
+const float &hhtree::lep2Eta()
+{
+ if(not lep2Eta_isLoaded)
+ {
+   if(lep2Eta_branch != 0) lep2Eta_branch->GetEntry(index);
+   else
+   {
+     printf("branch lep2Eta_branch does not exist!\n");
+exit(1);
+   }
+   lep2Eta_isLoaded = true;
+ }
+ return lep2Eta_;
+}
+const float &hhtree::lep2Phi()
+{
+ if(not lep2Phi_isLoaded)
+ {
+   if(lep2Phi_branch != 0) lep2Phi_branch->GetEntry(index);
+   else
+   {
+     printf("branch lep2Phi_branch does not exist!\n");
+exit(1);
+   }
+   lep2Phi_isLoaded = true;
+ }
+ return lep2Phi_;
+}
+
+const int &hhtree::lep2Id()
+{
+ if(not lep2Id_isLoaded)
+ {
+   if(lep2Id_branch != 0) lep2Id_branch->GetEntry(index);
+   else
+   {
+     printf("branch lep2Id_branch does not exist!\n");
+exit(1);
+   }
+   lep2Id_isLoaded = true;
+ }
+ return lep2Id_;
 }
 
 const bool &hhtree::HLT_PFHT1050() 

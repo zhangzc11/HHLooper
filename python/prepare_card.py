@@ -10,13 +10,21 @@ if __name__ == "__main__":
     proc_file  = ["data", "qcd", "ttbar", "Higgs", "VH",  "ttH", "others",  "HHc1", "HHc0",  "HHc5", "HHc2p45"]
 
     systs = ["BDTMassShape", "ttJetsCorr", "BDTShape"]
-
-    outFile =  r.TFile("HHTo4BPlots_Run2.root", "recreate")
+    outName = "HHTo4BPlots_Run2.root"
+    if "ttbar" in tag:
+        outName = "HHTo4BPlots_Run2_ttbarSkim.root"
+    outFile =  r.TFile(outName, "recreate")
 
     for idx in range(len(proc)):
         inFile_this = r.TFile("../hists/"+tag+"/combine/"+proc_file[idx]+".root",  "READ")
         print("read file "+"../hists/"+tag+"/combine/"+proc_file[idx]+".root")
-        for region in ["SRBin1", "SRBin2",  "SRBin3", "SRBin4", "FailSR",  "FitCR1", "FitCR2", "FailFitCR1", "FailFitCR2", "TTBarCR"]:
+        region_list = []
+        if "ttbar" in tag:
+            region_list =  ["TTBarCR", "TTBarCRTight", "TTBarCRBDT1", "TTBarCRBDT2", "TTBarCRBDT3", "TTBarCRBDT4", "TTBarCRBDT5"]
+        else:
+            region_list = ["SRBin1", "SRBin2",  "SRBin3", "SRBin4", "FailSR", "FitCR", "FitCR1", "FitCR2", "FitCR3", "FailFitCR", "FailFitCR1", "FailFitCR2", "FailFitCR3"]
+
+        for region in region_list:
             inFile_this.cd()
             hist_nominal = inFile_this.Get(region+"__fatJet2MassSD")
             outBinName=region.replace("SR",  "").replace("Fail", "fail")
