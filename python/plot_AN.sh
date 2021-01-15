@@ -1,3 +1,7 @@
+
+########This is the instruction to reproduce Figure 7 to  Figure 25 in this version of  AN-20-201: https://zhicaiz.web.cern.ch/zhicaiz/sharebox/notes/AN-20-201-20210115.pdf
+
+
 #### first, run then tupler in the following order:
 
 #cd ..
