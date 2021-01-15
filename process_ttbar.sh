@@ -4,11 +4,11 @@ TAG=$1
 mkdir -p hists/${TAG}/
 rm -rf hists/${TAG}/*
 
-#inputBase=/eos/cms/store/group/phys_susy/razor/Run2Analysis/HHBoost/Option5NonSkim/
+inputBase=/eos/cms/store/group/phys_susy/razor/Run2Analysis/HHBoost/Tau3Over20p54Skim/
 #inputBase=/eos/cms/store/group/phys_susy/razor/Run2Analysis/HHBoost/HHTo4BNtupler_20200902_option5_combined_BDT_Jet2Xbb0p8Skim/ 
 #inputBase=data/Jet2Xbb0p8Skim/
 #inputBase=data/Option5NonSkim/
-inputBase=data/Tau3Over20p54Skim/
+#inputBase=data/Tau3Over20p54Skim/
 
 
 doSyst=no
