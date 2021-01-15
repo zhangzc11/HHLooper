@@ -89,13 +89,13 @@ sig_fnames = [input_dir+"HHc1.root"]
 #bkg_fnames = [input_dir+"others.root", input_dir+"Higgs.root", input_dir+"VH.root", input_dir+"ttH.root", input_dir+"tW.root", input_dir+"qcd.root", input_dir+"ttbar.root"]
 #bkg_fnames = [input_dir+"others.root", input_dir+"Higgs.root", input_dir+"VH.root", input_dir+"ttH.root", input_dir+"qcd.root", input_dir+"ttbar.root"]
 #bkg_fnames = [input_dir+"others.root", input_dir+"Higgs.root", input_dir+"VH.root", input_dir+"ttH.root", input_dir+"ttbar.root", input_dir+"qcd.root"]
-bkg_fnames = [input_dir+"others.root", input_dir+"WJets.root", input_dir+"qcd.root", input_dir+"ttbar.root"]
+bkg_fnames = [input_dir+"WJets.root", input_dir+"qcd.root", input_dir+"tt1L.root", input_dir+"tt2L.root"]
 
 sig_legends = ["HH"]
 #bkg_legends = ["others", "ggH+VBFH", "VH", "t#bar{t}H", "tW", "QCD", "t#bar{t}+jets"]
 #bkg_legends = ["others", "ggH+VBFH", "VH", "t#bar{t}H", "QCD", "t#bar{t}+jets"]
 #bkg_legends = ["others", "ggH+VBFH", "VH", "t#bar{t}H", "t#bar{t}+jets", "QCD"]
-bkg_legends = ["others", "W+jets", "QCD", "t#bar{t}+jets"]
+bkg_legends = ["W+jets", "QCD", "t#bar{t}+jets 1L", "t#bar{t}+jets 2L"]
 
 
 data_fname = input_dir+"data.root"
@@ -103,7 +103,7 @@ sig_colors = [617, 839, 800, 1, 632]
 #bkg_colors = [2001, 2003, 2011, 920, 2007, 46, 2005, 800]
 #bkg_colors = [2001, 2003, 2011, 920, 2007, 2005, 800, 839]
 #bkg_colors = [2001, 2003, 2011, 920, 2005, 2007, 800, 839]
-bkg_colors = [2001, 2003, 2007, 2005, 800, 839]
+bkg_colors = [2003, 2007, 2005, 2001, 800, 839]
 
 
 if float(args.sig_scale) != 1:
@@ -203,8 +203,10 @@ else:
             "yaxis_label": args.yaxis_title,
             "remove_underflow":args.rm_udflow,
             "remove_overflow":args.rm_ovflow,
+            "add_underflow":args.add_udflow,
+            "add_overflow":args.add_ovflow,
             "lumi_value": lumi,
-            "ratio_range": [0., 2.],
+            "ratio_range": [0.6, 1.2],
             "stack_signal": args.stack_signal
             },
         )

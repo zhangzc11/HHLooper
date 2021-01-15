@@ -7,8 +7,8 @@ rm -rf hists/${TAG}/*
 #inputBase=/eos/cms/store/group/phys_susy/razor/Run2Analysis/HHBoost/Option5NonSkim/
 #inputBase=/eos/cms/store/group/phys_susy/razor/Run2Analysis/HHBoost/HHTo4BNtupler_20200902_option5_combined_BDT_Jet2Xbb0p8Skim/ 
 #inputBase=data/Jet2Xbb0p8Skim/
-inputBase=data/Option5NonSkim/
-#inputBase=data/Tau3Over20p54Skim/
+#inputBase=data/Option5NonSkim/
+inputBase=data/Tau3Over20p54Skim/
 
 
 doSyst=no
@@ -55,5 +55,5 @@ hadd -k -f hists/${TAG}/combine/others.root hists/${TAG}/2016/others.root hists/
 #hadd -k -f hists/${TAG}/combine/tW.root hists/${TAG}/2016/tW.root hists/${TAG}/2017/tW.root hists/${TAG}/2018/tW.root
 
 
-hadd -k -f hists/${TAG}/combine/bkg.root hists/${TAG}/combine/qcd.root hists/${TAG}/combine/ttbar.root  hists/${TAG}/combine/VH.root hists/${TAG}/combine/Higgs.root hists/${TAG}/combine/ttH.root hists/${TAG}/combine/others.root 
+hadd -k -f hists/${TAG}/combine/bkg.root hists/${TAG}/combine/qcd.root hists/${TAG}/combine/ttbar.root hists/${TAG}/combine/VH.root hists/${TAG}/combine/Higgs.root hists/${TAG}/combine/ttH.root hists/${TAG}/combine/others.root 
 

@@ -59,24 +59,24 @@ class TTJetsScaleFactors
             if(pt>999.9) pt =999.9;
             if(year ==  "2016")
             {
-                float p0 = 0.6528, p1=0.0006043, y1=0.783;
-                if (type==1 || type==-1) p1 += 0.0002218*type;
+                float p0 = 0.9183, p1=0.0008758, y1=1.179;
+                if (type==1 || type==-1) p1 += 0.0004871*type;
                 float x1=(y1-p0)/p1;
                 if(pt>x1) result = y1;
                 else  result = p0+p1*pt;
             }
             if(year ==  "2017")
             {
-                float p0 = 0.6648, p1=0.002605, y1=1.299;
-                if (type==1 || type==-1) p1 += 0.000297*type;
+                float p0 = 0.7434, p1=0.003026, y1=1.475;
+                if (type==1 || type==-1) p1 += 0.000367*type;
                 float x1=(y1-p0)/p1;
                 if(pt>x1) result = y1;
                 else  result = p0+p1*pt;
             }
             if(year ==  "2018")
             {
-                float p0 = 0.6778, p1=0.001174, y1=1.029;
-                if (type==1 || type==-1) p1 += 0.000207*type;
+                float p0 = 0.7114, p1=0.001274, y1=1.063;
+                if (type==1 || type==-1) p1 += 0.000234*type;
                 float x1=(y1-p0)/p1;
                 if(pt>x1) result = y1;
                 else  result = p0+p1*pt;
@@ -84,6 +84,35 @@ class TTJetsScaleFactors
             if(result <0.01) result = 1.0;
             if(result >3.0) result = 1.0;
             return result;
+        }
+        float getPNetXbbShapeScaleFactors(string year, float xbb, int type=0)
+        {
+            //type: 0, 1, -1 for nominal Up Down
+            int idx_xbb  = 0;
+            if(xbb < 0.945) idx_xbb  = 0;
+            else if (xbb  < 0.955) idx_xbb =1;
+            else if (xbb  < 0.975) idx_xbb =2;
+            else if (xbb < 0.985) idx_xbb =3;
+            else idx_xbb = 4;
+            if (year == "2016")
+            {
+               float sf[5] = {0.825, 0.787, 0.818, 0.673, 0.698};
+               float esf[5] = {0.011, 0.059, 0.041, 0.069, 0.062};
+               return sf[idx_xbb] + type*esf[idx_xbb];
+            }
+            if (year == "2017")
+            {
+               float sf[5] = {0.932, 0.898, 0.901, 0.876, 0.926};
+               float esf[5] = {0.013, 0.066, 0.045, 0.065, 0.071};
+               return sf[idx_xbb] + type*esf[idx_xbb];
+            }
+            if (year == "2018")
+            {
+               float sf[5] = {0.981, 1.013, 0.922, 0.871, 0.781};
+               float esf[5] = {0.011, 0.058, 0.038, 0.053, 0.054};
+               return sf[idx_xbb] + type*esf[idx_xbb];
+            }
+            return 1.0;
         }
 
 };

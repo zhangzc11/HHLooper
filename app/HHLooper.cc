@@ -139,8 +139,15 @@ if(isData_ == "1" || isData_ == "true" || isData_ == "yes" || isData_ == "True" 
 if(isData) lumi = 1.0;
 //if(input.find("qcd") != std::string::npos) lumi = lumi*0.72;
 
+if(input.find("qcd") != std::string::npos and input.find("1LTopSkim") != std::string::npos) 
+{
+    if(year_ == "2016") lumi = lumi*0.8;
+    if(year_ == "2017") lumi = lumi*2.1;
+    if(year_ == "2018") lumi = lumi*1.9;
+}
+
 bool isTTJets =  false;
-if(input.find("ttbar") != std::string::npos) isTTJets = true;
+if((input.find("ttbar") != std::string::npos) || (input.find("tt1L") != std::string::npos) ||  (input.find("tt2L") != std::string::npos)) isTTJets = true;
 
 std::vector<std::string> list_chain;
 
@@ -223,13 +230,17 @@ histograms.addHistogram("fatJet1MassSD_raw",   "; j_{1} soft drop mass (GeV); Ev
 histograms.addHistogram("fatJet2MassSD_raw",   "; j_{1} soft drop mass (GeV); Events", 300,   0.,   300.,  [&]() { return  hh.fatJet2MassSD(); } );
 
 histograms.addHistogram("MET",           "; p_{T}^{miss} (GeV); Events",         200,   0.,   500.,  [&]() { return hh.MET(); } );
-//histograms.addHistogram("hh_pt",               "; p_{T}^{HH} (GeV); Events",           {0.,50., 100., 150., 200., 250., 300., 400., 500., 600., 800., 1000.},  [&]() { return hh.hh_pt(); } );
-histograms.addHistogram("hh_pt",               "; p_{T}^{HH} (GeV); Events",           {0.,50., 100., 150., 300., 1000.},  [&]() { return hh.hh_pt(); } );
-histograms.addHistogram("hh_eta",               "; #eta^{HH}; Events",                 200,   -5.0,  5.0,  [&]() { return hh.hh_eta(); } );
-histograms.addHistogram("hh_phi",               "; #Phi^{HH}; Events",                 200,   -3.2,  3.2,  [&]() { return hh.hh_phi(); } );
-histograms.addHistogram("hh_mass",             "; m_{HH} (GeV); Events",               200,   0.,  1500.,  [&]() { return hh.hh_mass(); } );
+//histograms.addHistogram("hh_pt",               "; p_{T}^{jj} (GeV); Events",           {0.,50., 100., 150., 200., 250., 300., 400., 500., 600., 800., 1000.},  [&]() { return hh.hh_pt(); } );
+histograms.addHistogram("hh_pt",               "; p_{T}^{jj} (GeV); Events",           {0.,50., 100., 150., 300., 1000.},  [&]() { return hh.hh_pt(); } );
+histograms.addHistogram("hh_eta",               "; #eta^{jj}; Events",                 200,   -5.0,  5.0,  [&]() { return hh.hh_eta(); } );
+histograms.addHistogram("hh_phi",               "; #Phi^{jj}; Events",                 200,   -3.2,  3.2,  [&]() { return hh.hh_phi(); } );
+histograms.addHistogram("hh_mass",             "; m_{jj} (GeV); Events",               200,   0.,  1500.,  [&]() { return hh.hh_mass(); } );
 histograms.addHistogram("fatJet1PNetXbb",   "; j_{1} PNet Xbb tagger; Events",           200,   0.0,  1.0,   [&]() { return  hh.fatJet1PNetXbb(); } );
 histograms.addHistogram("fatJet2PNetXbb",   "; j_{2} PNet Xbb tagger; Events",           200,   0.0,  1.0,   [&]() { return  hh.fatJet2PNetXbb(); } );
+histograms.addHistogram("fatJet1PNetXbb_Bin1",   "; j_{1} PNet Xbb tagger; Events",    {0.90, 0.95,  0.975, 0.985,  1.00} ,   [&]() { return  hh.fatJet1PNetXbb(); } );
+histograms.addHistogram("fatJet2PNetXbb_Bin1",   "; j_{2} PNet Xbb tagger; Events",    {0.90, 0.95,  0.975, 0.985,  1.00} ,   [&]() { return  hh.fatJet2PNetXbb(); } );
+histograms.addHistogram("fatJet1PNetXbb_Bin2",   "; j_{1} PNet Xbb tagger; Events",    {0.90, 0.945, 0.955,  0.975, 0.985,  1.00} ,   [&]() { return  hh.fatJet1PNetXbb(); } );
+histograms.addHistogram("fatJet2PNetXbb_Bin2",   "; j_{2} PNet Xbb tagger; Events",    {0.90, 0.945, 0.955,  0.975, 0.985,  1.00} ,   [&]() { return  hh.fatJet2PNetXbb(); } );
 histograms.addHistogram("fatJet1Pt",          "; p_{T}^{j1} (GeV); Events",           200,   0.,   900.,  [&]() { return  hh.fatJet1Pt(); } );
 histograms.addHistogram("fatJet1Eta",          "; #eta^{j1}; Events",                 200,   -2.5,  2.5,  [&]() { return  hh.fatJet1Eta(); } );
 histograms.addHistogram("fatJet1Phi",          "; #Phi^{j1}; Events",                 200,  -3.2,   3.2,  [&]() { return  hh.fatJet1Phi(); } );
@@ -250,9 +261,10 @@ histograms.addHistogram("fatJet2Tau3OverTau2",   "; j_{2} Tau3/2; Events",      
 if(input.find("1LTopSkim") != std::string::npos) histograms.addHistogram("abs_dR_l1j1",       "; #DeltaR(l_{1}, j_{1}); Events",        200,   0.,   5.0,    [&]() { return  sqrt(pow(hh.lep1Eta() - hh.fatJet1Eta(), 2) + pow(fabs(hh.lep1Phi()-hh.fatJet1Phi()) > pi ? fabs(hh.lep1Phi()-hh.fatJet1Phi()) - 2*pi : hh.lep1Phi()-hh.fatJet1Phi(), 2)); } );
 else
 {
-    histograms.addHistogram("EventBDT",   "; Event BDT; Events",           1000,   0.0,  0.2,   [&]() { return  hh.disc_qcd_and_ttbar_Run2_enhanced_v24(); } );
-    histograms.addHistogram("EventBDTBin2",   "; Event BDT; Events",           {0.000, 0.0005,0.0011,0.0117, 0.0190,0.0280, 0.04, 0.10},   [&]() { return  hh.disc_qcd_and_ttbar_Run2_enhanced_v24(); } );
-    histograms.addHistogram("EventBDTBin3",   "; Event BDT; Events",           {0.000, 0.0005,0.0011,0.0117, 0.0280, 0.1},   [&]() { return  hh.disc_qcd_and_ttbar_Run2_enhanced_v24(); } );
+    histograms.addHistogram("EventBDTNoBinv24",   "; Event BDT; Events",           1000,   0.0,  0.2,   [&]() { return  hh.disc_qcd_and_ttbar_Run2_enhanced_v24(); } );
+    histograms.addHistogram("EventBDTv24",   "; Event BDT; Events",           {0.000, 0.0024, 0.0054, 0.0118, 0.10},   [&]() { return  hh.disc_qcd_and_ttbar_Run2_enhanced_v24(); } );
+    histograms.addHistogram("EventBDTNoBinv8p2",   "; Event BDT; Events",           1000,   0.0,  0.2,   [&]() { return  hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2(); } );
+    histograms.addHistogram("EventBDTv8p2",   "; Event BDT; Events",           {0.000, 0.00008, 0.0002, 0.0004, 0.01},   [&]() { return  hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2(); } );
 }
 }
 
@@ -263,9 +275,10 @@ cutflow.setTFile(outfile);
 if(input.find("1LTopSkim") != std::string::npos) // this is 1LTopSkim input
 {
 ////Pre-selection cuts
-//cutflow.addCut("CutWeight", [&](){ return 1; },   [&](){ return isData ?  lumi : lumi*hh.weight()*hh.pileupWeight() * (isTTJets  ? ttjets_sf.getScaleFactorsFit(year_, hh.hh_pt(), 0) : 1.0); });
-cutflow.addCut("CutWeight", [&](){ return 1; },   [&](){ return isData ?  lumi : lumi*hh.weight(); });
-cutflow.addCutToLastActiveCut("CutLepJetPt",       [&](){ return hh.fatJet1Pt() > 250.0 && hh.lep1Pt() > 50.0; },   UNITY);
+cutflow.addCut("CutWeight", [&](){ return 1; },   [&](){ return isData ?  lumi : lumi*hh.weight(); }); //before correction
+//cutflow.addCut("CutWeight", [&](){ return 1; },   [&](){ return isData ?  lumi : lumi*hh.weight() * (isTTJets  ? ttjets_sf.getPNetXbbShapeScaleFactors(year_, hh.fatJet1PNetXbb(), 0) : 1.0); });//after correction
+if(input.find("HHc1") == std::string::npos) cutflow.addCutToLastActiveCut("CutHLT",       [&](){ return abs(hh.lep1Id()) == 11 ? (hh.HLT_Ele27_WPTight_Gsf() || hh.HLT_Ele28_WPTight_Gsf() ||  hh.HLT_Ele30_WPTight_Gsf()  || hh.HLT_Ele32_WPTight_Gsf()  || hh.HLT_Ele35_WPTight_Gsf()  || hh.HLT_Ele38_WPTight_Gsf()  || hh.HLT_Ele40_WPTight_Gsf() ) : (hh.HLT_IsoMu20()  || hh.HLT_IsoMu24()  || hh.HLT_IsoMu24_eta2p1()  || hh.HLT_IsoMu27()  || hh.HLT_IsoMu30()  || hh.HLT_Mu50()  || hh.HLT_Mu55()); },   UNITY);
+cutflow.addCutToLastActiveCut("CutLepJetPt",       [&](){ return hh.fatJet1Pt() > 250.0 && hh.lep1Pt() > 50.0 && hh.lep2Pt() <=0 ; },   UNITY);
 cutflow.addCutToLastActiveCut("CutfatJetMassSD",       [&](){ return isData ? (hh.fatJet1MassSD() > 50.0) : (FatJetMassCorrection(year_, hh.fatJet1MassSD(),0) > 50.0 ); },   UNITY);
 //ttbar 1L+jet control region
 cutflow.addCutToLastActiveCut("CutLepEta",       [&](){ return (abs(hh.lep1Id()) == 11 && fabs(hh.lep1Eta()) <  2.5) || (abs(hh.lep1Id()) == 13 && fabs(hh.lep1Eta()) <  2.4); },   UNITY);
@@ -282,68 +295,96 @@ else
 {
 
 ////Pre-selection cuts
-cutflow.addCut("CutWeight", [&](){ return 1; },   [&](){ return isData ?  lumi : lumi*hh.weight()*hh.triggerEffWeight()*hh.pileupWeight() * (isTTJets  ? ttjets_sf.getScaleFactorsFit(year_, hh.hh_pt(), 0) : 1.0); });
+cutflow.addCut("CutWeight", [&](){ return 1; },   [&](){ return isData ?  lumi : lumi*hh.weight()*hh.triggerEffWeight()*hh.pileupWeight() * (isTTJets  ? ttjets_sf.getScaleFactorsFit(year_, hh.hh_pt(), 0) : 1.0); }); //after correction
+//cutflow.addCut("CutWeight", [&](){ return 1; },   [&](){ return isData ?  lumi : lumi*hh.weight()*hh.triggerEffWeight()*hh.pileupWeight(); }); //before correction
+
 cutflow.addCutToLastActiveCut("CutHLT",       [&](){ return isData ? ((year_ == "2016" && (hh.HLT_AK8DiPFJet280_200_TrimMass30_BTagCSV_p20() || hh.HLT_AK8PFHT600_TrimR0p1PT0p03Mass50_BTagCSV_p20() || hh.HLT_AK8DiPFJet250_200_TrimMass30_BTagCSV_p20())) || (year_ == "2017" && (hh.HLT_PFJet500() || hh.HLT_AK8PFJet500() || hh.HLT_AK8PFJet360_TrimMass30() || hh.HLT_AK8PFJet380_TrimMass30() || hh.HLT_AK8PFJet400_TrimMass30() || hh.HLT_AK8PFHT800_TrimMass50() || hh.HLT_AK8PFJet330_PFAK8BTagCSV_p17())) || (year_ == "2018" && (hh.HLT_AK8PFJet400_TrimMass30() || hh.HLT_AK8PFHT800_TrimMass50() || hh.HLT_AK8PFJet330_TrimMass30_PFAK8BoostedDoubleB_np4()))) : 1.0; },   UNITY);
 
 cutflow.addCutToLastActiveCut("CutfatJetsPt",       [&](){ return hh.fatJet1Pt() > 250.0 && hh.fatJet2Pt() > 250.0; },   UNITY);
 cutflow.addCutToLastActiveCut("CutfatJetsMassSD",       [&](){ return isData ? (hh.fatJet1MassSD() > 50.0 && hh.fatJet2MassSD() > 50.0) : (FatJetMassCorrection(year_, hh.fatJet1MassSD(),0) > 50.0 && FatJetMassCorrection(year_, hh.fatJet2MassSD(), 0) > 50.0); },   UNITY);
 
-////Signal regions - pass
-cutflow.addCutToLastActiveCut("SRBin1",       [&](){ return hh.disc_qcd_and_ttbar_Run2_enhanced_v24() > 0.028 && hh.fatJet1PNetXbb() > 0.985 && hh.fatJet2PNetXbb() >  0.985; },   UNITY);
-cutflow.addCutToLastActiveCut("J2MassSideBandBin1",       [&](){ return hh.fatJet2MassSD() <= 95 || hh.fatJet2MassSD() >= 135.0; },   UNITY);
+
+////Signal regions - pass - BDT v24
+cutflow.getCut("CutfatJetsMassSD");
+cutflow.addCutToLastActiveCut("SRv24Bin1",       [&](){ return hh.disc_qcd_and_ttbar_Run2_enhanced_v24() > 0.029 && hh.fatJet1PNetXbb() > 0.985 && hh.fatJet2PNetXbb() >  0.985; },   [&](){ return isTTJets  ? ttjets_sf.getPNetXbbShapeScaleFactors(year_, hh.fatJet1PNetXbb(), 0) * ttjets_sf.getPNetXbbShapeScaleFactors(year_, hh.fatJet2PNetXbb(), 0)     : 1.0; });
+cutflow.addCutToLastActiveCut("J2MassSideBandv24Bin1",       [&](){ return hh.fatJet2MassSD() <= 110 || hh.fatJet2MassSD() >= 140.0; },   UNITY);
 
 
 cutflow.getCut("CutfatJetsMassSD");
-cutflow.addCutToLastActiveCut("SRBin2",       [&](){ return hh.disc_qcd_and_ttbar_Run2_enhanced_v24() > 0.0117 && hh.disc_qcd_and_ttbar_Run2_enhanced_v24() <= 0.028 && hh.fatJet1PNetXbb() > 0.985 && hh.fatJet2PNetXbb() >  0.985; },   UNITY);
-cutflow.addCutToLastActiveCut("J2MassSideBandBin2",       [&](){ return hh.fatJet2MassSD() <= 95 || hh.fatJet2MassSD() >= 135.0; },   UNITY);
+cutflow.addCutToLastActiveCut("SRv24Bin2",       [&](){ return (!(hh.disc_qcd_and_ttbar_Run2_enhanced_v24() > 0.029 && hh.fatJet1PNetXbb() > 0.985 && hh.fatJet2PNetXbb() >  0.985)) && hh.disc_qcd_and_ttbar_Run2_enhanced_v24() > 0.0118 && hh.fatJet1PNetXbb() > 0.975 && hh.fatJet2PNetXbb() >  0.975; },   [&](){ return isTTJets  ? ttjets_sf.getPNetXbbShapeScaleFactors(year_, hh.fatJet1PNetXbb(), 0) * ttjets_sf.getPNetXbbShapeScaleFactors(year_, hh.fatJet2PNetXbb(), 0)     : 1.0; });
+cutflow.addCutToLastActiveCut("J2MassSideBandv24Bin2",       [&](){ return hh.fatJet2MassSD() <= 110 || hh.fatJet2MassSD() >= 140.0; },   UNITY);
 
 cutflow.getCut("CutfatJetsMassSD");
-cutflow.addCutToLastActiveCut("SRBin3",       [&](){ return (!(hh.disc_qcd_and_ttbar_Run2_enhanced_v24() > 0.0117 && hh.fatJet1PNetXbb() > 0.985 && hh.fatJet2PNetXbb() >  0.985)) && hh.disc_qcd_and_ttbar_Run2_enhanced_v24() > 0.0063 && hh.fatJet1PNetXbb() > 0.975 && hh.fatJet2PNetXbb() >  0.975; },   UNITY);
-cutflow.addCutToLastActiveCut("J2MassSideBandBin3",       [&](){ return hh.fatJet2MassSD() <= 95 || hh.fatJet2MassSD() >= 135.0; },   UNITY);
+cutflow.addCutToLastActiveCut("SRv24Bin3",       [&](){ return (!(hh.disc_qcd_and_ttbar_Run2_enhanced_v24() > 0.0118 && hh.fatJet1PNetXbb() > 0.975 && hh.fatJet2PNetXbb() >  0.975)) && hh.disc_qcd_and_ttbar_Run2_enhanced_v24() > 0.0054 && ( (hh.fatJet1PNetXbb() > 0.985 && hh.fatJet2PNetXbb() >  0.955) || (hh.fatJet1PNetXbb() > 0.955 && hh.fatJet2PNetXbb() >  0.985)); },   [&](){ return isTTJets  ? ttjets_sf.getPNetXbbShapeScaleFactors(year_, hh.fatJet1PNetXbb(), 0) * ttjets_sf.getPNetXbbShapeScaleFactors(year_, hh.fatJet2PNetXbb(), 0)     : 1.0; });
+cutflow.addCutToLastActiveCut("J2MassSideBandv24Bin3",       [&](){ return hh.fatJet2MassSD() <= 110 || hh.fatJet2MassSD() >= 140.0; },   UNITY);
 
 cutflow.getCut("CutfatJetsMassSD");
-cutflow.addCutToLastActiveCut("SRBin4",       [&](){ return (!(hh.disc_qcd_and_ttbar_Run2_enhanced_v24() > 0.0117 && hh.fatJet1PNetXbb() > 0.985 && hh.fatJet2PNetXbb() >  0.985)) && (!(hh.disc_qcd_and_ttbar_Run2_enhanced_v24() > 0.0063 && hh.fatJet1PNetXbb() > 0.975 && hh.fatJet2PNetXbb() >  0.975)) && hh.disc_qcd_and_ttbar_Run2_enhanced_v24() > 0.0141 &&  ( (hh.fatJet1PNetXbb() > 0.95 && hh.fatJet2PNetXbb() >  0.975) || (hh.fatJet1PNetXbb() > 0.975 && hh.fatJet2PNetXbb() >  0.95)); },   UNITY);
-cutflow.addCutToLastActiveCut("J2MassSideBandBin4",       [&](){ return hh.fatJet2MassSD() <= 95 || hh.fatJet2MassSD() >= 135.0; },   UNITY);
+cutflow.addCutToLastActiveCut("SRv24Bin4",       [&](){ return (!(hh.disc_qcd_and_ttbar_Run2_enhanced_v24() > 0.0118 && hh.fatJet1PNetXbb() > 0.975 && hh.fatJet2PNetXbb() >  0.975)) && (!(hh.disc_qcd_and_ttbar_Run2_enhanced_v24() > 0.0054 && ( (hh.fatJet1PNetXbb() > 0.985 && hh.fatJet2PNetXbb() >  0.955) || (hh.fatJet1PNetXbb() > 0.955 && hh.fatJet2PNetXbb() >  0.985)))) && hh.disc_qcd_and_ttbar_Run2_enhanced_v24() > 0.0024 &&  hh.fatJet1PNetXbb() > 0.945 && hh.fatJet2PNetXbb() >  0.945; },   [&](){ return isTTJets  ? ttjets_sf.getPNetXbbShapeScaleFactors(year_, hh.fatJet1PNetXbb(), 0) * ttjets_sf.getPNetXbbShapeScaleFactors(year_, hh.fatJet2PNetXbb(), 0)     : 1.0; });
+cutflow.addCutToLastActiveCut("J2MassSideBandv24Bin4",       [&](){ return hh.fatJet2MassSD() <= 110 || hh.fatJet2MassSD() >= 140.0; },   UNITY);
 
-
-////Signal region - fail
+////Signal regions - pass - BDT v8p2
 cutflow.getCut("CutfatJetsMassSD");
-cutflow.addCutToLastActiveCut("FailSR",       [&](){ return  hh.disc_qcd_and_ttbar_Run2_enhanced_v24() > 0.0063 && hh.fatJet2PNetXbb() < 0.95; },   UNITY);
+cutflow.addCutToLastActiveCut("SRv8p2Bin1",       [&](){ return hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2() > 0.43 && hh.fatJet2PNetXbb() > 0.980; },   [&](){ return isTTJets  ? ttjets_sf.getPNetXbbShapeScaleFactors(year_, hh.fatJet2PNetXbb(), 0): 1.0; });
+cutflow.addCutToLastActiveCut("J2MassSideBandv8p2Bin1",       [&](){ return hh.fatJet2MassSD() <= 110 || hh.fatJet2MassSD() >= 140.0; },   UNITY);
 
+
+cutflow.getCut("CutfatJetsMassSD");
+cutflow.addCutToLastActiveCut("SRv8p2Bin2",       [&](){ return (!(hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2() > 0.43 && hh.fatJet2PNetXbb() > 0.980))  && ((hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2() > 0.11 && hh.fatJet2PNetXbb() > 0.980)||(hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2() > 0.43 && hh.fatJet2PNetXbb() > 0.950)); },   [&](){ return isTTJets  ? ttjets_sf.getPNetXbbShapeScaleFactors(year_, hh.fatJet2PNetXbb(), 0): 1.0; });
+cutflow.addCutToLastActiveCut("J2MassSideBandv8p2Bin2",       [&](){ return hh.fatJet2MassSD() <= 110 || hh.fatJet2MassSD() >= 140.0; },   UNITY);
+
+cutflow.getCut("CutfatJetsMassSD");
+cutflow.addCutToLastActiveCut("SRv8p2Bin3",       [&](){ return (!((hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2() > 0.11 && hh.fatJet2PNetXbb() > 0.980)||(hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2() > 0.43 && hh.fatJet2PNetXbb() > 0.950)))  && hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2() > 0.03 && hh.fatJet2PNetXbb() > 0.950; },   [&](){ return isTTJets  ? ttjets_sf.getPNetXbbShapeScaleFactors(year_, hh.fatJet2PNetXbb(), 0): 1.0; });
+cutflow.addCutToLastActiveCut("J2MassSideBandv8p2Bin3",       [&](){ return hh.fatJet2MassSD() <= 110 || hh.fatJet2MassSD() >= 140.0; },   UNITY);
+
+
+////Signal region - fail 
+cutflow.getCut("CutfatJetsMassSD");
+cutflow.addCutToLastActiveCut("FailSRv24",       [&](){ return  hh.disc_qcd_and_ttbar_Run2_enhanced_v24() > 0.0024 && hh.fatJet1PNetXbb() >  0.945 &&  hh.fatJet2PNetXbb() < 0.945; },   [&](){ return isTTJets  ? ttjets_sf.getPNetXbbShapeScaleFactors(year_, hh.fatJet1PNetXbb(), 0) * ttjets_sf.getPNetXbbShapeScaleFactors(year_, hh.fatJet2PNetXbb(), 0)     : 1.0; }); 
+cutflow.addCutToLastActiveCut("J2MassSideBandFailSRv24",       [&](){ return hh.fatJet2MassSD() <= 110 || hh.fatJet2MassSD() >= 140.0; },   UNITY);
+
+cutflow.getCut("CutfatJetsMassSD");
+cutflow.addCutToLastActiveCut("FailSRv8p2",       [&](){ return  hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2() > 0.03 && hh.fatJet2PNetXbb() < 0.950; },   [&](){ return isTTJets  ? ttjets_sf.getPNetXbbShapeScaleFactors(year_, hh.fatJet2PNetXbb(), 0) : 1.0; }); 
+cutflow.addCutToLastActiveCut("J2MassSideBandFailSRv8p2",       [&](){ return hh.fatJet2MassSD() <= 110 || hh.fatJet2MassSD() >= 140.0; },   UNITY);
 
 
 ////BDT inverted regions for F-test
 cutflow.getCut("CutfatJetsMassSD");
-cutflow.addCutToLastActiveCut("FitCR3",       [&](){ return  hh.disc_qcd_and_ttbar_Run2_enhanced_v24() < 0.0063 && hh.disc_qcd_and_ttbar_Run2_enhanced_v24() > 0.0011 && hh.fatJet2PNetXbb() > 0.95 && hh.fatJet1PNetXbb() > 0.95; },   UNITY);
+cutflow.addCutToLastActiveCut("FitCRv24",       [&](){ return  hh.disc_qcd_and_ttbar_Run2_enhanced_v24() < 0.0024 && hh.fatJet1PNetXbb() > 0.945 && hh.fatJet2PNetXbb() > 0.945; },   [&](){ return isTTJets  ? ttjets_sf.getPNetXbbShapeScaleFactors(year_, hh.fatJet1PNetXbb(), 0) * ttjets_sf.getPNetXbbShapeScaleFactors(year_, hh.fatJet2PNetXbb(), 0)     : 1.0; });
 cutflow.getCut("CutfatJetsMassSD");
-cutflow.addCutToLastActiveCut("FitCR2",       [&](){ return  hh.disc_qcd_and_ttbar_Run2_enhanced_v24() < 0.0011 && hh.disc_qcd_and_ttbar_Run2_enhanced_v24() > 0.0005 && hh.fatJet2PNetXbb() > 0.95 && hh.fatJet1PNetXbb() > 0.95; },   UNITY);
-cutflow.getCut("CutfatJetsMassSD");
-cutflow.addCutToLastActiveCut("FitCR1",       [&](){ return  hh.disc_qcd_and_ttbar_Run2_enhanced_v24() < 0.0005 && hh.disc_qcd_and_ttbar_Run2_enhanced_v24() > 0.000 && hh.fatJet2PNetXbb() > 0.95 && hh.fatJet1PNetXbb() > 0.95; },   UNITY);
-cutflow.getCut("CutfatJetsMassSD");
-cutflow.addCutToLastActiveCut("FitCR",       [&](){ return  hh.disc_qcd_and_ttbar_Run2_enhanced_v24() < 0.0063 && hh.fatJet2PNetXbb() > 0.95 && hh.fatJet1PNetXbb() > 0.95; },   UNITY);
-cutflow.getCut("CutfatJetsMassSD");
-cutflow.addCutToLastActiveCut("FailFitCR3",       [&](){ return  hh.disc_qcd_and_ttbar_Run2_enhanced_v24() < 0.0063 && hh.disc_qcd_and_ttbar_Run2_enhanced_v24() > 0.0011 && hh.fatJet2PNetXbb() < 0.95; },   UNITY);
-cutflow.getCut("CutfatJetsMassSD");
-cutflow.addCutToLastActiveCut("FailFitCR2",       [&](){ return  hh.disc_qcd_and_ttbar_Run2_enhanced_v24() < 0.0011 && hh.disc_qcd_and_ttbar_Run2_enhanced_v24() > 0.0005 && hh.fatJet2PNetXbb() < 0.95; },   UNITY);
-cutflow.getCut("CutfatJetsMassSD");
-cutflow.addCutToLastActiveCut("FailFitCR1",       [&](){ return  hh.disc_qcd_and_ttbar_Run2_enhanced_v24() < 0.0005 && hh.disc_qcd_and_ttbar_Run2_enhanced_v24() > 0.000 && hh.fatJet2PNetXbb() < 0.95; },   UNITY);
-cutflow.getCut("CutfatJetsMassSD");
-cutflow.addCutToLastActiveCut("FailFitCR",       [&](){ return  hh.disc_qcd_and_ttbar_Run2_enhanced_v24() < 0.0063 && hh.fatJet2PNetXbb() < 0.95; },   UNITY);
+cutflow.addCutToLastActiveCut("FailFitCRv24",       [&](){ return  hh.disc_qcd_and_ttbar_Run2_enhanced_v24() < 0.0024 && hh.fatJet1PNetXbb() > 0.945 && hh.fatJet2PNetXbb() < 0.945; },   [&](){ return isTTJets  ? ttjets_sf.getPNetXbbShapeScaleFactors(year_, hh.fatJet1PNetXbb(), 0) * ttjets_sf.getPNetXbbShapeScaleFactors(year_, hh.fatJet2PNetXbb(), 0)     : 1.0; });
 
+cutflow.getCut("CutfatJetsMassSD");
+cutflow.addCutToLastActiveCut("FitCRv8p2",       [&](){ return  hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2() < 0.03 && hh.fatJet2PNetXbb() > 0.95; },   [&](){ return isTTJets  ? ttjets_sf.getPNetXbbShapeScaleFactors(year_, hh.fatJet2PNetXbb(), 0)     : 1.0; });
+cutflow.getCut("CutfatJetsMassSD");
+cutflow.addCutToLastActiveCut("FailFitCRv8p2",       [&](){ return  hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2() < 0.03 && hh.fatJet2PNetXbb() < 0.95; },   [&](){ return isTTJets  ? ttjets_sf.getPNetXbbShapeScaleFactors(year_, hh.fatJet2PNetXbb(), 0)     : 1.0; });
 
 ////Top control region
 cutflow.getCut("CutfatJetsMassSD");
-cutflow.addCutToLastActiveCut("CutfatJetsXbb",       [&](){ return hh.fatJet1PNetXbb() > 0.1 && hh.fatJet2PNetXbb() > 0.1; },   UNITY);
+cutflow.addCutToLastActiveCut("CutfatJetsXbb",       [&](){ return hh.fatJet1PNetXbb() > 0.1 && hh.fatJet2PNetXbb() > 0.1; },   [&](){ return isTTJets  ? ttjets_sf.getPNetXbbShapeScaleFactors(year_, hh.fatJet1PNetXbb(), 0) * ttjets_sf.getPNetXbbShapeScaleFactors(year_, hh.fatJet2PNetXbb(), 0)     : 1.0; });
 cutflow.addCutToLastActiveCut("TTBarCR",       [&](){ return hh.fatJet1Tau3OverTau2() < 0.46 && hh.fatJet2Tau3OverTau2() < 0.46 &&  hh.fatJet1HasBJetCSVLoose() && hh.fatJet2HasBJetCSVLoose(); },   [&]() {return isTTJets ? (TopTagSF("0.46", year_, hh.fatJet1Pt()) * TopTagSF("0.46", year_, hh.fatJet2Pt())) : 1.0;} );
-cutflow.addCutToLastActiveCut("TTBarCRBDT1",       [&](){ return  hh.disc_qcd_and_ttbar_Run2_enhanced_v24() < 0.0005 && hh.disc_qcd_and_ttbar_Run2_enhanced_v24() > 0.000 && hh.fatJet2PNetXbb() < 0.95; },   UNITY);
+
 cutflow.getCut("TTBarCR");
-cutflow.addCutToLastActiveCut("TTBarCRBDT2",       [&](){ return  hh.disc_qcd_and_ttbar_Run2_enhanced_v24() < 0.0011 && hh.disc_qcd_and_ttbar_Run2_enhanced_v24() > 0.0005 && hh.fatJet2PNetXbb() < 0.95; },   UNITY);
+cutflow.addCutToLastActiveCut("TTBarCRBDT1v24",       [&](){ return  hh.disc_qcd_and_ttbar_Run2_enhanced_v24() < 0.0024 && hh.disc_qcd_and_ttbar_Run2_enhanced_v24() > 0.000; },   UNITY);
 cutflow.getCut("TTBarCR");
-cutflow.addCutToLastActiveCut("TTBarCRBDT3",       [&](){ return  hh.disc_qcd_and_ttbar_Run2_enhanced_v24() < 0.0117 && hh.disc_qcd_and_ttbar_Run2_enhanced_v24() > 0.0011 && hh.fatJet2PNetXbb() < 0.95; },   UNITY);
+cutflow.addCutToLastActiveCut("TTBarCRBDT2v24",       [&](){ return  hh.disc_qcd_and_ttbar_Run2_enhanced_v24() < 0.0054 && hh.disc_qcd_and_ttbar_Run2_enhanced_v24() > 0.0024; },   UNITY);
 cutflow.getCut("TTBarCR");
-cutflow.addCutToLastActiveCut("TTBarCRBDT4",       [&](){ return  hh.disc_qcd_and_ttbar_Run2_enhanced_v24() < 0.028&& hh.disc_qcd_and_ttbar_Run2_enhanced_v24() > 0.0117 && hh.fatJet2PNetXbb() < 0.95; },   UNITY);
+cutflow.addCutToLastActiveCut("TTBarCRBDT3v24",       [&](){ return  hh.disc_qcd_and_ttbar_Run2_enhanced_v24() < 0.0118 && hh.disc_qcd_and_ttbar_Run2_enhanced_v24() > 0.0054; },   UNITY);
 cutflow.getCut("TTBarCR");
-cutflow.addCutToLastActiveCut("TTBarCRBDT5",       [&](){ return  hh.disc_qcd_and_ttbar_Run2_enhanced_v24() > 0.028 && hh.fatJet2PNetXbb() < 0.95; },   UNITY);
+cutflow.addCutToLastActiveCut("TTBarCRBDT4v24",       [&](){ return  hh.disc_qcd_and_ttbar_Run2_enhanced_v24() < 1.0 && hh.disc_qcd_and_ttbar_Run2_enhanced_v24() > 0.0118; },   UNITY);
+
+cutflow.getCut("TTBarCR");
+cutflow.addCutToLastActiveCut("TTBarCRBDT1v8p2",       [&](){ return  hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2() < 0.00008 && hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2() > 0.000; },   UNITY);
+cutflow.getCut("TTBarCR");
+cutflow.addCutToLastActiveCut("TTBarCRBDT2v8p2",       [&](){ return  hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2() < 0.0002 && hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2() > 0.00008; },   UNITY);
+cutflow.getCut("TTBarCR");
+cutflow.addCutToLastActiveCut("TTBarCRBDT3v8p2",       [&](){ return  hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2() < 0.0004 && hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2() > 0.0002; },   UNITY);
+cutflow.getCut("TTBarCR");
+cutflow.addCutToLastActiveCut("TTBarCRBDT4v8p2",       [&](){ return  hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2() < 1.0 && hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2() > 0.0004; },   UNITY);
+
+
+cutflow.getCut("CutfatJetsXbb");
+
+
 cutflow.getCut("CutfatJetsXbb");
 cutflow.addCutToLastActiveCut("TTBarCRTight",       [&](){ return hh.fatJet1Tau3OverTau2() < 0.39 && hh.fatJet2Tau3OverTau2() < 0.39 &&  hh.fatJet1HasBJetCSVLoose() && hh.fatJet2HasBJetCSVLoose(); },   [&]() {return isTTJets ? (TopTagSF("0.40", year_, hh.fatJet1Pt()) * TopTagSF("0.40", year_, hh.fatJet2Pt())) : 1.0;} );
 
@@ -353,12 +394,18 @@ cutflow.addCutToLastActiveCut("TTBarCRTight",       [&](){ return hh.fatJet1Tau3
 /****Systematics******/
 if(doSystematics)
 {
-    cutflow.addWgtSyst("BDTMassShapeUp",  [&](){return (isTTJets && hh.disc_qcd_and_ttbar_Run2_enhanced_v24() > 0.028)?  1.06 :1.00;});
-    cutflow.addWgtSyst("BDTMassShapeDown",  [&](){return (isTTJets && hh.disc_qcd_and_ttbar_Run2_enhanced_v24() > 0.028)?  0.94 :1.00;});
-    cutflow.addWgtSyst("BDTShapeUp",  [&](){return isTTJets ? ( hh.disc_qcd_and_ttbar_Run2_enhanced_v24()  < 0.0005 ? 1.07 : ( hh.disc_qcd_and_ttbar_Run2_enhanced_v24()  <  0.0011 ?  1.13 : (hh.disc_qcd_and_ttbar_Run2_enhanced_v24()  < 0.0117 ? 1.015 : (hh.disc_qcd_and_ttbar_Run2_enhanced_v24()< 0.028 ? 1.097 : 1.288)))) : 1.0;});
-    cutflow.addWgtSyst("BDTShapeDown",  [&](){return isTTJets ? ( hh.disc_qcd_and_ttbar_Run2_enhanced_v24()  < 0.0005 ? 1.-0.07 : ( hh.disc_qcd_and_ttbar_Run2_enhanced_v24()  <  0.0011 ?  1.-0.13 : (hh.disc_qcd_and_ttbar_Run2_enhanced_v24()  < 0.0117 ? 1.-0.015 : (hh.disc_qcd_and_ttbar_Run2_enhanced_v24()< 0.028 ? 1.-0.097 : 1.-0.288)))) : 1.0;});
+    cutflow.addWgtSyst("BDTv24MassShapeUp",  [&](){return isTTJets ?  1.01 :1.00;});
+    cutflow.addWgtSyst("BDTv24MassShapeDown",  [&](){return isTTJets ?  0.99 :1.00;});
+    cutflow.addWgtSyst("BDTv8p2MassShapeUp",  [&](){return isTTJets ?  1.01 :1.00;});
+    cutflow.addWgtSyst("BDTv8p2MassShapeDown",  [&](){return isTTJets ?  0.99 :1.00;});
+    cutflow.addWgtSyst("BDTv24ShapeUp",  [&](){return isTTJets ? ( hh.disc_qcd_and_ttbar_Run2_enhanced_v24()  < 0.00024 ? 1.068 : ( hh.disc_qcd_and_ttbar_Run2_enhanced_v24()  <  0.0054 ?  1.016 : (hh.disc_qcd_and_ttbar_Run2_enhanced_v24()  < 0.0118 ? 1.026 :  1.240))) : 1.0;});
+    cutflow.addWgtSyst("BDTv24ShapeDown",  [&](){return isTTJets ? ( hh.disc_qcd_and_ttbar_Run2_enhanced_v24()  < 0.00024 ? 1.-0.068 : ( hh.disc_qcd_and_ttbar_Run2_enhanced_v24()  <  0.0054 ?  1.-0.016 : (hh.disc_qcd_and_ttbar_Run2_enhanced_v24()  < 0.0118 ? 1.-0.026 :  1.-0.240))) : 1.0;});
+    cutflow.addWgtSyst("BDTv8p2ShapeUp",  [&](){return isTTJets ? ( hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2()  < 0.00008 ? 1.060 : ( hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2()  <  0.0002 ?  1.015 : (hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2()  < 0.0004 ? 1.001 :  1.300))) : 1.0;});
+    cutflow.addWgtSyst("BDTv8p2ShapeDown",  [&](){return isTTJets ? ( hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2()  < 0.00008 ? 1.-0.060 : ( hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2()  <  0.0002 ?  1.-0.015 : (hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2()  < 0.0004 ? 1.-0.001 :  1.-0.300))) : 1.0;});
     cutflow.addWgtSyst("ttJetsCorrUp",  [&](){return isTTJets ?  ttjets_sf.getScaleFactorsFit(year_, hh.hh_pt(), 1)/ttjets_sf.getScaleFactorsFit(year_, hh.hh_pt(), 0) : 1.0;});
     cutflow.addWgtSyst("ttJetsCorrDown",  [&](){return isTTJets ? ttjets_sf.getScaleFactorsFit(year_, hh.hh_pt(), -1)/ttjets_sf.getScaleFactorsFit(year_, hh.hh_pt(), 0) : 1.0;});
+    cutflow.addWgtSyst("PNetShapeUp",  [&](){return isTTJets ?  ttjets_sf.getPNetXbbShapeScaleFactors(year_, hh.fatJet1PNetXbb(), 1)*ttjets_sf.getPNetXbbShapeScaleFactors(year_, hh.fatJet2PNetXbb(), 1)/(ttjets_sf.getPNetXbbShapeScaleFactors(year_, hh.fatJet1PNetXbb(), 0)*ttjets_sf.getPNetXbbShapeScaleFactors(year_, hh.fatJet2PNetXbb(), 0)) : 1.0;});
+    cutflow.addWgtSyst("PNetShapeDown",  [&](){return isTTJets ?  ttjets_sf.getPNetXbbShapeScaleFactors(year_, hh.fatJet1PNetXbb(), -1)*ttjets_sf.getPNetXbbShapeScaleFactors(year_, hh.fatJet2PNetXbb(), -1)/(ttjets_sf.getPNetXbbShapeScaleFactors(year_, hh.fatJet1PNetXbb(), 0)*ttjets_sf.getPNetXbbShapeScaleFactors(year_, hh.fatJet2PNetXbb(), 0)) : 1.0;});
 }
 
 //book histograms for cuts
@@ -369,28 +416,41 @@ else
     {
         cutflow.bookHistogramsForCut(histograms, "TTBarCR");
         cutflow.bookHistogramsForCut(histograms, "TTBarCRTight");
-        cutflow.bookHistogramsForCut(histograms, "TTBarCRBDT1");
-        cutflow.bookHistogramsForCut(histograms, "TTBarCRBDT2");
-        cutflow.bookHistogramsForCut(histograms, "TTBarCRBDT3");
-        cutflow.bookHistogramsForCut(histograms, "TTBarCRBDT4");
-        cutflow.bookHistogramsForCut(histograms, "TTBarCRBDT5");
+        cutflow.bookHistogramsForCut(histograms, "TTBarCRBDT1v24");
+        cutflow.bookHistogramsForCut(histograms, "TTBarCRBDT2v24");
+        cutflow.bookHistogramsForCut(histograms, "TTBarCRBDT3v24");
+        cutflow.bookHistogramsForCut(histograms, "TTBarCRBDT4v24");
+        cutflow.bookHistogramsForCut(histograms, "TTBarCRBDT1v8p2");
+        cutflow.bookHistogramsForCut(histograms, "TTBarCRBDT2v8p2");
+        cutflow.bookHistogramsForCut(histograms, "TTBarCRBDT3v8p2");
+        cutflow.bookHistogramsForCut(histograms, "TTBarCRBDT4v8p2");
     }
     else // normal  signal enriched input
     {
-        cutflow.bookHistogramsForCut(histograms, "SRBin1");
-        cutflow.bookHistogramsForCut(histograms, "SRBin2");
-        cutflow.bookHistogramsForCut(histograms, "SRBin3");
-        cutflow.bookHistogramsForCut(histograms, "SRBin4");
-        cutflow.bookHistogramsForCut(histograms, "FailSR");
+        cutflow.bookHistogramsForCut(histograms, "SRv24Bin1");
+        cutflow.bookHistogramsForCut(histograms, "SRv24Bin2");
+        cutflow.bookHistogramsForCut(histograms, "SRv24Bin3");
+        cutflow.bookHistogramsForCut(histograms, "SRv24Bin4");
+        cutflow.bookHistogramsForCut(histograms, "FailSRv24");
+        cutflow.bookHistogramsForCut(histograms, "J2MassSideBandv24Bin1");
+        cutflow.bookHistogramsForCut(histograms, "J2MassSideBandv24Bin2");
+        cutflow.bookHistogramsForCut(histograms, "J2MassSideBandv24Bin3");
+        cutflow.bookHistogramsForCut(histograms, "J2MassSideBandv24Bin4");
+        cutflow.bookHistogramsForCut(histograms, "J2MassSideBandFailSRv24");
+        cutflow.bookHistogramsForCut(histograms, "FitCRv24");
+        cutflow.bookHistogramsForCut(histograms, "FailFitCRv24");
 
-        cutflow.bookHistogramsForCut(histograms, "FitCR");
-        cutflow.bookHistogramsForCut(histograms, "FitCR1");
-        cutflow.bookHistogramsForCut(histograms, "FitCR2");
-        cutflow.bookHistogramsForCut(histograms, "FitCR3");
-        cutflow.bookHistogramsForCut(histograms, "FailFitCR");
-        cutflow.bookHistogramsForCut(histograms, "FailFitCR1");
-        cutflow.bookHistogramsForCut(histograms, "FailFitCR2");
-        cutflow.bookHistogramsForCut(histograms, "FailFitCR3");
+        cutflow.bookHistogramsForCut(histograms, "SRv8p2Bin1");
+        cutflow.bookHistogramsForCut(histograms, "SRv8p2Bin2");
+        cutflow.bookHistogramsForCut(histograms, "SRv8p2Bin3");
+        cutflow.bookHistogramsForCut(histograms, "FailSRv8p2");
+        cutflow.bookHistogramsForCut(histograms, "J2MassSideBandv8p2Bin1");
+        cutflow.bookHistogramsForCut(histograms, "J2MassSideBandv8p2Bin2");
+        cutflow.bookHistogramsForCut(histograms, "J2MassSideBandv8p2Bin3");
+        cutflow.bookHistogramsForCut(histograms, "J2MassSideBandFailSRv8p2");
+        cutflow.bookHistogramsForCut(histograms, "FitCRv8p2");
+        cutflow.bookHistogramsForCut(histograms, "FailFitCRv8p2");
+
     }
 }
 cutflow.bookCutflows();

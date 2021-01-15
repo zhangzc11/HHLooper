@@ -68,6 +68,34 @@ def add_overflow(hists):
         func(hists)
     return hists
 
+def blind_data(hists):
+    def func(hist):
+        nx=hist.FindBin(125.0)
+        hist.SetBinContent(nx, 0.0)
+        hist.SetBinError(nx, 0.0)
+        hist.SetBinContent(nx-1, 0.0)
+        hist.SetBinError(nx-1, 0.0)
+        hist.SetBinContent(nx+1, 0.0)
+        hist.SetBinError(nx+1, 0.0)
+    if isinstance(hists, list):
+        for hist in hists:
+            func(hist)
+    else:
+        func(hists)
+    return hists
+
+def add_underflow(hists):
+    def func(hist):
+        hist.SetBinContent(1, hist.GetBinContent(1)+hist.GetBinContent(0))
+        hist.SetBinError(1, math.sqrt(hist.GetBinError(1)*hist.GetBinError(1)+hist.GetBinError(0)*hist.GetBinError(0)))
+    if isinstance(hists, list):
+        for hist in hists:
+            func(hist)
+    else:
+        func(hists)
+    return hists
+
+
 
 def makeplot_single_2d(
     sig_fnames_=None,
@@ -431,6 +459,18 @@ def makeplot_single(
             add_overflow(h1_bkg)
             if h1_data:
                 add_overflow([h1_data])
+    if "add_underflow" in extraoptions:
+        if extraoptions["add_underflow"]:
+            add_underflow(h1_sig)
+            add_underflow(h1_bkg)
+            if h1_data:
+                add_underflow([h1_data])
+    if "blind_data" in extraoptions:
+        if extraoptions["blind_data"]:
+            #blind_data(h1_sig)
+            #blind_data(h1_bkg)
+            if h1_data:
+                blind_data([h1_data])
 
     myC = r.TCanvas("myC","myC", 600, 600)
     myC.SetTicky(1)

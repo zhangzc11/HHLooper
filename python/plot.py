@@ -8,8 +8,8 @@ from colors import *
 
 parser = argparse.ArgumentParser(description="plot settings")
 parser.add_argument('-i' , '--input_dir'              , dest='input_dir'       , help='input dir path '                        , required=True      )
-#parser.add_argument('-o' , '--output_dir'             , dest='output_dir'      , help='output dir path'                        , default='/var/www/html/sharebox/HH'                                                 )
-parser.add_argument('-o' , '--output_dir'             , dest='output_dir'      , help='output dir path'                        , default='plots/'                                                 )
+parser.add_argument('-o' , '--output_dir'             , dest='output_dir'      , help='output dir path'                        , default='/var/www/html/sharebox/HH'                                                 )
+#parser.add_argument('-o' , '--output_dir'             , dest='output_dir'      , help='output dir path'                        , default='plots/'                                                 )
 parser.add_argument('-n' , '--nbins'                  , dest='nbins'           , help='number of bins for the histograms'      , default=30                                                      )
 parser.add_argument('-xt', '--xaxis_title'            , dest='xaxis_title'     , help='X-axis title'                           , default=None                                                    )
 parser.add_argument('-yt', '--yaxis_title'            , dest='yaxis_title'     , help='X-axis title'                           , default=None                                                    )
@@ -23,6 +23,7 @@ parser.add_argument('-ov' , '--rm_ovflow'              , dest='rm_ovflow'       
 parser.add_argument('-au' , '--add_udflow'              , dest='add_udflow'       , help='Add underflow'                       , default=False                              , action='store_true')
 parser.add_argument('-aov' , '--add_ovflow'              , dest='add_ovflow'       , help='Add overflow'                       , default=True                              , action='store_true')
 parser.add_argument('-d' , '--draw_data'              , dest='draw_data'       , help='Draw data'                              , default=False                              , action='store_true')
+parser.add_argument('-bd' , '--blind_data'              , dest='blind_data'       , help='Draw data'                              , default=False                              , action='store_true')
 parser.add_argument('-1' , '--stack_signal'           , dest='stack_signal'    , help='stack signal'                           , default=False                              , action='store_true')
 parser.add_argument('-O' , '--output_name'            , dest='output_name'     , help='output file name when plot single hist' , default=None                                                    )
 parser.add_argument('-w' , '--whatSR'                 , dest='whatSR'          , help='what selecton for the nine bins'        , default="FatJetsSDMassCut"                                      )
@@ -171,6 +172,7 @@ if hist_name:
                 "remove_overflow":args.rm_ovflow,
                 "add_underflow":args.add_udflow,
                 "add_overflow":args.add_ovflow,
+                "blind_data":args.blind_data,
                 "lumi_value": lumi,
                 "ratio_range": [0., 2.],
                 "xaxis_label": args.xaxis_title,
@@ -200,6 +202,9 @@ else:
             "yaxis_label": args.yaxis_title,
             "remove_underflow":args.rm_udflow,
             "remove_overflow":args.rm_ovflow,
+            "add_underflow":args.add_udflow,
+            "add_overflow":args.add_ovflow,
+            "blind_data":args.blind_data,
             "lumi_value": lumi,
             "ratio_range": [0., 2.],
             "stack_signal": args.stack_signal
