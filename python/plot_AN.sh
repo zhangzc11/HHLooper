@@ -4,24 +4,26 @@
 
 #### first, run then tupler in the following order:
 
-#cd ..
-#source process.sh yield_AN_sr
-#source process.sh yield_AN_sr_sys yes
-#source process_1Lttbar.sh yield_AN_1Lttbar
-#source process_ttbar.sh yield_AN_ttbar_cor
-#source process_ttbar.sh yield_AN_ttbar_cor_sys yes
+cd ..
+source process.sh yield_AN_sr
+source process.sh yield_AN_sr_sys yes
+source process_1Lttbar.sh yield_AN_1Lttbar
+source process_ttbar.sh yield_AN_ttbar_cor
+source process_ttbar.sh yield_AN_ttbar_cor_sys yes
 
 ###now comment Line 298, and uncomment Line  299 in ../app/HHLooper.cc to remove recoil correction;  
-#make clean; make
-#source process_ttbar.sh yield_AN_ttbar
+make clean; make
+source process_ttbar.sh yield_AN_ttbar
 ###now comment line 299 and uncommend line 298  in ../app/HHLooper.cc
 ###now make data card:
-#cd python
-#python prepare_card.py yield_AN_sr_sys v24
-#python prepare_card.py yield_AN_sr_sys v8p2
-#python prepare_card.py yield_AN_ttbar_cor_sys v24
-#python prepare_card.py yield_AN_ttbar_cor_sys v8p2
+cd python
+python prepare_card.py yield_AN_sr_sys v24
+python prepare_card.py yield_AN_sr_sys v8p2
+python prepare_card.py yield_AN_ttbar_cor_sys v24
+python prepare_card.py yield_AN_ttbar_cor_sys v8p2
 
+
+###now begin to make plots:
 
 ####Figure 7 (J2 mass in SR for BDT v1)
 TAG=yield_AN_sr
