@@ -133,7 +133,7 @@ python runFtest.py --v1n1=2 --v1n2=3 --toys=1000 -s 1
 #### pre-fit  and post-fit plots, figure 24 and figure 25
 # first, you  need to run combine in https://github.com/LPC-HH/combine-hh
 # run shape cards (for pre-fit plots) for all bins and for v24 and v8p2 input files
-python create_shapecard.py
+python create_shapecard_passOnly.py
 # and then run combine with  the FitDiagnostics command (see README in https://github.com/LPC-HH/combine-hh)  to save the pre-fit shapes
 # run alphabet cards (for post-fit plots) for all bins and for v24 and v8p2 input files
 python create_datacard.py
@@ -147,7 +147,7 @@ fitDiagnosticsBin2Pre.root  fitDiagnosticsBin3.root
 directory BDTv8p2:
 fitDiagnosticsBin1Pre.root  fitDiagnosticsBin2Pre.root	fitDiagnosticsBin3Pre.root  
 fitDiagnosticsBin1.root     fitDiagnosticsBin2.root	fitDiagnosticsBin3.root    
-#where file names with "Pre" are from create_shapecard.py, and file names without "Pre" are from create_datacard.py
+#where file names with "Pre" are from create_shapecard_passOnly.py, and file names without "Pre" are from create_datacard.py
 # then run the following script to produce the prefit and postfit plot (figure 24 and 25)
 python  makePostFitPlot.py
 #change Line 307 to change BDT version
