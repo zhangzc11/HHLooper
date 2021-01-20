@@ -141,12 +141,12 @@ python create_datacard.py
 #  and then run  combine with FitDiagnostics command to save the post-fit shapes
 # once all done, copy all the FitDiagnostics output files, and copy it into this directory, with the following directory and file names:
 directory BDTv24:
-fitDiagnosticsBin1Pre.root  fitDiagnosticsBin2.root	fitDiagnosticsBin4Pre.root   fitDiagnosticsFitCR.root
+fitDiagnosticsBin1Pre.root  fitDiagnosticsBin2.root	fitDiagnosticsBin4Pre.root  
 fitDiagnosticsBin1.root     fitDiagnosticsBin3Pre.root	fitDiagnosticsBin4.root
-fitDiagnosticsBin2Pre.root  fitDiagnosticsBin3.root	fitDiagnosticsFitCRPre.root
+fitDiagnosticsBin2Pre.root  fitDiagnosticsBin3.root	
 directory BDTv8p2:
-fitDiagnosticsBin1Pre.root  fitDiagnosticsBin2Pre.root	fitDiagnosticsBin3Pre.root  fitDiagnosticsFitCRPre.root
-fitDiagnosticsBin1.root     fitDiagnosticsBin2.root	fitDiagnosticsBin3.root     fitDiagnosticsFitCR.root
+fitDiagnosticsBin1Pre.root  fitDiagnosticsBin2Pre.root	fitDiagnosticsBin3Pre.root  
+fitDiagnosticsBin1.root     fitDiagnosticsBin2.root	fitDiagnosticsBin3.root    
 #where file names with "Pre" are from create_shapecard.py, and file names without "Pre" are from create_datacard.py
 # then run the following script to produce the prefit and postfit plot (figure 24 and 25)
 python  makePostFitPlot.py
