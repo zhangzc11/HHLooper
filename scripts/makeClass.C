@@ -3,7 +3,8 @@
 void makeClass()
 {
  //TFile * file = new TFile("../data_noskim/ttJets/TTJets_TuneCP5_13TeV-amcatnloFXFX-pythia8_MC_Fall17_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14_V2_1pb_weighted_v0.root");
- TFile * file = new TFile("../data/Jet2Xbb0p8Skim/2016/HHSM/GluGluToHHTo4B_node_SM_13TeV-madgraph_1pb_weighted_BDTs_Jet2Xbb0p8Skim.root");
+ //TFile * file = new TFile("../data/Jet2Xbb0p8Skim/2016/HHSM/GluGluToHHTo4B_node_SM_13TeV-madgraph_1pb_weighted_BDTs_Jet2Xbb0p8Skim.root");
+ TFile * file = new TFile("../data/1LTopSkim/2016/tt1L/TTToSemiLeptonic_TuneCP5_PSweights_13TeV-powheg-pythia8_1pb_weighted_1LTopSkim.root");
  TTree * tree = (TTree*)file->Get("tree");
  
 

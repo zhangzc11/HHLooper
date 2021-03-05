@@ -507,18 +507,19 @@ void RooUtil::Cutflow::bookVecHistogram(TString cut, std::pair<TString, std::tup
 }
 
 //_______________________________________________________________________________________________________
-void RooUtil::Cutflow::bookHistogram(TString cut, std::pair<TString, std::tuple<std::vector<float>, std::function<float()>>> key, TString syst)
+void RooUtil::Cutflow::bookHistogram(TString cut, std::pair<TString, std::tuple<std::vector<float>, std::function<float()>, TString>> key, TString syst)
 {
     TString varname = key.first;
     std::vector<float> boundaries = std::get<0>(key.second);
     std::function<float()> vardef = std::get<1>(key.second);
+    TString title = std::get<2>(key.second);
     TString histname = cut + syst + "__" + varname;
     if (booked_histograms.find(std::make_tuple(cut.Data(), syst.Data(), varname.Data())) == booked_histograms.end())
     {
         Float_t bounds[boundaries.size()];
         for (unsigned int i = 0; i < boundaries.size(); ++i)
             bounds[i] = boundaries[i];
-        booked_histograms[std::make_tuple(cut.Data(), syst.Data(), varname.Data())] = new TH1F(histname, "", boundaries.size()-1, bounds);
+        booked_histograms[std::make_tuple(cut.Data(), syst.Data(), varname.Data())] = new TH1F(histname, title, boundaries.size()-1, bounds);
         booked_histograms[std::make_tuple(cut.Data(), syst.Data(), varname.Data())]->SetDirectory(0);
         booked_histograms[std::make_tuple(cut.Data(), syst.Data(), varname.Data())]->Sumw2();
         if (syst.IsNull())
@@ -743,11 +744,11 @@ void RooUtil::Histograms::addVecHistogram(TString name, unsigned int n, float mi
 }
 
 //_______________________________________________________________________________________________________
-void RooUtil::Histograms::addHistogram(TString name, std::vector<float> boundaries, std::function<float()> vardef)
+void RooUtil::Histograms::addHistogram(TString name, TString title, std::vector<float> boundaries, std::function<float()> vardef)
 {
     if (th1fs_varbin.find(name) == th1fs_varbin.end())
     {
-        th1fs_varbin[name] = std::make_tuple(boundaries, vardef);
+        th1fs_varbin[name] = std::make_tuple(boundaries, vardef, title);
     }
     else
     {

@@ -194,6 +194,50 @@ void hhtree::Init(TTree *tree)
  if(ptj2_over_ptj1_branch) ptj2_over_ptj1_branch->SetAddress(&ptj2_over_ptj1_);
  mj2_over_mj1_branch = tree->GetBranch("mj2_over_mj1");
  if(mj2_over_mj1_branch) mj2_over_mj1_branch->SetAddress(&mj2_over_mj1_);
+ lep1Pt_branch = tree->GetBranch("lep1Pt");
+ if(lep1Pt_branch) lep1Pt_branch->SetAddress(&lep1Pt_);
+ lep1Eta_branch = tree->GetBranch("lep1Eta");
+ if(lep1Eta_branch) lep1Eta_branch->SetAddress(&lep1Eta_);
+ lep1Phi_branch = tree->GetBranch("lep1Phi");
+ if(lep1Phi_branch) lep1Phi_branch->SetAddress(&lep1Phi_);
+ lep1Id_branch = tree->GetBranch("lep1Id");
+ if(lep1Id_branch) lep1Id_branch->SetAddress(&lep1Id_);
+ lep2Pt_branch = tree->GetBranch("lep2Pt");
+ if(lep2Pt_branch) lep2Pt_branch->SetAddress(&lep2Pt_);
+ lep2Eta_branch = tree->GetBranch("lep2Eta");
+ if(lep2Eta_branch) lep2Eta_branch->SetAddress(&lep2Eta_);
+ lep2Phi_branch = tree->GetBranch("lep2Phi");
+ if(lep2Phi_branch) lep2Phi_branch->SetAddress(&lep2Phi_);
+ lep2Id_branch = tree->GetBranch("lep2Id");
+ if(lep2Id_branch) lep2Id_branch->SetAddress(&lep2Id_);
+ HLT_Ele27_WPTight_Gsf_branch = tree->GetBranch("HLT_Ele27_WPTight_Gsf");
+ if(HLT_Ele27_WPTight_Gsf_branch) HLT_Ele27_WPTight_Gsf_branch->SetAddress(&HLT_Ele27_WPTight_Gsf_);
+ HLT_Ele28_WPTight_Gsf_branch = tree->GetBranch("HLT_Ele28_WPTight_Gsf");
+ if(HLT_Ele28_WPTight_Gsf_branch) HLT_Ele28_WPTight_Gsf_branch->SetAddress(&HLT_Ele28_WPTight_Gsf_);
+ HLT_Ele30_WPTight_Gsf_branch = tree->GetBranch("HLT_Ele30_WPTight_Gsf");
+ if(HLT_Ele30_WPTight_Gsf_branch) HLT_Ele30_WPTight_Gsf_branch->SetAddress(&HLT_Ele30_WPTight_Gsf_);
+ HLT_Ele32_WPTight_Gsf_branch = tree->GetBranch("HLT_Ele32_WPTight_Gsf");
+ if(HLT_Ele32_WPTight_Gsf_branch) HLT_Ele32_WPTight_Gsf_branch->SetAddress(&HLT_Ele32_WPTight_Gsf_);
+ HLT_Ele35_WPTight_Gsf_branch = tree->GetBranch("HLT_Ele35_WPTight_Gsf");
+ if(HLT_Ele35_WPTight_Gsf_branch) HLT_Ele35_WPTight_Gsf_branch->SetAddress(&HLT_Ele35_WPTight_Gsf_);
+ HLT_Ele38_WPTight_Gsf_branch = tree->GetBranch("HLT_Ele38_WPTight_Gsf");
+ if(HLT_Ele38_WPTight_Gsf_branch) HLT_Ele38_WPTight_Gsf_branch->SetAddress(&HLT_Ele38_WPTight_Gsf_);
+ HLT_Ele40_WPTight_Gsf_branch = tree->GetBranch("HLT_Ele40_WPTight_Gsf");
+ if(HLT_Ele40_WPTight_Gsf_branch) HLT_Ele40_WPTight_Gsf_branch->SetAddress(&HLT_Ele40_WPTight_Gsf_);
+ HLT_IsoMu20_branch = tree->GetBranch("HLT_IsoMu20");
+ if(HLT_IsoMu20_branch) HLT_IsoMu20_branch->SetAddress(&HLT_IsoMu20_);
+ HLT_IsoMu24_branch = tree->GetBranch("HLT_IsoMu24");
+ if(HLT_IsoMu24_branch) HLT_IsoMu24_branch->SetAddress(&HLT_IsoMu24_);
+ HLT_IsoMu24_eta2p1_branch = tree->GetBranch("HLT_IsoMu24_eta2p1");
+ if(HLT_IsoMu24_eta2p1_branch) HLT_IsoMu24_eta2p1_branch->SetAddress(&HLT_IsoMu24_eta2p1_);
+ HLT_IsoMu27_branch = tree->GetBranch("HLT_IsoMu27");
+ if(HLT_IsoMu27_branch) HLT_IsoMu27_branch->SetAddress(&HLT_IsoMu27_);
+ HLT_IsoMu30_branch = tree->GetBranch("HLT_IsoMu30");
+ if(HLT_IsoMu30_branch) HLT_IsoMu30_branch->SetAddress(&HLT_IsoMu30_);
+ HLT_Mu50_branch = tree->GetBranch("HLT_Mu50");
+ if(HLT_Mu50_branch) HLT_Mu50_branch->SetAddress(&HLT_Mu50_);
+ HLT_Mu55_branch = tree->GetBranch("HLT_Mu55");
+ if(HLT_Mu55_branch) HLT_Mu55_branch->SetAddress(&HLT_Mu55_);
  HLT_PFHT1050_branch = tree->GetBranch("HLT_PFHT1050");
  if(HLT_PFHT1050_branch) HLT_PFHT1050_branch->SetAddress(&HLT_PFHT1050_);
  HLT_AK8PFJet360_TrimMass30_branch = tree->GetBranch("HLT_AK8PFJet360_TrimMass30");
@@ -248,8 +292,8 @@ void hhtree::Init(TTree *tree)
  if(HLT_AK8DiPFJet280_200_TrimMass30_BTagCSV_p20_branch) HLT_AK8DiPFJet280_200_TrimMass30_BTagCSV_p20_branch->SetAddress(&HLT_AK8DiPFJet280_200_TrimMass30_BTagCSV_p20_);
  HLT_AK8DiPFJet250_200_TrimMass30_BTagCSV_p20_branch = tree->GetBranch("HLT_AK8DiPFJet250_200_TrimMass30_BTagCSV_p20");
  if(HLT_AK8DiPFJet250_200_TrimMass30_BTagCSV_p20_branch) HLT_AK8DiPFJet250_200_TrimMass30_BTagCSV_p20_branch->SetAddress(&HLT_AK8DiPFJet250_200_TrimMass30_BTagCSV_p20_);
- disc_qcd_and_ttbar_Run2_enhanced_v23_branch = tree->GetBranch("disc_qcd_and_ttbar_Run2_enhanced_v23");
- if(disc_qcd_and_ttbar_Run2_enhanced_v23_branch) disc_qcd_and_ttbar_Run2_enhanced_v23_branch->SetAddress(&disc_qcd_and_ttbar_Run2_enhanced_v23_);
+ disc_qcd_and_ttbar_Run2_enhanced_v8p2_branch = tree->GetBranch("disc_qcd_and_ttbar_Run2_enhanced_v8p2");
+ if(disc_qcd_and_ttbar_Run2_enhanced_v8p2_branch) disc_qcd_and_ttbar_Run2_enhanced_v8p2_branch->SetAddress(&disc_qcd_and_ttbar_Run2_enhanced_v8p2_);
  disc_qcd_and_ttbar_Run2_enhanced_v24_branch = tree->GetBranch("disc_qcd_and_ttbar_Run2_enhanced_v24");
  if(disc_qcd_and_ttbar_Run2_enhanced_v24_branch) disc_qcd_and_ttbar_Run2_enhanced_v24_branch->SetAddress(&disc_qcd_and_ttbar_Run2_enhanced_v24_);
 }
@@ -353,6 +397,28 @@ void hhtree::GetEntry(unsigned int idx)
  deltaR_j1j2_isLoaded = false;
  ptj2_over_ptj1_isLoaded = false;
  mj2_over_mj1_isLoaded = false;
+ lep1Pt_isLoaded = false;
+ lep1Eta_isLoaded = false;
+ lep1Phi_isLoaded = false;
+ lep1Id_isLoaded = false;
+ lep2Pt_isLoaded = false;
+ lep2Eta_isLoaded = false;
+ lep2Phi_isLoaded = false;
+ lep2Id_isLoaded = false;
+ HLT_Ele27_WPTight_Gsf_isLoaded = false;
+ HLT_Ele28_WPTight_Gsf_isLoaded = false;
+ HLT_Ele30_WPTight_Gsf_isLoaded = false;
+ HLT_Ele32_WPTight_Gsf_isLoaded = false;
+ HLT_Ele35_WPTight_Gsf_isLoaded = false;
+ HLT_Ele38_WPTight_Gsf_isLoaded = false;
+ HLT_Ele40_WPTight_Gsf_isLoaded = false;
+ HLT_IsoMu20_isLoaded = false;
+ HLT_IsoMu24_isLoaded = false;
+ HLT_IsoMu24_eta2p1_isLoaded = false;
+ HLT_IsoMu27_isLoaded = false;
+ HLT_IsoMu30_isLoaded = false;
+ HLT_Mu50_isLoaded = false;
+ HLT_Mu55_isLoaded = false;
  HLT_PFHT1050_isLoaded = false;
  HLT_AK8PFJet360_TrimMass30_isLoaded = false;
  HLT_AK8PFJet380_TrimMass30_isLoaded = false;
@@ -380,7 +446,7 @@ void hhtree::GetEntry(unsigned int idx)
  HLT_AK8PFHT600_TrimR0p1PT0p03Mass50_BTagCSV_p20_isLoaded = false;
  HLT_AK8DiPFJet280_200_TrimMass30_BTagCSV_p20_isLoaded = false;
  HLT_AK8DiPFJet250_200_TrimMass30_BTagCSV_p20_isLoaded = false;
- disc_qcd_and_ttbar_Run2_enhanced_v23_isLoaded = false;
+ disc_qcd_and_ttbar_Run2_enhanced_v8p2_isLoaded = false;
  disc_qcd_and_ttbar_Run2_enhanced_v24_isLoaded = false;
 }
 
@@ -1809,6 +1875,335 @@ exit(1);
  return mj2_over_mj1_;
 }
 
+const float &hhtree::lep1Pt()
+{
+ if(not lep1Pt_isLoaded)
+ {
+   if(lep1Pt_branch != 0) lep1Pt_branch->GetEntry(index);
+   else
+   {
+     printf("branch lep1Pt_branch does not exist!\n");
+exit(1);
+   }
+   lep1Pt_isLoaded = true;
+ }
+ return lep1Pt_;
+}
+
+const float &hhtree::lep1Eta()
+{
+ if(not lep1Eta_isLoaded)
+ {
+   if(lep1Eta_branch != 0) lep1Eta_branch->GetEntry(index);
+   else
+   {
+     printf("branch lep1Eta_branch does not exist!\n");
+exit(1);
+   }
+   lep1Eta_isLoaded = true;
+ }
+ return lep1Eta_;
+}
+
+const float &hhtree::lep1Phi()
+{
+ if(not lep1Phi_isLoaded)
+ {
+   if(lep1Phi_branch != 0) lep1Phi_branch->GetEntry(index);
+   else
+   {
+     printf("branch lep1Phi_branch does not exist!\n");
+exit(1);
+   }
+   lep1Phi_isLoaded = true;
+ }
+ return lep1Phi_;
+}
+
+const int &hhtree::lep1Id()
+{
+ if(not lep1Id_isLoaded)
+ {
+   if(lep1Id_branch != 0) lep1Id_branch->GetEntry(index);
+   else
+   {
+     printf("branch lep1Id_branch does not exist!\n");
+exit(1);
+   }
+   lep1Id_isLoaded = true;
+ }
+ return lep1Id_;
+}
+
+const float &hhtree::lep2Pt()
+{
+ if(not lep2Pt_isLoaded)
+ {
+   if(lep2Pt_branch != 0) lep2Pt_branch->GetEntry(index);
+   else
+   {
+     printf("branch lep2Pt_branch does not exist!\n");
+exit(1);
+   }
+   lep2Pt_isLoaded = true;
+ }
+ return lep2Pt_;
+}
+
+const float &hhtree::lep2Eta()
+{
+ if(not lep2Eta_isLoaded)
+ {
+   if(lep2Eta_branch != 0) lep2Eta_branch->GetEntry(index);
+   else
+   {
+     printf("branch lep2Eta_branch does not exist!\n");
+exit(1);
+   }
+   lep2Eta_isLoaded = true;
+ }
+ return lep2Eta_;
+}
+const float &hhtree::lep2Phi()
+{
+ if(not lep2Phi_isLoaded)
+ {
+   if(lep2Phi_branch != 0) lep2Phi_branch->GetEntry(index);
+   else
+   {
+     printf("branch lep2Phi_branch does not exist!\n");
+exit(1);
+   }
+   lep2Phi_isLoaded = true;
+ }
+ return lep2Phi_;
+}
+
+const int &hhtree::lep2Id()
+{
+ if(not lep2Id_isLoaded)
+ {
+   if(lep2Id_branch != 0) lep2Id_branch->GetEntry(index);
+   else
+   {
+     printf("branch lep2Id_branch does not exist!\n");
+exit(1);
+   }
+   lep2Id_isLoaded = true;
+ }
+ return lep2Id_;
+}
+
+const bool &hhtree::HLT_Ele27_WPTight_Gsf()
+{
+ if(not HLT_Ele27_WPTight_Gsf_isLoaded)
+ {
+   if(HLT_Ele27_WPTight_Gsf_branch != 0) HLT_Ele27_WPTight_Gsf_branch->GetEntry(index);
+   else
+   {
+     printf("branch HLT_Ele27_WPTight_Gsf_branch does not exist!\n");
+exit(1);
+   }
+   HLT_Ele27_WPTight_Gsf_isLoaded = true;
+ }
+ return HLT_Ele27_WPTight_Gsf_;
+}
+
+const bool &hhtree::HLT_Ele28_WPTight_Gsf()
+{
+ if(not HLT_Ele28_WPTight_Gsf_isLoaded)
+ {
+   if(HLT_Ele28_WPTight_Gsf_branch != 0) HLT_Ele28_WPTight_Gsf_branch->GetEntry(index);
+   else
+   {
+     printf("branch HLT_Ele28_WPTight_Gsf_branch does not exist!\n");
+exit(1);
+   }
+   HLT_Ele28_WPTight_Gsf_isLoaded = true;
+ }
+ return HLT_Ele28_WPTight_Gsf_;
+}
+
+const bool &hhtree::HLT_Ele30_WPTight_Gsf()
+{
+ if(not HLT_Ele30_WPTight_Gsf_isLoaded)
+ {
+   if(HLT_Ele30_WPTight_Gsf_branch != 0) HLT_Ele30_WPTight_Gsf_branch->GetEntry(index);
+   else
+   {
+     printf("branch HLT_Ele30_WPTight_Gsf_branch does not exist!\n");
+exit(1);
+   }
+   HLT_Ele30_WPTight_Gsf_isLoaded = true;
+ }
+ return HLT_Ele30_WPTight_Gsf_;
+}
+
+
+const bool &hhtree::HLT_Ele32_WPTight_Gsf()
+{
+ if(not HLT_Ele32_WPTight_Gsf_isLoaded)
+ {
+   if(HLT_Ele32_WPTight_Gsf_branch != 0) HLT_Ele32_WPTight_Gsf_branch->GetEntry(index);
+   else
+   {
+     printf("branch HLT_Ele32_WPTight_Gsf_branch does not exist!\n");
+exit(1);
+   }
+   HLT_Ele32_WPTight_Gsf_isLoaded = true;
+ }
+ return HLT_Ele32_WPTight_Gsf_;
+}
+
+const bool &hhtree::HLT_Ele35_WPTight_Gsf()
+{
+ if(not HLT_Ele35_WPTight_Gsf_isLoaded)
+ {
+   if(HLT_Ele35_WPTight_Gsf_branch != 0) HLT_Ele35_WPTight_Gsf_branch->GetEntry(index);
+   else
+   {
+     printf("branch HLT_Ele35_WPTight_Gsf_branch does not exist!\n");
+exit(1);
+   }
+   HLT_Ele35_WPTight_Gsf_isLoaded = true;
+ }
+ return HLT_Ele35_WPTight_Gsf_;
+}
+
+const bool &hhtree::HLT_Ele38_WPTight_Gsf()
+{
+ if(not HLT_Ele38_WPTight_Gsf_isLoaded)
+ {
+   if(HLT_Ele38_WPTight_Gsf_branch != 0) HLT_Ele38_WPTight_Gsf_branch->GetEntry(index);
+   else
+   {
+     printf("branch HLT_Ele38_WPTight_Gsf_branch does not exist!\n");
+exit(1);
+   }
+   HLT_Ele38_WPTight_Gsf_isLoaded = true;
+ }
+ return HLT_Ele38_WPTight_Gsf_;
+}
+const bool &hhtree::HLT_Ele40_WPTight_Gsf()
+{
+ if(not HLT_Ele40_WPTight_Gsf_isLoaded)
+ {
+   if(HLT_Ele40_WPTight_Gsf_branch != 0) HLT_Ele40_WPTight_Gsf_branch->GetEntry(index);
+   else
+   {
+     printf("branch HLT_Ele40_WPTight_Gsf_branch does not exist!\n");
+exit(1);
+   }
+   HLT_Ele40_WPTight_Gsf_isLoaded = true;
+ }
+ return HLT_Ele40_WPTight_Gsf_;
+}
+
+const bool &hhtree::HLT_IsoMu20()
+{
+ if(not HLT_IsoMu20_isLoaded)
+ {
+   if(HLT_IsoMu20_branch != 0) HLT_IsoMu20_branch->GetEntry(index);
+   else
+   {
+     printf("branch HLT_IsoMu20_branch does not exist!\n");
+exit(1);
+   }
+   HLT_IsoMu20_isLoaded = true;
+ }
+ return HLT_IsoMu20_;
+}
+
+const bool &hhtree::HLT_IsoMu24()
+{
+ if(not HLT_IsoMu24_isLoaded)
+ {
+   if(HLT_IsoMu24_branch != 0) HLT_IsoMu24_branch->GetEntry(index);
+   else
+   {
+     printf("branch HLT_IsoMu24_branch does not exist!\n");
+exit(1);
+   }
+   HLT_IsoMu24_isLoaded = true;
+ }
+ return HLT_IsoMu24_;
+}
+
+const bool &hhtree::HLT_IsoMu24_eta2p1()
+{
+ if(not HLT_IsoMu24_eta2p1_isLoaded)
+ {
+   if(HLT_IsoMu24_eta2p1_branch != 0) HLT_IsoMu24_eta2p1_branch->GetEntry(index);
+   else
+   {
+     printf("branch HLT_IsoMu24_eta2p1_branch does not exist!\n");
+exit(1);
+   }
+   HLT_IsoMu24_eta2p1_isLoaded = true;
+ }
+ return HLT_IsoMu24_eta2p1_;
+}
+
+const bool &hhtree::HLT_IsoMu27()
+{
+ if(not HLT_IsoMu27_isLoaded)
+ {
+   if(HLT_IsoMu27_branch != 0) HLT_IsoMu27_branch->GetEntry(index);
+   else
+   {
+     printf("branch HLT_IsoMu27_branch does not exist!\n");
+exit(1);
+   }
+   HLT_IsoMu27_isLoaded = true;
+ }
+ return HLT_IsoMu27_;
+}
+
+const bool &hhtree::HLT_IsoMu30()
+{
+ if(not HLT_IsoMu30_isLoaded)
+ {
+   if(HLT_IsoMu30_branch != 0) HLT_IsoMu30_branch->GetEntry(index);
+   else
+   {
+     printf("branch HLT_IsoMu30_branch does not exist!\n");
+exit(1);
+   }
+   HLT_IsoMu30_isLoaded = true;
+ }
+ return HLT_IsoMu30_;
+}
+const bool &hhtree::HLT_Mu50()
+{
+ if(not HLT_Mu50_isLoaded)
+ {
+   if(HLT_Mu50_branch != 0) HLT_Mu50_branch->GetEntry(index);
+   else
+   {
+     printf("branch HLT_Mu50_branch does not exist!\n");
+exit(1);
+   }
+   HLT_Mu50_isLoaded = true;
+ }
+ return HLT_Mu50_;
+}
+
+const bool &hhtree::HLT_Mu55()
+{
+ if(not HLT_Mu55_isLoaded)
+ {
+   if(HLT_Mu55_branch != 0) HLT_Mu55_branch->GetEntry(index);
+   else
+   {
+     printf("branch HLT_Mu55_branch does not exist!\n");
+exit(1);
+   }
+   HLT_Mu55_isLoaded = true;
+ }
+ return HLT_Mu55_;
+}
+
+
 const bool &hhtree::HLT_PFHT1050() 
 {
  if(not HLT_PFHT1050_isLoaded)
@@ -2214,19 +2609,19 @@ exit(1);
  return HLT_AK8DiPFJet250_200_TrimMass30_BTagCSV_p20_;
 }
 
-const float &hhtree::disc_qcd_and_ttbar_Run2_enhanced_v23() 
+const float &hhtree::disc_qcd_and_ttbar_Run2_enhanced_v8p2() 
 {
- if(not disc_qcd_and_ttbar_Run2_enhanced_v23_isLoaded)
+ if(not disc_qcd_and_ttbar_Run2_enhanced_v8p2_isLoaded)
  {
-   if(disc_qcd_and_ttbar_Run2_enhanced_v23_branch != 0) disc_qcd_and_ttbar_Run2_enhanced_v23_branch->GetEntry(index);
+   if(disc_qcd_and_ttbar_Run2_enhanced_v8p2_branch != 0) disc_qcd_and_ttbar_Run2_enhanced_v8p2_branch->GetEntry(index);
    else
    {
-     printf("branch disc_qcd_and_ttbar_Run2_enhanced_v23_branch does not exist!\n");
+     printf("branch disc_qcd_and_ttbar_Run2_enhanced_v8p2_branch does not exist!\n");
 exit(1);
    }
-   disc_qcd_and_ttbar_Run2_enhanced_v23_isLoaded = true;
+   disc_qcd_and_ttbar_Run2_enhanced_v8p2_isLoaded = true;
  }
- return disc_qcd_and_ttbar_Run2_enhanced_v23_;
+ return disc_qcd_and_ttbar_Run2_enhanced_v8p2_;
 }
 
 const float &hhtree::disc_qcd_and_ttbar_Run2_enhanced_v24() 

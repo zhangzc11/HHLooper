@@ -46,6 +46,57 @@ def remove_overflow(hists):
         func(hists)
     return hists
 
+def add_underflow(hists):
+    def func(hist):
+        hist.SetBinContent(1, hist.GetBinContent(0)+hist.GetBinContent(1))
+        hist.SetBinError(1, math.sqrt(hist.GetBinError(0)*hist.GetBinError(0)+hist.GetBinError(1)*hist.GetBinError(1)))
+    if isinstance(hists, list):
+        for hist in hists:
+            func(hist)
+    else:
+        func(hists)
+    return hists
+def add_overflow(hists):
+    def func(hist):
+        nx=hist.GetNbinsX()
+        hist.SetBinContent(nx, hist.GetBinContent(nx)+hist.GetBinContent(nx+1))
+        hist.SetBinError(nx, math.sqrt(hist.GetBinError(nx)*hist.GetBinError(nx)+hist.GetBinError(nx+1)*hist.GetBinError(nx+1)))
+    if isinstance(hists, list):
+        for hist in hists:
+            func(hist)
+    else:
+        func(hists)
+    return hists
+
+def blind_data(hists):
+    def func(hist):
+        nx=hist.FindBin(125.0)
+        hist.SetBinContent(nx, 0.0)
+        hist.SetBinError(nx, 0.0)
+        hist.SetBinContent(nx-1, 0.0)
+        hist.SetBinError(nx-1, 0.0)
+        hist.SetBinContent(nx+1, 0.0)
+        hist.SetBinError(nx+1, 0.0)
+    if isinstance(hists, list):
+        for hist in hists:
+            func(hist)
+    else:
+        func(hists)
+    return hists
+
+def add_underflow(hists):
+    def func(hist):
+        hist.SetBinContent(1, hist.GetBinContent(1)+hist.GetBinContent(0))
+        hist.SetBinError(1, math.sqrt(hist.GetBinError(1)*hist.GetBinError(1)+hist.GetBinError(0)*hist.GetBinError(0)))
+    if isinstance(hists, list):
+        for hist in hists:
+            func(hist)
+    else:
+        func(hists)
+    return hists
+
+
+
 def makeplot_single_2d(
     sig_fnames_=None,
     bkg_fnames_=None,
@@ -402,6 +453,25 @@ def makeplot_single(
             remove_overflow(h1_bkg)
             if h1_data:
                 remove_overflow([h1_data])
+    if "add_overflow" in extraoptions:
+        if extraoptions["add_overflow"]:
+            add_overflow(h1_sig)
+            add_overflow(h1_bkg)
+            if h1_data:
+                add_overflow([h1_data])
+    if "add_underflow" in extraoptions:
+        if extraoptions["add_underflow"]:
+            add_underflow(h1_sig)
+            add_underflow(h1_bkg)
+            if h1_data:
+                add_underflow([h1_data])
+    if "blind_data" in extraoptions:
+        if extraoptions["blind_data"]:
+            #blind_data(h1_sig)
+            #blind_data(h1_bkg)
+            if h1_data:
+                blind_data([h1_data])
+
     myC = r.TCanvas("myC","myC", 600, 600)
     myC.SetTicky(1)
     pad1 = r.TPad("pad1","pad1", 0.05, 0.33,0.95, 0.97) 
@@ -462,12 +532,15 @@ def makeplot_single(
     stack.GetYaxis().SetTitleSize(0.08)
     stack.GetYaxis().SetLabelSize(0.045)
     stack.GetYaxis().CenterTitle()
+    #if "xaxis_range" in extraoptions:
+    #    stack.GetXaxis().SetRangeUser(float(extraoptions["xaxis_range"][0]),float(extraoptions["xaxis_range"][1]))
 
-    leg = r.TLegend(0.45, 0.65, 0.95, 0.88)
-    leg.SetNColumns(2)
+    leg = r.TLegend(0.16, 0.60, 0.97, 0.88)
+    leg.SetNColumns(3)
     leg.SetFillStyle(0)
     leg.SetBorderSize(0)
     leg.SetTextFont(42)
+    leg.SetTextSize(0.07)
     for idx in range(len(h1_bkg)):
         leg.AddEntry(h1_bkg[idx], bkg_legends_[idx], "F")
     for idx in range(len(h1_sig)):
@@ -485,7 +558,7 @@ def makeplot_single(
     ratio_Low  = 0.0
     ratio_High  = 2.0
     if h1_data:
-        ratio = h1_data.Clone("ratio")
+        ratio = h1_data.Clone("ratio_data_over_mc")
         ratio.Divide(hist_all)
         if "ratio_range" in extraoptions:
             ratio_Low = extraoptions["ratio_range"][0]
@@ -524,6 +597,8 @@ def makeplot_single(
     ratio.GetYaxis().SetLabelSize(0.13)
     ratio.GetYaxis().SetTickLength(0.01)
     ratio.GetYaxis().SetNdivisions(505)
+    #if "xaxis_range" in extraoptions:
+    #    ratio.GetXaxis().SetRangeUser(float(extraoptions["xaxis_range"][0]),float(extraoptions["xaxis_range"][1]))
 
     if "cutflow" in hist_name_:
         ratio.GetXaxis().SetTitle("")
@@ -565,7 +640,7 @@ def makeplot_single(
         outFile = outFile + "/" + hist_name_
 
     #print("maxY = "+str(maxY))
-    stack.SetMaximum(maxY*1.3)
+    stack.SetMaximum(maxY*1.45)
 
     #print everything into txt file
     text_file = open(outFile+"_linY.txt", "w")
@@ -576,7 +651,7 @@ def makeplot_single(
     for idx in range(len(sig_legends_)):
         text_file.write(" | %25s"%sig_legends_[idx])
     if h1_data:
-        text_file.write(" | data")
+        text_file.write(" | data | data/mc")
     text_file.write("\n-------------")
     for idx in range(24*(len(bkg_legends_) + 1)+ 29*len(sig_legends_)):
         text_file.write("-")
@@ -592,7 +667,7 @@ def makeplot_single(
         for idx in range(len(sig_legends_)):
             text_file.write(" | %9.3f "%h1_sig[idx].GetBinContent(ibin)+"$\\pm$"+ " %9.3f"%h1_sig[idx].GetBinError(ibin))
         if h1_data:
-            text_file.write(" | %d"%h1_data.GetBinContent(ibin))
+            text_file.write(" | %d"%h1_data.GetBinContent(ibin) +  " | %7.3f "%ratio.GetBinContent(ibin) +"$\\pm$"+ " %7.3f"%ratio.GetBinError(ibin))
         text_file.write("\n")
     text_file.close()
     os.system("cp "+outFile+"_linY.txt "+outFile+"_logY.txt")
@@ -602,12 +677,24 @@ def makeplot_single(
     myC.SaveAs(outFile+"_linY.pdf")
     myC.SaveAs(outFile+"_linY.C")
     pad1.cd()
-    stack.SetMaximum(maxY*1000.0)
-    stack.SetMinimum(0.01)
+    stack.SetMaximum(maxY*100.0)
+    stack.SetMinimum(0.5)
     pad1.SetLogy()
     myC.SaveAs(outFile+"_logY.png")
     myC.SaveAs(outFile+"_logY.pdf")
     myC.SaveAs(outFile+"_logY.C")
+    #save histogram and ratio to root file
+    outFile_root = r.TFile(outFile+".root", "recreate")
+    outFile_root.cd()
+    for idx in range(len(bkg_legends_)):
+        h1_bkg[idx].Write()
+    for idx in range(len(sig_legends_)):
+        h1_sig[idx].Write()
+    if  h1_data:
+        h1_data.Write()
+        ratio.Write()
+    #outFile_root.Write()
+    outFile_root.Close()
 
 def makeplot_all(
     sig_fnames_=None,
