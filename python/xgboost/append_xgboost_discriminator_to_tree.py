@@ -15,7 +15,7 @@ import pandas as pd
 import math
 import pickle as pickle
 import ROOT as root
-import uproot
+import uproot3 as uproot
 
 #################
 ##Preliminaries
