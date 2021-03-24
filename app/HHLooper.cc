@@ -131,6 +131,7 @@ std::string isData_ = argv[4];
 bool saveSkim = false;
 bool doSystematics = false;
 bool dotrigsys = false;
+bool doPNetSFsys = false;
 std::string syst_name = "";
     
 if(argc > 5)
@@ -149,14 +150,20 @@ if(argc > 7)
   std::string s_trigsys = argv[7];
   if(s_trigsys == "1" || s_trigsys == "syst" || s_trigsys == "yes") dotrigsys = true; 
 }
-    
+
 if(argc > 8)
 {
-  std::string s_skim = argv[8];
+  std::string s_PNetSFsys = argv[8];
+  if(s_PNetSFsys == "1" || s_PNetSFsys == "syst" || s_PNetSFsys == "yes") doPNetSFsys = true;
+}
+    
+if(argc > 9)
+{
+  std::string s_skim = argv[9];
   if(s_skim == "1" || s_skim == "skim" || s_skim == "yes") saveSkim = true; 
 }
 
-cout<< "debug: "<<input<<" outputFileName "<<outputFileName<<" label "<<label<<" isData_ "<<isData_<<" syst_name "<<syst_name<<" doSystematics "<<doSystematics<<" doTrigsys "<<dotrigsys<<endl;
+cout<< "debug: "<<input<<" outputFileName "<<outputFileName<<" label "<<label<<" isData_ "<<isData_<<" syst_name "<<syst_name<<" doSystematics "<<doSystematics<<" doTrigsys "<<dotrigsys <<" do PNet Hbb SF unc "<< doPNetSFsys <<endl;
     
 system("mkdir -p hists");
 system(("mkdir -p hists/"+label).c_str());
@@ -372,11 +379,11 @@ cutflow.addCut("CutWeight", [&](){ return 1; },  [&](){
     if(isH){
         float fatJet1_genH_dR = DeltaR(hh.fatJet1Eta(), hh.fatJet1Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
         float fatJet2_genH_dR = DeltaR(hh.fatJet2Eta(), hh.fatJet2Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
-        if( (fatJet1_genH_dR < fatJet2_genH_dR) && (fatJet1_genH_dR < 0.4) )  total_weight = total_weight * PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0);
-        else if( (fatJet1_genH_dR > fatJet2_genH_dR) && (fatJet2_genH_dR < 0.4) )  total_weight = total_weight * PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0);
+        if( (fatJet1_genH_dR < fatJet2_genH_dR) && (fatJet1_genH_dR < 0.4) )  total_weight = total_weight * PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0);
+        else if( (fatJet1_genH_dR > fatJet2_genH_dR) && (fatJet2_genH_dR < 0.4) )  total_weight = total_weight * PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0);
     }
     else if(isHH){
-        total_weight = total_weight * PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0);
+        total_weight = total_weight * PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0);
     }
     return total_weight;
 }); //after ttbar recoil correction
@@ -551,49 +558,1270 @@ if(doSystematics && (outputFileName.find("qcd") == std::string::npos ) && (outpu
     cutflow.addWgtSyst("pileupWeightUp",  [&](){return hh.pileupWeight()!=0 ? hh.pileupWeightUp()/hh.pileupWeight() : 1.0;});
     cutflow.addWgtSyst("pileupWeightDown",  [&](){return hh.pileupWeight()!=0 ? hh.pileupWeightDown()/hh.pileupWeight() : 1.0;});
     
-    //PNetHbbScaleFactors uncertainty
-    cutflow.addWgtSyst("PNetHbbScaleFactorsUp",  [&](){
+    //PNetHbbScaleFactors uncertainty   
+    if(doPNetSFsys){
+    cutflow.addWgtSyst("PNetHbbScaleFactors"+year_+"bin11Up",  [&](){
         float nominal_weight =  1.0;
         float varied_weight = 1.0;
         if(isH){
             float fatJet1_genH_dR = DeltaR(hh.fatJet1Eta(), hh.fatJet1Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
             float fatJet2_genH_dR = DeltaR(hh.fatJet2Eta(), hh.fatJet2Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
             if( (fatJet1_genH_dR < fatJet2_genH_dR) && (fatJet1_genH_dR < 0.4) ){
-                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0);
-                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 1)/nominal_weight;
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0);
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 1, 1, 1)/nominal_weight;
             }  
             else if( (fatJet1_genH_dR > fatJet2_genH_dR) && (fatJet2_genH_dR < 0.4) ){
-                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0); 
-                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 1)/nominal_weight;
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0); 
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 1, 1, 1)/nominal_weight;
             } 
         }
         else if(isHH){
-            nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0);
-            if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 1)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 1)/nominal_weight;
+            nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0);
+            if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 1, 1, 1)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 1, 1, 1)/nominal_weight;
         }
         return varied_weight;
     });
-    cutflow.addWgtSyst("PNetHbbScaleFactorsDown",  [&](){
+    cutflow.addWgtSyst("PNetHbbScaleFactors"+year_+"bin11Down",  [&](){
         float nominal_weight =  1.0;
         float varied_weight = 1.0;
         if(isH){
             float fatJet1_genH_dR = DeltaR(hh.fatJet1Eta(), hh.fatJet1Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
             float fatJet2_genH_dR = DeltaR(hh.fatJet2Eta(), hh.fatJet2Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
             if( (fatJet1_genH_dR < fatJet2_genH_dR) && (fatJet1_genH_dR < 0.4) ){
-                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0);
-                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), -1)/nominal_weight;
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0);
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 1, 1, -1)/nominal_weight;
             }  
             else if( (fatJet1_genH_dR > fatJet2_genH_dR) && (fatJet2_genH_dR < 0.4) ){
-                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0); 
-                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), -1)/nominal_weight;
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0); 
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 1, 1, -1)/nominal_weight;
             } 
         }
         else if(isHH){
-            nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0);
-            if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), -1)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), -1)/nominal_weight;
+            nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0);
+            if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 1, 1, -1)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 1, 1, -1)/nominal_weight;
         }
         return varied_weight;
     });
+    cutflow.addWgtSyst("PNetHbbScaleFactors"+year_+"bin12Up",  [&](){
+        float nominal_weight =  1.0;
+        float varied_weight = 1.0;
+        if(isH){
+            float fatJet1_genH_dR = DeltaR(hh.fatJet1Eta(), hh.fatJet1Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            float fatJet2_genH_dR = DeltaR(hh.fatJet2Eta(), hh.fatJet2Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            if( (fatJet1_genH_dR < fatJet2_genH_dR) && (fatJet1_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0);
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 1, 2, 1)/nominal_weight;
+            }  
+            else if( (fatJet1_genH_dR > fatJet2_genH_dR) && (fatJet2_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0); 
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 1, 2, 1)/nominal_weight;
+            } 
+        }
+        else if(isHH){
+            nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0);
+            if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 1, 2, 1)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 1, 2, 1)/nominal_weight;
+        }
+        return varied_weight;
+    });
+    cutflow.addWgtSyst("PNetHbbScaleFactors"+year_+"bin12Down",  [&](){
+        float nominal_weight =  1.0;
+        float varied_weight = 1.0;
+        if(isH){
+            float fatJet1_genH_dR = DeltaR(hh.fatJet1Eta(), hh.fatJet1Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            float fatJet2_genH_dR = DeltaR(hh.fatJet2Eta(), hh.fatJet2Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            if( (fatJet1_genH_dR < fatJet2_genH_dR) && (fatJet1_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0);
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 1, 2, -1)/nominal_weight;
+            }  
+            else if( (fatJet1_genH_dR > fatJet2_genH_dR) && (fatJet2_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0); 
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 1, 2, -1)/nominal_weight;
+            } 
+        }
+        else if(isHH){
+            nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0);
+            if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 1, 2, -1)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 1, 2, -1)/nominal_weight;
+        }
+        return varied_weight;
+    });
+    cutflow.addWgtSyst("PNetHbbScaleFactors"+year_+"bin13Up",  [&](){
+        float nominal_weight =  1.0;
+        float varied_weight = 1.0;
+        if(isH){
+            float fatJet1_genH_dR = DeltaR(hh.fatJet1Eta(), hh.fatJet1Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            float fatJet2_genH_dR = DeltaR(hh.fatJet2Eta(), hh.fatJet2Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            if( (fatJet1_genH_dR < fatJet2_genH_dR) && (fatJet1_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0);
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 1, 3, 1)/nominal_weight;
+            }  
+            else if( (fatJet1_genH_dR > fatJet2_genH_dR) && (fatJet2_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0); 
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 1, 3, 1)/nominal_weight;
+            } 
+        }
+        else if(isHH){
+            nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0);
+            if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 1, 3, 1)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 1, 3, 1)/nominal_weight;
+        }
+        return varied_weight;
+    });
+    cutflow.addWgtSyst("PNetHbbScaleFactors"+year_+"bin13Down",  [&](){
+        float nominal_weight =  1.0;
+        float varied_weight = 1.0;
+        if(isH){
+            float fatJet1_genH_dR = DeltaR(hh.fatJet1Eta(), hh.fatJet1Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            float fatJet2_genH_dR = DeltaR(hh.fatJet2Eta(), hh.fatJet2Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            if( (fatJet1_genH_dR < fatJet2_genH_dR) && (fatJet1_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0);
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 1, 3, -1)/nominal_weight;
+            }  
+            else if( (fatJet1_genH_dR > fatJet2_genH_dR) && (fatJet2_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0); 
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 1, 3, -1)/nominal_weight;
+            } 
+        }
+        else if(isHH){
+            nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0);
+            if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 1, 3, -1)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 1, 3, -1)/nominal_weight;
+        }
+        return varied_weight;
+    });
+    cutflow.addWgtSyst("PNetHbbScaleFactors"+year_+"bin14Up",  [&](){
+        float nominal_weight =  1.0;
+        float varied_weight = 1.0;
+        if(isH){
+            float fatJet1_genH_dR = DeltaR(hh.fatJet1Eta(), hh.fatJet1Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            float fatJet2_genH_dR = DeltaR(hh.fatJet2Eta(), hh.fatJet2Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            if( (fatJet1_genH_dR < fatJet2_genH_dR) && (fatJet1_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0);
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 1, 4, 1)/nominal_weight;
+            }  
+            else if( (fatJet1_genH_dR > fatJet2_genH_dR) && (fatJet2_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0); 
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 1, 4, 1)/nominal_weight;
+            } 
+        }
+        else if(isHH){
+            nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0);
+            if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 1, 4, 1)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 1, 4, 1)/nominal_weight;
+        }
+        return varied_weight;
+    });
+    cutflow.addWgtSyst("PNetHbbScaleFactors"+year_+"bin14Down",  [&](){
+        float nominal_weight =  1.0;
+        float varied_weight = 1.0;
+        if(isH){
+            float fatJet1_genH_dR = DeltaR(hh.fatJet1Eta(), hh.fatJet1Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            float fatJet2_genH_dR = DeltaR(hh.fatJet2Eta(), hh.fatJet2Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            if( (fatJet1_genH_dR < fatJet2_genH_dR) && (fatJet1_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0);
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 1, 4, -1)/nominal_weight;
+            }  
+            else if( (fatJet1_genH_dR > fatJet2_genH_dR) && (fatJet2_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0); 
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 1, 4, -1)/nominal_weight;
+            } 
+        }
+        else if(isHH){
+            nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0);
+            if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 1, 4, -1)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 1, 4, -1)/nominal_weight;
+        }
+        return varied_weight;
+    });
+    cutflow.addWgtSyst("PNetHbbScaleFactors"+year_+"bin15Up",  [&](){
+        float nominal_weight =  1.0;
+        float varied_weight = 1.0;
+        if(isH){
+            float fatJet1_genH_dR = DeltaR(hh.fatJet1Eta(), hh.fatJet1Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            float fatJet2_genH_dR = DeltaR(hh.fatJet2Eta(), hh.fatJet2Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            if( (fatJet1_genH_dR < fatJet2_genH_dR) && (fatJet1_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0);
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 1, 5, 1)/nominal_weight;
+            }  
+            else if( (fatJet1_genH_dR > fatJet2_genH_dR) && (fatJet2_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0); 
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 1, 5, 1)/nominal_weight;
+            } 
+        }
+        else if(isHH){
+            nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0);
+            if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 1, 5, 1)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 1, 5, 1)/nominal_weight;
+        }
+        return varied_weight;
+    });
+    cutflow.addWgtSyst("PNetHbbScaleFactors"+year_+"bin15Down",  [&](){
+        float nominal_weight =  1.0;
+        float varied_weight = 1.0;
+        if(isH){
+            float fatJet1_genH_dR = DeltaR(hh.fatJet1Eta(), hh.fatJet1Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            float fatJet2_genH_dR = DeltaR(hh.fatJet2Eta(), hh.fatJet2Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            if( (fatJet1_genH_dR < fatJet2_genH_dR) && (fatJet1_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0);
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 1, 5, -1)/nominal_weight;
+            }  
+            else if( (fatJet1_genH_dR > fatJet2_genH_dR) && (fatJet2_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0); 
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 1, 5, -1)/nominal_weight;
+            } 
+        }
+        else if(isHH){
+            nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0);
+            if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 1, 5, -1)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 1, 5, -1)/nominal_weight;
+        }
+        return varied_weight;
+    });
+    cutflow.addWgtSyst("PNetHbbScaleFactors"+year_+"bin21Up",  [&](){
+        float nominal_weight =  1.0;
+        float varied_weight = 1.0;
+        if(isH){
+            float fatJet1_genH_dR = DeltaR(hh.fatJet1Eta(), hh.fatJet1Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            float fatJet2_genH_dR = DeltaR(hh.fatJet2Eta(), hh.fatJet2Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            if( (fatJet1_genH_dR < fatJet2_genH_dR) && (fatJet1_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0);
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 2, 1, 1)/nominal_weight;
+            }  
+            else if( (fatJet1_genH_dR > fatJet2_genH_dR) && (fatJet2_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0); 
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 2, 1, 1)/nominal_weight;
+            } 
+        }
+        else if(isHH){
+            nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0);
+            if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 2, 1, 1)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 2, 1, 1)/nominal_weight;
+        }
+        return varied_weight;
+    });
+    cutflow.addWgtSyst("PNetHbbScaleFactors"+year_+"bin21Down",  [&](){
+        float nominal_weight =  1.0;
+        float varied_weight = 1.0;
+        if(isH){
+            float fatJet1_genH_dR = DeltaR(hh.fatJet1Eta(), hh.fatJet1Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            float fatJet2_genH_dR = DeltaR(hh.fatJet2Eta(), hh.fatJet2Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            if( (fatJet1_genH_dR < fatJet2_genH_dR) && (fatJet1_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0);
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 2, 1, -1)/nominal_weight;
+            }  
+            else if( (fatJet1_genH_dR > fatJet2_genH_dR) && (fatJet2_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0); 
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 2, 1, -1)/nominal_weight;
+            } 
+        }
+        else if(isHH){
+            nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0);
+            if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 2, 1, -1)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 2, 1, -1)/nominal_weight;
+        }
+        return varied_weight;
+    });
+    cutflow.addWgtSyst("PNetHbbScaleFactors"+year_+"bin22Up",  [&](){
+        float nominal_weight =  1.0;
+        float varied_weight = 1.0;
+        if(isH){
+            float fatJet1_genH_dR = DeltaR(hh.fatJet1Eta(), hh.fatJet1Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            float fatJet2_genH_dR = DeltaR(hh.fatJet2Eta(), hh.fatJet2Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            if( (fatJet1_genH_dR < fatJet2_genH_dR) && (fatJet1_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0);
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 2, 2, 1)/nominal_weight;
+            }  
+            else if( (fatJet1_genH_dR > fatJet2_genH_dR) && (fatJet2_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0); 
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 2, 2, 1)/nominal_weight;
+            } 
+        }
+        else if(isHH){
+            nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0);
+            if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 2, 2, 1)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 2, 2, 1)/nominal_weight;
+        }
+        return varied_weight;
+    });
+    cutflow.addWgtSyst("PNetHbbScaleFactors"+year_+"bin22Down",  [&](){
+        float nominal_weight =  1.0;
+        float varied_weight = 1.0;
+        if(isH){
+            float fatJet1_genH_dR = DeltaR(hh.fatJet1Eta(), hh.fatJet1Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            float fatJet2_genH_dR = DeltaR(hh.fatJet2Eta(), hh.fatJet2Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            if( (fatJet1_genH_dR < fatJet2_genH_dR) && (fatJet1_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0);
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 2, 2, -1)/nominal_weight;
+            }  
+            else if( (fatJet1_genH_dR > fatJet2_genH_dR) && (fatJet2_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0); 
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 2, 2, -1)/nominal_weight;
+            } 
+        }
+        else if(isHH){
+            nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0);
+            if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 2, 2, -1)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 2, 2, -1)/nominal_weight;
+        }
+        return varied_weight;
+    });
+    cutflow.addWgtSyst("PNetHbbScaleFactors"+year_+"bin23Up",  [&](){
+        float nominal_weight =  1.0;
+        float varied_weight = 1.0;
+        if(isH){
+            float fatJet1_genH_dR = DeltaR(hh.fatJet1Eta(), hh.fatJet1Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            float fatJet2_genH_dR = DeltaR(hh.fatJet2Eta(), hh.fatJet2Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            if( (fatJet1_genH_dR < fatJet2_genH_dR) && (fatJet1_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0);
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 2, 3, 1)/nominal_weight;
+            }  
+            else if( (fatJet1_genH_dR > fatJet2_genH_dR) && (fatJet2_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0); 
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 2, 3, 1)/nominal_weight;
+            } 
+        }
+        else if(isHH){
+            nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0);
+            if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 2, 3, 1)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 2, 3, 1)/nominal_weight;
+        }
+        return varied_weight;
+    });
+    cutflow.addWgtSyst("PNetHbbScaleFactors"+year_+"bin23Down",  [&](){
+        float nominal_weight =  1.0;
+        float varied_weight = 1.0;
+        if(isH){
+            float fatJet1_genH_dR = DeltaR(hh.fatJet1Eta(), hh.fatJet1Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            float fatJet2_genH_dR = DeltaR(hh.fatJet2Eta(), hh.fatJet2Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            if( (fatJet1_genH_dR < fatJet2_genH_dR) && (fatJet1_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0);
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 2, 3, -1)/nominal_weight;
+            }  
+            else if( (fatJet1_genH_dR > fatJet2_genH_dR) && (fatJet2_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0); 
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 2, 3, -1)/nominal_weight;
+            } 
+        }
+        else if(isHH){
+            nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0);
+            if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 2, 3, -1)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 2, 3, -1)/nominal_weight;
+        }
+        return varied_weight;
+    });
+    cutflow.addWgtSyst("PNetHbbScaleFactors"+year_+"bin24Up",  [&](){
+        float nominal_weight =  1.0;
+        float varied_weight = 1.0;
+        if(isH){
+            float fatJet1_genH_dR = DeltaR(hh.fatJet1Eta(), hh.fatJet1Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            float fatJet2_genH_dR = DeltaR(hh.fatJet2Eta(), hh.fatJet2Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            if( (fatJet1_genH_dR < fatJet2_genH_dR) && (fatJet1_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0);
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 2, 4, 1)/nominal_weight;
+            }  
+            else if( (fatJet1_genH_dR > fatJet2_genH_dR) && (fatJet2_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0); 
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 2, 4, 1)/nominal_weight;
+            } 
+        }
+        else if(isHH){
+            nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0);
+            if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 2, 4, 1)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 2, 4, 1)/nominal_weight;
+        }
+        return varied_weight;
+    });
+    cutflow.addWgtSyst("PNetHbbScaleFactors"+year_+"bin24Down",  [&](){
+        float nominal_weight =  1.0;
+        float varied_weight = 1.0;
+        if(isH){
+            float fatJet1_genH_dR = DeltaR(hh.fatJet1Eta(), hh.fatJet1Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            float fatJet2_genH_dR = DeltaR(hh.fatJet2Eta(), hh.fatJet2Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            if( (fatJet1_genH_dR < fatJet2_genH_dR) && (fatJet1_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0);
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 2, 4, -1)/nominal_weight;
+            }  
+            else if( (fatJet1_genH_dR > fatJet2_genH_dR) && (fatJet2_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0); 
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 2, 4, -1)/nominal_weight;
+            } 
+        }
+        else if(isHH){
+            nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0);
+            if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 2, 4, -1)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 2, 4, -1)/nominal_weight;
+        }
+        return varied_weight;
+    });
+    cutflow.addWgtSyst("PNetHbbScaleFactors"+year_+"bin25Up",  [&](){
+        float nominal_weight =  1.0;
+        float varied_weight = 1.0;
+        if(isH){
+            float fatJet1_genH_dR = DeltaR(hh.fatJet1Eta(), hh.fatJet1Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            float fatJet2_genH_dR = DeltaR(hh.fatJet2Eta(), hh.fatJet2Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            if( (fatJet1_genH_dR < fatJet2_genH_dR) && (fatJet1_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0);
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 2, 5, 1)/nominal_weight;
+            }  
+            else if( (fatJet1_genH_dR > fatJet2_genH_dR) && (fatJet2_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0); 
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 2, 5, 1)/nominal_weight;
+            } 
+        }
+        else if(isHH){
+            nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0);
+            if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 2, 5, 1)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 2, 5, 1)/nominal_weight;
+        }
+        return varied_weight;
+    });
+    cutflow.addWgtSyst("PNetHbbScaleFactors"+year_+"bin25Down",  [&](){
+        float nominal_weight =  1.0;
+        float varied_weight = 1.0;
+        if(isH){
+            float fatJet1_genH_dR = DeltaR(hh.fatJet1Eta(), hh.fatJet1Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            float fatJet2_genH_dR = DeltaR(hh.fatJet2Eta(), hh.fatJet2Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            if( (fatJet1_genH_dR < fatJet2_genH_dR) && (fatJet1_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0);
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 2, 5, -1)/nominal_weight;
+            }  
+            else if( (fatJet1_genH_dR > fatJet2_genH_dR) && (fatJet2_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0); 
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 2, 5, -1)/nominal_weight;
+            } 
+        }
+        else if(isHH){
+            nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0);
+            if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 2, 5, -1)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 2, 5, -1)/nominal_weight;
+        }
+        return varied_weight;
+    });
+    cutflow.addWgtSyst("PNetHbbScaleFactors"+year_+"bin31Up",  [&](){
+        float nominal_weight =  1.0;
+        float varied_weight = 1.0;
+        if(isH){
+            float fatJet1_genH_dR = DeltaR(hh.fatJet1Eta(), hh.fatJet1Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            float fatJet2_genH_dR = DeltaR(hh.fatJet2Eta(), hh.fatJet2Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            if( (fatJet1_genH_dR < fatJet2_genH_dR) && (fatJet1_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0);
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 3, 1, 1)/nominal_weight;
+            }  
+            else if( (fatJet1_genH_dR > fatJet2_genH_dR) && (fatJet2_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0); 
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 3, 1, 1)/nominal_weight;
+            } 
+        }
+        else if(isHH){
+            nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0);
+            if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 3, 1, 1)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 3, 1, 1)/nominal_weight;
+        }
+        return varied_weight;
+    });
+    cutflow.addWgtSyst("PNetHbbScaleFactors"+year_+"bin31Down",  [&](){
+        float nominal_weight =  1.0;
+        float varied_weight = 1.0;
+        if(isH){
+            float fatJet1_genH_dR = DeltaR(hh.fatJet1Eta(), hh.fatJet1Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            float fatJet2_genH_dR = DeltaR(hh.fatJet2Eta(), hh.fatJet2Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            if( (fatJet1_genH_dR < fatJet2_genH_dR) && (fatJet1_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0);
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 3, 1, -1)/nominal_weight;
+            }  
+            else if( (fatJet1_genH_dR > fatJet2_genH_dR) && (fatJet2_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0); 
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 3, 1, -1)/nominal_weight;
+            } 
+        }
+        else if(isHH){
+            nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0);
+            if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 3, 1, -1)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 3, 1, -1)/nominal_weight;
+        }
+        return varied_weight;
+    });
+    cutflow.addWgtSyst("PNetHbbScaleFactors"+year_+"bin32Up",  [&](){
+        float nominal_weight =  1.0;
+        float varied_weight = 1.0;
+        if(isH){
+            float fatJet1_genH_dR = DeltaR(hh.fatJet1Eta(), hh.fatJet1Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            float fatJet2_genH_dR = DeltaR(hh.fatJet2Eta(), hh.fatJet2Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            if( (fatJet1_genH_dR < fatJet2_genH_dR) && (fatJet1_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0);
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 3, 2, 1)/nominal_weight;
+            }  
+            else if( (fatJet1_genH_dR > fatJet2_genH_dR) && (fatJet2_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0); 
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 3, 2, 1)/nominal_weight;
+            } 
+        }
+        else if(isHH){
+            nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0);
+            if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 3, 2, 1)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 3, 2, 1)/nominal_weight;
+        }
+        return varied_weight;
+    });
+    cutflow.addWgtSyst("PNetHbbScaleFactors"+year_+"bin32Down",  [&](){
+        float nominal_weight =  1.0;
+        float varied_weight = 1.0;
+        if(isH){
+            float fatJet1_genH_dR = DeltaR(hh.fatJet1Eta(), hh.fatJet1Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            float fatJet2_genH_dR = DeltaR(hh.fatJet2Eta(), hh.fatJet2Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            if( (fatJet1_genH_dR < fatJet2_genH_dR) && (fatJet1_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0);
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 3, 2, -1)/nominal_weight;
+            }  
+            else if( (fatJet1_genH_dR > fatJet2_genH_dR) && (fatJet2_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0); 
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 3, 2, -1)/nominal_weight;
+            } 
+        }
+        else if(isHH){
+            nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0);
+            if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 3, 2, -1)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 3, 2, -1)/nominal_weight;
+        }
+        return varied_weight;
+    });
+    cutflow.addWgtSyst("PNetHbbScaleFactors"+year_+"bin33Up",  [&](){
+        float nominal_weight =  1.0;
+        float varied_weight = 1.0;
+        if(isH){
+            float fatJet1_genH_dR = DeltaR(hh.fatJet1Eta(), hh.fatJet1Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            float fatJet2_genH_dR = DeltaR(hh.fatJet2Eta(), hh.fatJet2Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            if( (fatJet1_genH_dR < fatJet2_genH_dR) && (fatJet1_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0);
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 3, 3, 1)/nominal_weight;
+            }  
+            else if( (fatJet1_genH_dR > fatJet2_genH_dR) && (fatJet2_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0); 
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 3, 3, 1)/nominal_weight;
+            } 
+        }
+        else if(isHH){
+            nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0);
+            if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 3, 3, 1)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 3, 3, 1)/nominal_weight;
+        }
+        return varied_weight;
+    });
+    cutflow.addWgtSyst("PNetHbbScaleFactors"+year_+"bin33Down",  [&](){
+        float nominal_weight =  1.0;
+        float varied_weight = 1.0;
+        if(isH){
+            float fatJet1_genH_dR = DeltaR(hh.fatJet1Eta(), hh.fatJet1Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            float fatJet2_genH_dR = DeltaR(hh.fatJet2Eta(), hh.fatJet2Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            if( (fatJet1_genH_dR < fatJet2_genH_dR) && (fatJet1_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0);
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 3, 3, -1)/nominal_weight;
+            }  
+            else if( (fatJet1_genH_dR > fatJet2_genH_dR) && (fatJet2_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0); 
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 3, 3, -1)/nominal_weight;
+            } 
+        }
+        else if(isHH){
+            nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0);
+            if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 3, 3, -1)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 3, 3, -1)/nominal_weight;
+        }
+        return varied_weight;
+    });
+    cutflow.addWgtSyst("PNetHbbScaleFactors"+year_+"bin34Up",  [&](){
+        float nominal_weight =  1.0;
+        float varied_weight = 1.0;
+        if(isH){
+            float fatJet1_genH_dR = DeltaR(hh.fatJet1Eta(), hh.fatJet1Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            float fatJet2_genH_dR = DeltaR(hh.fatJet2Eta(), hh.fatJet2Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            if( (fatJet1_genH_dR < fatJet2_genH_dR) && (fatJet1_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0);
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 3, 4, 1)/nominal_weight;
+            }  
+            else if( (fatJet1_genH_dR > fatJet2_genH_dR) && (fatJet2_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0); 
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 3, 4, 1)/nominal_weight;
+            } 
+        }
+        else if(isHH){
+            nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0);
+            if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 3, 4, 1)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 3, 4, 1)/nominal_weight;
+        }
+        return varied_weight;
+    });
+    cutflow.addWgtSyst("PNetHbbScaleFactors"+year_+"bin34Down",  [&](){
+        float nominal_weight =  1.0;
+        float varied_weight = 1.0;
+        if(isH){
+            float fatJet1_genH_dR = DeltaR(hh.fatJet1Eta(), hh.fatJet1Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            float fatJet2_genH_dR = DeltaR(hh.fatJet2Eta(), hh.fatJet2Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            if( (fatJet1_genH_dR < fatJet2_genH_dR) && (fatJet1_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0);
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 3, 4, -1)/nominal_weight;
+            }  
+            else if( (fatJet1_genH_dR > fatJet2_genH_dR) && (fatJet2_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0); 
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 3, 4, -1)/nominal_weight;
+            } 
+        }
+        else if(isHH){
+            nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0);
+            if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 3, 4, -1)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 3, 4, -1)/nominal_weight;
+        }
+        return varied_weight;
+    });
+    cutflow.addWgtSyst("PNetHbbScaleFactors"+year_+"bin35Up",  [&](){
+        float nominal_weight =  1.0;
+        float varied_weight = 1.0;
+        if(isH){
+            float fatJet1_genH_dR = DeltaR(hh.fatJet1Eta(), hh.fatJet1Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            float fatJet2_genH_dR = DeltaR(hh.fatJet2Eta(), hh.fatJet2Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            if( (fatJet1_genH_dR < fatJet2_genH_dR) && (fatJet1_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0);
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 3, 5, 1)/nominal_weight;
+            }  
+            else if( (fatJet1_genH_dR > fatJet2_genH_dR) && (fatJet2_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0); 
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 3, 5, 1)/nominal_weight;
+            } 
+        }
+        else if(isHH){
+            nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0);
+            if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 3, 5, 1)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 3, 5, 1)/nominal_weight;
+        }
+        return varied_weight;
+    });
+    cutflow.addWgtSyst("PNetHbbScaleFactors"+year_+"bin35Down",  [&](){
+        float nominal_weight =  1.0;
+        float varied_weight = 1.0;
+        if(isH){
+            float fatJet1_genH_dR = DeltaR(hh.fatJet1Eta(), hh.fatJet1Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            float fatJet2_genH_dR = DeltaR(hh.fatJet2Eta(), hh.fatJet2Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            if( (fatJet1_genH_dR < fatJet2_genH_dR) && (fatJet1_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0);
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 3, 5, -1)/nominal_weight;
+            }  
+            else if( (fatJet1_genH_dR > fatJet2_genH_dR) && (fatJet2_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0); 
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 3, 5, -1)/nominal_weight;
+            } 
+        }
+        else if(isHH){
+            nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0);
+            if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 3, 5, -1)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 3, 5, -1)/nominal_weight;
+        }
+        return varied_weight;
+    });
+    cutflow.addWgtSyst("PNetHbbScaleFactors"+year_+"bin41Up",  [&](){
+        float nominal_weight =  1.0;
+        float varied_weight = 1.0;
+        if(isH){
+            float fatJet1_genH_dR = DeltaR(hh.fatJet1Eta(), hh.fatJet1Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            float fatJet2_genH_dR = DeltaR(hh.fatJet2Eta(), hh.fatJet2Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            if( (fatJet1_genH_dR < fatJet2_genH_dR) && (fatJet1_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0);
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 4, 1, 1)/nominal_weight;
+            }  
+            else if( (fatJet1_genH_dR > fatJet2_genH_dR) && (fatJet2_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0); 
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 4, 1, 1)/nominal_weight;
+            } 
+        }
+        else if(isHH){
+            nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0);
+            if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 4, 1, 1)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 4, 1, 1)/nominal_weight;
+        }
+        return varied_weight;
+    });
+    cutflow.addWgtSyst("PNetHbbScaleFactors"+year_+"bin41Down",  [&](){
+        float nominal_weight =  1.0;
+        float varied_weight = 1.0;
+        if(isH){
+            float fatJet1_genH_dR = DeltaR(hh.fatJet1Eta(), hh.fatJet1Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            float fatJet2_genH_dR = DeltaR(hh.fatJet2Eta(), hh.fatJet2Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            if( (fatJet1_genH_dR < fatJet2_genH_dR) && (fatJet1_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0);
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 4, 1, -1)/nominal_weight;
+            }  
+            else if( (fatJet1_genH_dR > fatJet2_genH_dR) && (fatJet2_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0); 
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 4, 1, -1)/nominal_weight;
+            } 
+        }
+        else if(isHH){
+            nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0);
+            if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 4, 1, -1)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 4, 1, -1)/nominal_weight;
+        }
+        return varied_weight;
+    });
+    cutflow.addWgtSyst("PNetHbbScaleFactors"+year_+"bin42Up",  [&](){
+        float nominal_weight =  1.0;
+        float varied_weight = 1.0;
+        if(isH){
+            float fatJet1_genH_dR = DeltaR(hh.fatJet1Eta(), hh.fatJet1Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            float fatJet2_genH_dR = DeltaR(hh.fatJet2Eta(), hh.fatJet2Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            if( (fatJet1_genH_dR < fatJet2_genH_dR) && (fatJet1_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0);
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 4, 2, 1)/nominal_weight;
+            }  
+            else if( (fatJet1_genH_dR > fatJet2_genH_dR) && (fatJet2_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0); 
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 4, 2, 1)/nominal_weight;
+            } 
+        }
+        else if(isHH){
+            nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0);
+            if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 4, 2, 1)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 4, 2, 1)/nominal_weight;
+        }
+        return varied_weight;
+    });
+    cutflow.addWgtSyst("PNetHbbScaleFactors"+year_+"bin42Down",  [&](){
+        float nominal_weight =  1.0;
+        float varied_weight = 1.0;
+        if(isH){
+            float fatJet1_genH_dR = DeltaR(hh.fatJet1Eta(), hh.fatJet1Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            float fatJet2_genH_dR = DeltaR(hh.fatJet2Eta(), hh.fatJet2Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            if( (fatJet1_genH_dR < fatJet2_genH_dR) && (fatJet1_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0);
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 4, 2, -1)/nominal_weight;
+            }  
+            else if( (fatJet1_genH_dR > fatJet2_genH_dR) && (fatJet2_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0); 
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 4, 2, -1)/nominal_weight;
+            } 
+        }
+        else if(isHH){
+            nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0);
+            if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 4, 2, -1)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 4, 2, -1)/nominal_weight;
+        }
+        return varied_weight;
+    });
+    cutflow.addWgtSyst("PNetHbbScaleFactors"+year_+"bin43Up",  [&](){
+        float nominal_weight =  1.0;
+        float varied_weight = 1.0;
+        if(isH){
+            float fatJet1_genH_dR = DeltaR(hh.fatJet1Eta(), hh.fatJet1Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            float fatJet2_genH_dR = DeltaR(hh.fatJet2Eta(), hh.fatJet2Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            if( (fatJet1_genH_dR < fatJet2_genH_dR) && (fatJet1_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0);
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 4, 3, 1)/nominal_weight;
+            }  
+            else if( (fatJet1_genH_dR > fatJet2_genH_dR) && (fatJet2_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0); 
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 4, 3, 1)/nominal_weight;
+            } 
+        }
+        else if(isHH){
+            nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0);
+            if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 4, 3, 1)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 4, 3, 1)/nominal_weight;
+        }
+        return varied_weight;
+    });
+    cutflow.addWgtSyst("PNetHbbScaleFactors"+year_+"bin43Down",  [&](){
+        float nominal_weight =  1.0;
+        float varied_weight = 1.0;
+        if(isH){
+            float fatJet1_genH_dR = DeltaR(hh.fatJet1Eta(), hh.fatJet1Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            float fatJet2_genH_dR = DeltaR(hh.fatJet2Eta(), hh.fatJet2Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            if( (fatJet1_genH_dR < fatJet2_genH_dR) && (fatJet1_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0);
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 4, 3, -1)/nominal_weight;
+            }  
+            else if( (fatJet1_genH_dR > fatJet2_genH_dR) && (fatJet2_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0); 
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 4, 3, -1)/nominal_weight;
+            } 
+        }
+        else if(isHH){
+            nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0);
+            if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 4, 3, -1)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 4, 3, -1)/nominal_weight;
+        }
+        return varied_weight;
+    });
+    cutflow.addWgtSyst("PNetHbbScaleFactors"+year_+"bin44Up",  [&](){
+        float nominal_weight =  1.0;
+        float varied_weight = 1.0;
+        if(isH){
+            float fatJet1_genH_dR = DeltaR(hh.fatJet1Eta(), hh.fatJet1Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            float fatJet2_genH_dR = DeltaR(hh.fatJet2Eta(), hh.fatJet2Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            if( (fatJet1_genH_dR < fatJet2_genH_dR) && (fatJet1_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0);
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 4, 4, 1)/nominal_weight;
+            }  
+            else if( (fatJet1_genH_dR > fatJet2_genH_dR) && (fatJet2_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0); 
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 4, 4, 1)/nominal_weight;
+            } 
+        }
+        else if(isHH){
+            nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0);
+            if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 4, 4, 1)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 4, 4, 1)/nominal_weight;
+        }
+        return varied_weight;
+    });
+    cutflow.addWgtSyst("PNetHbbScaleFactors"+year_+"bin44Down",  [&](){
+        float nominal_weight =  1.0;
+        float varied_weight = 1.0;
+        if(isH){
+            float fatJet1_genH_dR = DeltaR(hh.fatJet1Eta(), hh.fatJet1Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            float fatJet2_genH_dR = DeltaR(hh.fatJet2Eta(), hh.fatJet2Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            if( (fatJet1_genH_dR < fatJet2_genH_dR) && (fatJet1_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0);
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 4, 4, -1)/nominal_weight;
+            }  
+            else if( (fatJet1_genH_dR > fatJet2_genH_dR) && (fatJet2_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0); 
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 4, 4, -1)/nominal_weight;
+            } 
+        }
+        else if(isHH){
+            nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0);
+            if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 4, 4, -1)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 4, 4, -1)/nominal_weight;
+        }
+        return varied_weight;
+    });
+    cutflow.addWgtSyst("PNetHbbScaleFactors"+year_+"bin45Up",  [&](){
+        float nominal_weight =  1.0;
+        float varied_weight = 1.0;
+        if(isH){
+            float fatJet1_genH_dR = DeltaR(hh.fatJet1Eta(), hh.fatJet1Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            float fatJet2_genH_dR = DeltaR(hh.fatJet2Eta(), hh.fatJet2Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            if( (fatJet1_genH_dR < fatJet2_genH_dR) && (fatJet1_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0);
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 4, 5, 1)/nominal_weight;
+            }  
+            else if( (fatJet1_genH_dR > fatJet2_genH_dR) && (fatJet2_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0); 
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 4, 5, 1)/nominal_weight;
+            } 
+        }
+        else if(isHH){
+            nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0);
+            if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 4, 5, 1)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 4, 5, 1)/nominal_weight;
+        }
+        return varied_weight;
+    });
+    cutflow.addWgtSyst("PNetHbbScaleFactors"+year_+"bin45Down",  [&](){
+        float nominal_weight =  1.0;
+        float varied_weight = 1.0;
+        if(isH){
+            float fatJet1_genH_dR = DeltaR(hh.fatJet1Eta(), hh.fatJet1Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            float fatJet2_genH_dR = DeltaR(hh.fatJet2Eta(), hh.fatJet2Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            if( (fatJet1_genH_dR < fatJet2_genH_dR) && (fatJet1_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0);
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 4, 5, -1)/nominal_weight;
+            }  
+            else if( (fatJet1_genH_dR > fatJet2_genH_dR) && (fatJet2_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0); 
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 4, 5, -1)/nominal_weight;
+            } 
+        }
+        else if(isHH){
+            nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0);
+            if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 4, 5, -1)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 4, 5, -1)/nominal_weight;
+        }
+        return varied_weight;
+    });
+    cutflow.addWgtSyst("PNetHbbScaleFactors"+year_+"bin51Up",  [&](){
+        float nominal_weight =  1.0;
+        float varied_weight = 1.0;
+        if(isH){
+            float fatJet1_genH_dR = DeltaR(hh.fatJet1Eta(), hh.fatJet1Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            float fatJet2_genH_dR = DeltaR(hh.fatJet2Eta(), hh.fatJet2Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            if( (fatJet1_genH_dR < fatJet2_genH_dR) && (fatJet1_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0);
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 5, 1, 1)/nominal_weight;
+            }  
+            else if( (fatJet1_genH_dR > fatJet2_genH_dR) && (fatJet2_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0); 
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 5, 1, 1)/nominal_weight;
+            } 
+        }
+        else if(isHH){
+            nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0);
+            if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 5, 1, 1)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 5, 1, 1)/nominal_weight;
+        }
+        return varied_weight;
+    });
+    cutflow.addWgtSyst("PNetHbbScaleFactors"+year_+"bin51Down",  [&](){
+        float nominal_weight =  1.0;
+        float varied_weight = 1.0;
+        if(isH){
+            float fatJet1_genH_dR = DeltaR(hh.fatJet1Eta(), hh.fatJet1Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            float fatJet2_genH_dR = DeltaR(hh.fatJet2Eta(), hh.fatJet2Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            if( (fatJet1_genH_dR < fatJet2_genH_dR) && (fatJet1_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0);
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 5, 1, -1)/nominal_weight;
+            }  
+            else if( (fatJet1_genH_dR > fatJet2_genH_dR) && (fatJet2_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0); 
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 5, 1, -1)/nominal_weight;
+            } 
+        }
+        else if(isHH){
+            nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0);
+            if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 5, 1, -1)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 5, 1, -1)/nominal_weight;
+        }
+        return varied_weight;
+    });
+    cutflow.addWgtSyst("PNetHbbScaleFactors"+year_+"bin52Up",  [&](){
+        float nominal_weight =  1.0;
+        float varied_weight = 1.0;
+        if(isH){
+            float fatJet1_genH_dR = DeltaR(hh.fatJet1Eta(), hh.fatJet1Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            float fatJet2_genH_dR = DeltaR(hh.fatJet2Eta(), hh.fatJet2Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            if( (fatJet1_genH_dR < fatJet2_genH_dR) && (fatJet1_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0);
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 5, 2, 1)/nominal_weight;
+            }  
+            else if( (fatJet1_genH_dR > fatJet2_genH_dR) && (fatJet2_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0); 
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 5, 2, 1)/nominal_weight;
+            } 
+        }
+        else if(isHH){
+            nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0);
+            if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 5, 2, 1)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 5, 2, 1)/nominal_weight;
+        }
+        return varied_weight;
+    });
+    cutflow.addWgtSyst("PNetHbbScaleFactors"+year_+"bin52Down",  [&](){
+        float nominal_weight =  1.0;
+        float varied_weight = 1.0;
+        if(isH){
+            float fatJet1_genH_dR = DeltaR(hh.fatJet1Eta(), hh.fatJet1Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            float fatJet2_genH_dR = DeltaR(hh.fatJet2Eta(), hh.fatJet2Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            if( (fatJet1_genH_dR < fatJet2_genH_dR) && (fatJet1_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0);
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 5, 2, -1)/nominal_weight;
+            }  
+            else if( (fatJet1_genH_dR > fatJet2_genH_dR) && (fatJet2_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0); 
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 5, 2, -1)/nominal_weight;
+            } 
+        }
+        else if(isHH){
+            nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0);
+            if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 5, 2, -1)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 5, 2, -1)/nominal_weight;
+        }
+        return varied_weight;
+    });
+    cutflow.addWgtSyst("PNetHbbScaleFactors"+year_+"bin53Up",  [&](){
+        float nominal_weight =  1.0;
+        float varied_weight = 1.0;
+        if(isH){
+            float fatJet1_genH_dR = DeltaR(hh.fatJet1Eta(), hh.fatJet1Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            float fatJet2_genH_dR = DeltaR(hh.fatJet2Eta(), hh.fatJet2Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            if( (fatJet1_genH_dR < fatJet2_genH_dR) && (fatJet1_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0);
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 5, 3, 1)/nominal_weight;
+            }  
+            else if( (fatJet1_genH_dR > fatJet2_genH_dR) && (fatJet2_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0); 
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 5, 3, 1)/nominal_weight;
+            } 
+        }
+        else if(isHH){
+            nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0);
+            if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 5, 3, 1)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 5, 3, 1)/nominal_weight;
+        }
+        return varied_weight;
+    });
+    cutflow.addWgtSyst("PNetHbbScaleFactors"+year_+"bin53Down",  [&](){
+        float nominal_weight =  1.0;
+        float varied_weight = 1.0;
+        if(isH){
+            float fatJet1_genH_dR = DeltaR(hh.fatJet1Eta(), hh.fatJet1Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            float fatJet2_genH_dR = DeltaR(hh.fatJet2Eta(), hh.fatJet2Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            if( (fatJet1_genH_dR < fatJet2_genH_dR) && (fatJet1_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0);
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 5, 3, -1)/nominal_weight;
+            }  
+            else if( (fatJet1_genH_dR > fatJet2_genH_dR) && (fatJet2_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0); 
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 5, 3, -1)/nominal_weight;
+            } 
+        }
+        else if(isHH){
+            nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0);
+            if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 5, 3, -1)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 5, 3, -1)/nominal_weight;
+        }
+        return varied_weight;
+    });
+    cutflow.addWgtSyst("PNetHbbScaleFactors"+year_+"bin54Up",  [&](){
+        float nominal_weight =  1.0;
+        float varied_weight = 1.0;
+        if(isH){
+            float fatJet1_genH_dR = DeltaR(hh.fatJet1Eta(), hh.fatJet1Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            float fatJet2_genH_dR = DeltaR(hh.fatJet2Eta(), hh.fatJet2Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            if( (fatJet1_genH_dR < fatJet2_genH_dR) && (fatJet1_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0);
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 5, 4, 1)/nominal_weight;
+            }  
+            else if( (fatJet1_genH_dR > fatJet2_genH_dR) && (fatJet2_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0); 
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 5, 4, 1)/nominal_weight;
+            } 
+        }
+        else if(isHH){
+            nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0);
+            if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 5, 4, 1)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 5, 4, 1)/nominal_weight;
+        }
+        return varied_weight;
+    });
+    cutflow.addWgtSyst("PNetHbbScaleFactors"+year_+"bin54Down",  [&](){
+        float nominal_weight =  1.0;
+        float varied_weight = 1.0;
+        if(isH){
+            float fatJet1_genH_dR = DeltaR(hh.fatJet1Eta(), hh.fatJet1Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            float fatJet2_genH_dR = DeltaR(hh.fatJet2Eta(), hh.fatJet2Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            if( (fatJet1_genH_dR < fatJet2_genH_dR) && (fatJet1_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0);
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 5, 4, -1)/nominal_weight;
+            }  
+            else if( (fatJet1_genH_dR > fatJet2_genH_dR) && (fatJet2_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0); 
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 5, 4, -1)/nominal_weight;
+            } 
+        }
+        else if(isHH){
+            nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0);
+            if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 5, 4, -1)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 5, 4, -1)/nominal_weight;
+        }
+        return varied_weight;
+    });
+    cutflow.addWgtSyst("PNetHbbScaleFactors"+year_+"bin55Up",  [&](){
+        float nominal_weight =  1.0;
+        float varied_weight = 1.0;
+        if(isH){
+            float fatJet1_genH_dR = DeltaR(hh.fatJet1Eta(), hh.fatJet1Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            float fatJet2_genH_dR = DeltaR(hh.fatJet2Eta(), hh.fatJet2Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            if( (fatJet1_genH_dR < fatJet2_genH_dR) && (fatJet1_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0);
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 5, 5, 1)/nominal_weight;
+            }  
+            else if( (fatJet1_genH_dR > fatJet2_genH_dR) && (fatJet2_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0); 
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 5, 5, 1)/nominal_weight;
+            } 
+        }
+        else if(isHH){
+            nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0);
+            if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 5, 5, 1)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 5, 5, 1)/nominal_weight;
+        }
+        return varied_weight;
+    });
+    cutflow.addWgtSyst("PNetHbbScaleFactors"+year_+"bin55Down",  [&](){
+        float nominal_weight =  1.0;
+        float varied_weight = 1.0;
+        if(isH){
+            float fatJet1_genH_dR = DeltaR(hh.fatJet1Eta(), hh.fatJet1Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            float fatJet2_genH_dR = DeltaR(hh.fatJet2Eta(), hh.fatJet2Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            if( (fatJet1_genH_dR < fatJet2_genH_dR) && (fatJet1_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0);
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 5, 5, -1)/nominal_weight;
+            }  
+            else if( (fatJet1_genH_dR > fatJet2_genH_dR) && (fatJet2_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0); 
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 5, 5, -1)/nominal_weight;
+            } 
+        }
+        else if(isHH){
+            nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0);
+            if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 5, 5, -1)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 5, 5, -1)/nominal_weight;
+        }
+        return varied_weight;
+    });
+    cutflow.addWgtSyst("PNetHbbScaleFactors"+year_+"bin61Up",  [&](){
+        float nominal_weight =  1.0;
+        float varied_weight = 1.0;
+        if(isH){
+            float fatJet1_genH_dR = DeltaR(hh.fatJet1Eta(), hh.fatJet1Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            float fatJet2_genH_dR = DeltaR(hh.fatJet2Eta(), hh.fatJet2Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            if( (fatJet1_genH_dR < fatJet2_genH_dR) && (fatJet1_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0);
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 6, 1, 1)/nominal_weight;
+            }  
+            else if( (fatJet1_genH_dR > fatJet2_genH_dR) && (fatJet2_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0); 
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 6, 1, 1)/nominal_weight;
+            } 
+        }
+        else if(isHH){
+            nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0);
+            if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 6, 1, 1)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 6, 1, 1)/nominal_weight;
+        }
+        return varied_weight;
+    });
+    cutflow.addWgtSyst("PNetHbbScaleFactors"+year_+"bin61Down",  [&](){
+        float nominal_weight =  1.0;
+        float varied_weight = 1.0;
+        if(isH){
+            float fatJet1_genH_dR = DeltaR(hh.fatJet1Eta(), hh.fatJet1Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            float fatJet2_genH_dR = DeltaR(hh.fatJet2Eta(), hh.fatJet2Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            if( (fatJet1_genH_dR < fatJet2_genH_dR) && (fatJet1_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0);
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 6, 1, -1)/nominal_weight;
+            }  
+            else if( (fatJet1_genH_dR > fatJet2_genH_dR) && (fatJet2_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0); 
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 6, 1, -1)/nominal_weight;
+            } 
+        }
+        else if(isHH){
+            nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0);
+            if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 6, 1, -1)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 6, 1, -1)/nominal_weight;
+        }
+        return varied_weight;
+    });
+    cutflow.addWgtSyst("PNetHbbScaleFactors"+year_+"bin62Up",  [&](){
+        float nominal_weight =  1.0;
+        float varied_weight = 1.0;
+        if(isH){
+            float fatJet1_genH_dR = DeltaR(hh.fatJet1Eta(), hh.fatJet1Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            float fatJet2_genH_dR = DeltaR(hh.fatJet2Eta(), hh.fatJet2Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            if( (fatJet1_genH_dR < fatJet2_genH_dR) && (fatJet1_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0);
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 6, 2, 1)/nominal_weight;
+            }  
+            else if( (fatJet1_genH_dR > fatJet2_genH_dR) && (fatJet2_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0); 
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 6, 2, 1)/nominal_weight;
+            } 
+        }
+        else if(isHH){
+            nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0);
+            if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 6, 2, 1)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 6, 2, 1)/nominal_weight;
+        }
+        return varied_weight;
+    });
+    cutflow.addWgtSyst("PNetHbbScaleFactors"+year_+"bin62Down",  [&](){
+        float nominal_weight =  1.0;
+        float varied_weight = 1.0;
+        if(isH){
+            float fatJet1_genH_dR = DeltaR(hh.fatJet1Eta(), hh.fatJet1Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            float fatJet2_genH_dR = DeltaR(hh.fatJet2Eta(), hh.fatJet2Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            if( (fatJet1_genH_dR < fatJet2_genH_dR) && (fatJet1_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0);
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 6, 2, -1)/nominal_weight;
+            }  
+            else if( (fatJet1_genH_dR > fatJet2_genH_dR) && (fatJet2_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0); 
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 6, 2, -1)/nominal_weight;
+            } 
+        }
+        else if(isHH){
+            nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0);
+            if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 6, 2, -1)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 6, 2, -1)/nominal_weight;
+        }
+        return varied_weight;
+    });
+    cutflow.addWgtSyst("PNetHbbScaleFactors"+year_+"bin63Up",  [&](){
+        float nominal_weight =  1.0;
+        float varied_weight = 1.0;
+        if(isH){
+            float fatJet1_genH_dR = DeltaR(hh.fatJet1Eta(), hh.fatJet1Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            float fatJet2_genH_dR = DeltaR(hh.fatJet2Eta(), hh.fatJet2Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            if( (fatJet1_genH_dR < fatJet2_genH_dR) && (fatJet1_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0);
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 6, 3, 1)/nominal_weight;
+            }  
+            else if( (fatJet1_genH_dR > fatJet2_genH_dR) && (fatJet2_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0); 
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 6, 3, 1)/nominal_weight;
+            } 
+        }
+        else if(isHH){
+            nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0);
+            if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 6, 3, 1)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 6, 3, 1)/nominal_weight;
+        }
+        return varied_weight;
+    });
+    cutflow.addWgtSyst("PNetHbbScaleFactors"+year_+"bin63Down",  [&](){
+        float nominal_weight =  1.0;
+        float varied_weight = 1.0;
+        if(isH){
+            float fatJet1_genH_dR = DeltaR(hh.fatJet1Eta(), hh.fatJet1Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            float fatJet2_genH_dR = DeltaR(hh.fatJet2Eta(), hh.fatJet2Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            if( (fatJet1_genH_dR < fatJet2_genH_dR) && (fatJet1_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0);
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 6, 3, -1)/nominal_weight;
+            }  
+            else if( (fatJet1_genH_dR > fatJet2_genH_dR) && (fatJet2_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0); 
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 6, 3, -1)/nominal_weight;
+            } 
+        }
+        else if(isHH){
+            nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0);
+            if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 6, 3, -1)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 6, 3, -1)/nominal_weight;
+        }
+        return varied_weight;
+    });
+    cutflow.addWgtSyst("PNetHbbScaleFactors"+year_+"bin64Up",  [&](){
+        float nominal_weight =  1.0;
+        float varied_weight = 1.0;
+        if(isH){
+            float fatJet1_genH_dR = DeltaR(hh.fatJet1Eta(), hh.fatJet1Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            float fatJet2_genH_dR = DeltaR(hh.fatJet2Eta(), hh.fatJet2Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            if( (fatJet1_genH_dR < fatJet2_genH_dR) && (fatJet1_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0);
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 6, 4, 1)/nominal_weight;
+            }  
+            else if( (fatJet1_genH_dR > fatJet2_genH_dR) && (fatJet2_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0); 
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 6, 4, 1)/nominal_weight;
+            } 
+        }
+        else if(isHH){
+            nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0);
+            if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 6, 4, 1)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 6, 4, 1)/nominal_weight;
+        }
+        return varied_weight;
+    });
+    cutflow.addWgtSyst("PNetHbbScaleFactors"+year_+"bin64Down",  [&](){
+        float nominal_weight =  1.0;
+        float varied_weight = 1.0;
+        if(isH){
+            float fatJet1_genH_dR = DeltaR(hh.fatJet1Eta(), hh.fatJet1Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            float fatJet2_genH_dR = DeltaR(hh.fatJet2Eta(), hh.fatJet2Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            if( (fatJet1_genH_dR < fatJet2_genH_dR) && (fatJet1_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0);
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 6, 4, -1)/nominal_weight;
+            }  
+            else if( (fatJet1_genH_dR > fatJet2_genH_dR) && (fatJet2_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0); 
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 6, 4, -1)/nominal_weight;
+            } 
+        }
+        else if(isHH){
+            nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0);
+            if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 6, 4, -1)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 6, 4, -1)/nominal_weight;
+        }
+        return varied_weight;
+    });
+    cutflow.addWgtSyst("PNetHbbScaleFactors"+year_+"bin65Up",  [&](){
+        float nominal_weight =  1.0;
+        float varied_weight = 1.0;
+        if(isH){
+            float fatJet1_genH_dR = DeltaR(hh.fatJet1Eta(), hh.fatJet1Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            float fatJet2_genH_dR = DeltaR(hh.fatJet2Eta(), hh.fatJet2Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            if( (fatJet1_genH_dR < fatJet2_genH_dR) && (fatJet1_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0);
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 6, 5, 1)/nominal_weight;
+            }  
+            else if( (fatJet1_genH_dR > fatJet2_genH_dR) && (fatJet2_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0); 
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 6, 5, 1)/nominal_weight;
+            } 
+        }
+        else if(isHH){
+            nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0);
+            if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 6, 5, 1)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 6, 5, 1)/nominal_weight;
+        }
+        return varied_weight;
+    });
+    cutflow.addWgtSyst("PNetHbbScaleFactors"+year_+"bin65Down",  [&](){
+        float nominal_weight =  1.0;
+        float varied_weight = 1.0;
+        if(isH){
+            float fatJet1_genH_dR = DeltaR(hh.fatJet1Eta(), hh.fatJet1Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            float fatJet2_genH_dR = DeltaR(hh.fatJet2Eta(), hh.fatJet2Phi(), hh.genHiggs1Eta(), hh.genHiggs1Phi());
+            if( (fatJet1_genH_dR < fatJet2_genH_dR) && (fatJet1_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0);
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 6, 5, -1)/nominal_weight;
+            }  
+            else if( (fatJet1_genH_dR > fatJet2_genH_dR) && (fatJet2_genH_dR < 0.4) ){
+                nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0); 
+                if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 6, 5, -1)/nominal_weight;
+            } 
+        }
+        else if(isHH){
+            nominal_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 0, 0, 0)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 0, 0, 0);
+            if(nominal_weight!=0) varied_weight = PNet_sf.getPNetHbbScaleFactors(hh.fatJet1Pt(), hh.fatJet1PNetXbb(), 6, 5, -1)*PNet_sf.getPNetHbbScaleFactors(hh.fatJet2Pt(), hh.fatJet2PNetXbb(), 6, 5, -1)/nominal_weight;
+        }
+        return varied_weight;
+    });
+
+    }
     
     if(dotrigsys){
     //trigger eff SF uncertainty

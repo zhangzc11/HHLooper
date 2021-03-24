@@ -11,7 +11,6 @@ class PNetHbbScaleFactors
         {
             file_sf = new  TFile("data/scale_factor/PNetXBB_SF.root");
             PNetXBBSF =   (TH2D*)file_sf->Get(("PNetXBBSF_"+year).data());  
-            //PNetXBBSF = (TH2D*)file_sf->Get("PNetXBBSF_2018");  
             PNetXBBSF->SetDirectory(0);           
             file_sf->Close();               
         }
@@ -20,18 +19,25 @@ class PNetHbbScaleFactors
             delete PNetXBBSF;
         }
         //get the trigger eff per AK8 jet
-        float getPNetHbbScaleFactors(float pt, float PNetXbb, int variation) 
+        float getPNetHbbScaleFactors(float pt, float PNetXbb, int ibinx, int ibiny, int variation) 
         {
+            if( pt > PNetXBBSF->GetXaxis()->GetXmax() * 0.999 ) {
+                    pt = PNetXBBSF->GetXaxis()->GetXmax() * 0.999;
+            }
+            
             int bin_index_x = PNetXBBSF->GetXaxis()->FindFixBin(pt);
             int bin_index_y = PNetXBBSF->GetYaxis()->FindFixBin(PNetXbb);
+            
             float result = 1.0;
-            if( variation==0 ) result = PNetXBBSF->GetBinContent(bin_index_x, bin_index_y); 
-            else if( variation==1 ){
+            if ( (bin_index_x !=0) &&  (bin_index_y !=0) ){
+                if( (variation==1) && (ibinx == bin_index_x) && (ibiny == bin_index_y) ){
                 result = PNetXBBSF->GetBinContent(bin_index_x, bin_index_y) + PNetXBBSF->GetBinError(bin_index_x, bin_index_y);
-            }
-            else{
-                result = PNetXBBSF->GetBinContent(bin_index_x, bin_index_y) - PNetXBBSF->GetBinError(bin_index_x, bin_index_y);
-            }
+                }
+                else if( (variation==-1) && (ibinx == bin_index_x) && (ibiny == bin_index_y) ){
+                    result = PNetXBBSF->GetBinContent(bin_index_x, bin_index_y) - PNetXBBSF->GetBinError(bin_index_x, bin_index_y);
+                }
+                else result = PNetXBBSF->GetBinContent(bin_index_x, bin_index_y);
+            }            
             return result;
         }
 };
@@ -66,14 +72,14 @@ class TrigEffScaleFactors
         
         TrigEffScaleFactors(string year)
         {
-            if(year ==  "2016") file_sf = new  TFile("data/scale_factor/trigger/JetHTTriggerEfficiency_2016.root");
-            else if(year ==  "2017") file_sf = new  TFile("data/scale_factor/trigger/JetHTTriggerEfficiency_2017.root");
-            else if(year ==  "2018") file_sf = new  TFile("data/scale_factor/trigger/JetHTTriggerEfficiency_2018.root");
+            if(year == "2016") file_sf = new TFile("data/scale_factor/trigger/JetHTTriggerEfficiency_2016.root");
+            else if(year == "2017") file_sf = new TFile("data/scale_factor/trigger/JetHTTriggerEfficiency_2017.root");
+            else if(year == "2018") file_sf = new TFile("data/scale_factor/trigger/JetHTTriggerEfficiency_2018.root");
 
-            hist_sf_Xbb0p0To0p9 =   (TH2F*)file_sf->Get("efficiency_ptmass_Xbb0p0To0p9");
-            hist_sf_Xbb0p9To0p95 =   (TH2F*)file_sf->Get("efficiency_ptmass_Xbb0p9To0p95");
-            hist_sf_Xbb0p95To0p98 =   (TH2F*)file_sf->Get("efficiency_ptmass_Xbb0p95To0p98");
-            hist_sf_Xbb0p98To1p0 =   (TH2F*)file_sf->Get("efficiency_ptmass_Xbb0p98To1p0");   
+            hist_sf_Xbb0p0To0p9 = (TH2F*)file_sf->Get("efficiency_ptmass_Xbb0p0To0p9");
+            hist_sf_Xbb0p9To0p95 = (TH2F*)file_sf->Get("efficiency_ptmass_Xbb0p9To0p95");
+            hist_sf_Xbb0p95To0p98 = (TH2F*)file_sf->Get("efficiency_ptmass_Xbb0p95To0p98");
+            hist_sf_Xbb0p98To1p0 = (TH2F*)file_sf->Get("efficiency_ptmass_Xbb0p98To1p0");   
             
             hist_sf_Xbb0p0To0p9->SetDirectory(0);
             hist_sf_Xbb0p9To0p95->SetDirectory(0);
