@@ -27,28 +27,33 @@ if [ "$#" -gt 3 ]; then
     doTrigSyst=$4
 fi
 
+doPNetSFSyst=no
+if [ "$#" -gt 4 ]; then
+    doPNetSFSyst=$5
+fi
+
 for year in 2016 2017 2018
 
 do
- (set -x ;./HHLooper ${inputBase}/${year}/data/ data.root ${TAG} 1 ${doSyst} ${doShapeSyst} ${doTrigSyst} >&1) &
- (set -x ;./HHLooper ${inputBase}/${year}/qcd/  qcd.root ${TAG} 0 ${doSyst} ${doShapeSyst} ${doTrigSyst} >&1) &
- (set -x ;./HHLooper ${inputBase}/${year}/ttbar/skim/ ttbar.root ${TAG} 0 ${doSyst} ${doShapeSyst} ${doTrigSyst} >&1) &
- (set -x ;./HHLooper ${inputBase}/${year}/HHSM/ HHSM.root ${TAG} 0 ${doSyst} ${doShapeSyst} ${doTrigSyst} >&1) &
- #(set -x ;./HHLooper ${inputBase}/${year}/HHc0/ HHc0.root ${TAG} 0 ${doSyst} ${doShapeSyst} ${doTrigSyst} >&1) &
- (set -x ;./HHLooper ${inputBase}/${year}/HHc1/ HHc1.root ${TAG} 0 ${doSyst} ${doShapeSyst} ${doTrigSyst} >&1) &
- #(set -x ;./HHLooper ${inputBase}/${year}/HHc2p45/ HHc2p45.root ${TAG} 0 ${doSyst} ${doShapeSyst} ${doTrigSyst} >&1) &
- #(set -x ;./HHLooper ${inputBase}/${year}/HHc5/ HHc5.root ${TAG} 0 ${doSyst} ${doShapeSyst} ${doTrigSyst} >&1) &
- (set -x ;./HHLooper ${inputBase}/${year}/HHVBFSM/ HHVBFSM.root ${TAG} 0 ${doSyst} ${doShapeSyst} ${doTrigSyst} >&1) &
- #(set -x ;./HHLooper ${inputBase}/${year}/HHVBF0p511/ HHVBF0p511.root ${TAG} 0 ${doSyst} ${doShapeSyst} ${doTrigSyst} >&1) &
- #(set -x ;./HHLooper ${inputBase}/${year}/HHVBF1p511/ HHVBF1p511.root ${TAG} 0 ${doSyst} ${doShapeSyst} ${doTrigSyst} >&1) &
- #(set -x ;./HHLooper ${inputBase}/${year}/HHVBF110/ HHVBF110.root ${TAG} 0 ${doSyst} ${doShapeSyst} ${doTrigSyst} >&1) &
- #(set -x ;./HHLooper ${inputBase}/${year}/HHVBF112/ HHVBF112.root ${TAG} 0 ${doSyst} ${doShapeSyst} ${doTrigSyst} >&1) &
- #(set -x ;./HHLooper ${inputBase}/${year}/HHVBF121/ HHVBF121.root ${TAG} 0 ${doSyst} ${doShapeSyst} ${doTrigSyst} >&1) &
- (set -x ;./HHLooper ${inputBase}/${year}/VH/ VH.root ${TAG} 0 ${doSyst} ${doShapeSyst} ${doTrigSyst} >&1) &
- (set -x ;./HHLooper ${inputBase}/${year}/Higgs/ Higgs.root ${TAG} 0 ${doSyst} ${doShapeSyst} ${doTrigSyst} >&1) &
- (set -x ;./HHLooper ${inputBase}/${year}/ttH/ ttH.root ${TAG} 0 ${doSyst} ${doShapeSyst} ${doTrigSyst} >&1) &
- (set -x ;./HHLooper ${inputBase}/${year}/others/skim/ others.root ${TAG} 0 ${doSyst} ${doShapeSyst} ${doTrigSyst} >&1) &
- #(set -x ;./HHLooper ${inputBase}/${year}/tW/ tW.root ${TAG} 0 ${doSyst} ${doShapeSyst} ${doTrigSyst} >&1) &
+ (set -x ;./HHLooper ${inputBase}/${year}/data/ data.root ${TAG} 1 ${doSyst} ${doShapeSyst} ${doTrigSyst} ${doPNetSFSyst} >&1) &
+ (set -x ;./HHLooper ${inputBase}/${year}/qcd/  qcd.root ${TAG} 0 ${doSyst} ${doShapeSyst} ${doTrigSyst} ${doPNetSFSyst} >&1) &
+ (set -x ;./HHLooper ${inputBase}/${year}/ttbar/skim/ ttbar.root ${TAG} 0 ${doSyst} ${doShapeSyst} ${doTrigSyst} ${doPNetSFSyst} >&1) &
+ (set -x ;./HHLooper ${inputBase}/${year}/HHSM/ HHSM.root ${TAG} 0 ${doSyst} ${doShapeSyst} ${doTrigSyst} ${doPNetSFSyst} >&1) &
+ #(set -x ;./HHLooper ${inputBase}/${year}/HHc0/ HHc0.root ${TAG} 0 ${doSyst} ${doShapeSyst} ${doTrigSyst} ${doPNetSFSyst} >&1) &
+ (set -x ;./HHLooper ${inputBase}/${year}/HHc1/ HHc1.root ${TAG} 0 ${doSyst} ${doShapeSyst} ${doTrigSyst} ${doPNetSFSyst} >&1) &
+ #(set -x ;./HHLooper ${inputBase}/${year}/HHc2p45/ HHc2p45.root ${TAG} 0 ${doSyst} ${doShapeSyst} ${doTrigSyst} ${doPNetSFSyst} >&1) &
+ #(set -x ;./HHLooper ${inputBase}/${year}/HHc5/ HHc5.root ${TAG} 0 ${doSyst} ${doShapeSyst} ${doTrigSyst} ${doPNetSFSyst} >&1) &
+ (set -x ;./HHLooper ${inputBase}/${year}/HHVBFSM/ HHVBFSM.root ${TAG} 0 ${doSyst} ${doShapeSyst} ${doTrigSyst} ${doPNetSFSyst} >&1) &
+ #(set -x ;./HHLooper ${inputBase}/${year}/HHVBF0p511/ HHVBF0p511.root ${TAG} 0 ${doSyst} ${doShapeSyst} ${doTrigSyst} ${doPNetSFSyst} >&1) &
+ #(set -x ;./HHLooper ${inputBase}/${year}/HHVBF1p511/ HHVBF1p511.root ${TAG} 0 ${doSyst} ${doShapeSyst} ${doTrigSyst} ${doPNetSFSyst} >&1) &
+ #(set -x ;./HHLooper ${inputBase}/${year}/HHVBF110/ HHVBF110.root ${TAG} 0 ${doSyst} ${doShapeSyst} ${doTrigSyst} ${doPNetSFSyst} >&1) &
+ #(set -x ;./HHLooper ${inputBase}/${year}/HHVBF112/ HHVBF112.root ${TAG} 0 ${doSyst} ${doShapeSyst} ${doTrigSyst} ${doPNetSFSyst} >&1) &
+ #(set -x ;./HHLooper ${inputBase}/${year}/HHVBF121/ HHVBF121.root ${TAG} 0 ${doSyst} ${doShapeSyst} ${doTrigSyst} ${doPNetSFSyst} >&1) &
+ (set -x ;./HHLooper ${inputBase}/${year}/VH/ VH.root ${TAG} 0 ${doSyst} ${doShapeSyst} ${doTrigSyst} ${doPNetSFSyst} >&1) &
+ (set -x ;./HHLooper ${inputBase}/${year}/Higgs/ Higgs.root ${TAG} 0 ${doSyst} ${doShapeSyst} ${doTrigSyst} ${doPNetSFSyst} >&1) &
+ (set -x ;./HHLooper ${inputBase}/${year}/ttH/ ttH.root ${TAG} 0 ${doSyst} ${doShapeSyst} ${doTrigSyst} ${doPNetSFSyst} >&1) &
+ (set -x ;./HHLooper ${inputBase}/${year}/others/skim/ others.root ${TAG} 0 ${doSyst} ${doShapeSyst} ${doTrigSyst} ${doPNetSFSyst} >&1) &
+ #(set -x ;./HHLooper ${inputBase}/${year}/tW/ tW.root ${TAG} 0 ${doSyst} ${doShapeSyst} ${doTrigSyst} ${doPNetSFSyst} >&1) &
 
 done
 
