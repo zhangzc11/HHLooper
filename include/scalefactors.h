@@ -281,21 +281,27 @@ class TTJetsScaleFactors
             float result = 1.0;
             if (pt<0.1)  pt= 0.1;
             if(pt>999.9) pt =999.9;
-            if(year ==  "2016")
+            if(year == "2016")
             {
-                float slope = 3.39715e-04, slope_err = 2.72340e-04, constant = 1.06357e+00, constant_err = 5.52116e-02;
+                //float slope = 3.39715e-04, slope_err = 2.72340e-04, constant = 1.06357e+00, constant_err = 5.52116e-02;
+                //float slope = 1.86172e-04, slope_err = 2.75413e-04, constant = 1.07197e+00, constant_err = 5.54311e-02;
+                float slope = 0.000291232, slope_err = 0.000328419, constant = 1.10197, constant_err = 0.065916;
                 if(pt<300) result = (slope + type*slope_err)*(pt-300.) + constant + type*constant_err;
                 else result = constant + type*constant_err;
             }
-            if(year ==  "2017")
+            if(year == "2017")
             {
-                float slope = 1.52909e-03, slope_err = 2.36132e-04, constant = 1.20558e+00, constant_err = 5.00417e-02;
+                //float slope = 1.52909e-03, slope_err = 2.36132e-04, constant = 1.20558e+00, constant_err = 5.00417e-02;
+                //float slope = 1.60289e-03, slope_err = 2.51147e-04, constant = 1.28418e+00, constant_err = 5.31669e-02;
+                float slope = 0.00177981, slope_err = 0.000283582, constant = 1.31793, constant_err = 0.0582431;
                 if(pt<300) result = (slope + type*slope_err)*(pt-300.) + constant + type*constant_err;
                 else result = constant + type*constant_err;
             }
-            if(year ==  "2018")
+            if(year == "2018")
             {
-                float slope = 1.33382e-03, slope_err = 1.92282e-04, constant = 1.10805e+00, constant_err = 4.01827e-02;
+                //float slope = 1.33382e-03, slope_err = 1.92282e-04, constant = 1.10805e+00, constant_err = 4.01827e-02;
+                //float slope = 1.36880e-03, slope_err = 1.91672e-04, constant = 1.11018e+00, constant_err = 4.01700e-02;
+                float slope = 0.00148792, slope_err = 0.000222207, constant = 1.12203, constant_err = 0.045051;
                 if(pt<300) result = (slope + type*slope_err)*(pt-300.) + constant + type*constant_err;
                 else result = constant + type*constant_err;
             }
@@ -314,20 +320,20 @@ class TTJetsScaleFactors
             else idx_xbb = 4;
             if (year == "2016")
             {
-               float sf[5] = {0.825, 0.787, 0.818, 0.673, 0.698};
-               float esf[5] = {0.011, 0.059, 0.041, 0.069, 0.062};
+               float sf[5] = {0.821, 0.789, 0.824, 0.701, 0.741};
+               float esf[5] = {0.012, 0.066, 0.044, 0.084, 0.069};
                return sf[idx_xbb] + type*esf[idx_xbb];
             }
             if (year == "2017")
             {
-               float sf[5] = {0.932, 0.898, 0.901, 0.876, 0.926};
-               float esf[5] = {0.013, 0.066, 0.045, 0.065, 0.071};
+               float sf[5] = {0.901, 0.880, 0.876, 0.860, 0.916};
+               float esf[5] = {0.014, 0.067, 0.045, 0.064, 0.071};
                return sf[idx_xbb] + type*esf[idx_xbb];
             }
             if (year == "2018")
             {
-               float sf[5] = {0.981, 1.013, 0.922, 0.871, 0.781};
-               float esf[5] = {0.011, 0.058, 0.038, 0.053, 0.054};
+               float sf[5] = {0.975, 1.024, 0.935, 0.890, 0.798};
+               float esf[5] = {0.016, 0.059, 0.039, 0.055, 0.056};
                return sf[idx_xbb] + type*esf[idx_xbb];
             }
             return 1.0;
