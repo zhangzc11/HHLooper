@@ -318,6 +318,9 @@ else
     //histograms.addHistogram("EventBDTNoBinv24",   "; Event BDT; Events",           1000,   0.0,  0.2,   [&]() { return  hh.disc_qcd_and_ttbar_Run2_enhanced_v24(); } );
     //histograms.addHistogram("EventBDTv24",   "; Event BDT; Events",           {0.000, 0.0024, 0.0054, 0.0118, 0.10},   [&]() { return  hh.disc_qcd_and_ttbar_Run2_enhanced_v24(); } );
     histograms.addHistogram("EventBDTNoBinv8p2",   "; Event BDT; Events",           1000,   0.0,  0.2,   [&]() { return  hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2(); } );
+    histograms.addHistogram("EventBDTv8p2v3",   "; Event BDT; Events",           {0.000, 0.00008, 0.0002, 0.0004, 0.0005, 0.0007, 0.01},   [&]() { return  hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2(); } );
+    histograms.addHistogram("EventBDTv8p2v2",   "; Event BDT; Events",           {0.000, 0.00008, 0.0002, 0.0004, 0.0005, 0.01},   [&]() { return  hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2(); } );
+    histograms.addHistogram("EventBDTv8p2v1",   "; Event BDT; Events",           {0.000, 0.00008, 0.0002, 0.0004, 1.0},   [&]() { return  hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2(); } );
     histograms.addHistogram("EventBDTv8p2",   "; Event BDT; Events",           {0.000, 0.00008, 0.0002, 0.0004, 0.01},   [&]() { return  hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2(); } );
 }
 }
@@ -418,9 +421,10 @@ cutflow.addCutToLastActiveCut("CutfatJetsMassSD",       [&](){
     else return hh.fatJet1MassSD() > 50.0 && hh.fatJet2MassSD() > 50.0;
 },   UNITY);
 
-if(input.find("Tau3Over20p54Skim") == std::string::npos){
-    
-////Signal regions - pass - BDT v8p2
+  
+//Signal regions - pass - BDT v8p2
+if(input.find("Tau3Over20p54Skim") == std::string::npos){    
+
 cutflow.getCut("CutfatJetsMassSD");
 cutflow.addCutToLastActiveCut("SRv8p2Bin1",       [&](){    
     if(isData || syst_name.find("nominal") != std::string::npos) return hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2() > 0.43 && hh.fatJet2PNetXbb() > 0.980; 
@@ -512,17 +516,10 @@ else{
 
 /****Systematics******/
 if(doSystematics && (outputFileName.find("qcd") == std::string::npos ) && (outputFileName.find("data") == std::string::npos ) && (syst_name.find("nominal") != std::string::npos) )
-{
-    //cutflow.addWgtSyst("BDTv24MassShapeUp",  [&](){return isTTJets ?  1.01 :1.00;});
-    //cutflow.addWgtSyst("BDTv24MassShapeDown",  [&](){return isTTJets ?  0.99 :1.00;});
-    //cutflow.addWgtSyst("BDTv8p2MassShapeUp",  [&](){return isTTJets ?  1.01 :1.00;});
-    //cutflow.addWgtSyst("BDTv8p2MassShapeDown",  [&](){return isTTJets ?  0.99 :1.00;});
-    //cutflow.addWgtSyst("BDTv24ShapeUp",  [&](){return isTTJets ? ( hh.disc_qcd_and_ttbar_Run2_enhanced_v24()  < 0.00024 ? 1.068 : ( hh.disc_qcd_and_ttbar_Run2_enhanced_v24()  <  0.0054 ?  1.016 : (hh.disc_qcd_and_ttbar_Run2_enhanced_v24()  < 0.0118 ? 1.026 :  1.240))) : 1.0;});
-    //cutflow.addWgtSyst("BDTv24ShapeDown",  [&](){return isTTJets ? ( hh.disc_qcd_and_ttbar_Run2_enhanced_v24()  < 0.00024 ? 1.-0.068 : ( hh.disc_qcd_and_ttbar_Run2_enhanced_v24()  <  0.0054 ?  1.-0.016 : (hh.disc_qcd_and_ttbar_Run2_enhanced_v24()  < 0.0118 ? 1.-0.026 :  1.-0.240))) : 1.0;});
-    
+{    
     //BDT modeling uncertainty for ttbar
-    cutflow.addWgtSyst("BDTv8p2ShapeUp",  [&](){return isTTJets ? ( hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2()  < 0.00008 ? 1.060 : ( hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2()  <  0.0002 ?  1.015 : (hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2()  < 0.0004 ? 1.001 :  1.300))) : 1.0;});
-    cutflow.addWgtSyst("BDTv8p2ShapeDown",  [&](){return isTTJets ? ( hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2()  < 0.00008 ? 1.-0.060 : ( hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2()  <  0.0002 ?  1.-0.015 : (hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2()  < 0.0004 ? 1.-0.001 :  1.-0.300))) : 1.0;});
+    cutflow.addWgtSyst("BDTv8p2ShapeUp",  [&](){return isTTJets ? ( hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2()  < 0.00008 ? 0.96 : ( hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2()  <  0.0002 ?  0.91 : (hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2()  < 0.0004 ? 0.90 :  1.12))) : 1.0;});
+    cutflow.addWgtSyst("BDTv8p2ShapeDown",  [&](){return isTTJets ? ( hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2()  < 0.00008 ? 1.04 : ( hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2()  <  0.0002 ?  1.09 : (hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2()  < 0.0004 ? 1.10 :  0.88))) : 1.0;});
     
     //ttbar recoil correction uncertainty for ttbar
     cutflow.addWgtSyst("ttJetsCorrUp",  [&](){return isTTJets ?  ttjets_sf.getScaleFactorsFit(year_, hh.hh_pt(), 1)/ttjets_sf.getScaleFactorsFit(year_, hh.hh_pt(), 0) : 1.0;});
