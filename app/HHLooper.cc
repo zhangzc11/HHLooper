@@ -263,6 +263,10 @@ histograms.addHistogram("yield",               "; yield; Events",               
 if(doSystematics)
 {
 histograms.addHistogram("fatJet2MassSD",   "; j_{2} soft drop mass (GeV); Events", 46,   40.,    500.,  [&]() { return hh.fatJet2MassSD();} );
+histograms.addHistogram("fatJet1PNetXbb",   "; j_{1} PNet Xbb tagger; Events",           200,   0.95, 1.0,   [&]() { return  hh.fatJet1PNetXbb(); } );
+histograms.addHistogram("fatJet2PNetXbb",   "; j_{2} PNet Xbb tagger; Events",           200,   0.95, 1.0,   [&]() { return  hh.fatJet2PNetXbb(); } );
+histograms.addHistogram("EventBDTv8p2",   "; Event BDT; Events",           200, 0.0, 1.0,   [&]() { return  hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2(); } );
+
 //histograms.addHistogram("fatJet2MassSD_JMSDown",   "; j_{2} soft drop mass (GeV); Events", 46,   40.,    500.,  [&]() { return isData ? hh.fatJet2MassSD() : hh.fatJet2MassSD_JMS_Down();} );
 //histograms.addHistogram("fatJet2MassSD_JMSUp",   "; j_{2} soft drop mass (GeV); Events", 46,   40.,    500.,  [&]() { return isData ? hh.fatJet2MassSD() : hh.fatJet2MassSD_JMS_Up();} );
 //histograms.addHistogram("fatJet2MassSD_JMRDown",   "; j_{2} soft drop mass (GeV); Events", 46,   40.,    500.,  [&]() { return  isData ? hh.fatJet2MassSD() : hh.fatJet2MassSD_JMR_Down(); } );
@@ -271,9 +275,15 @@ histograms.addHistogram("fatJet2MassSD",   "; j_{2} soft drop mass (GeV); Events
 
 else
 {
-
-histograms.addHistogram("fatJet2MassSD",   "; j_{2} soft drop mass (GeV); Events", 46,   40.,    500.,  [&]() { return hh.fatJet2MassSD();} );
-    
+//final fit discriminant 
+histograms.addHistogram("fatJet2MassSD",   "; j_{2} soft drop mass (GeV); Events", 46,   40.,    500.,  [&]() {
+ if(syst_name.find("JMS_Down") != std::string::npos) return hh.fatJet2MassSD_JMS_Down();
+ else if(syst_name.find("JMS_Up") != std::string::npos) return hh.fatJet2MassSD_JMS_Up();
+ else if(syst_name.find("JMR_Down") != std::string::npos) return hh.fatJet2MassSD_JMR_Down();
+ else if(syst_name.find("JMR_Up") != std::string::npos) return hh.fatJet2MassSD_JMR_Up();
+ else return hh.fatJet2MassSD();
+} );
+//other variables does not have correct JMS/JMR variations    
 histograms.add2DHistogram("fat Jet2 MassSD vs pT", "mj2", 30,   50.,   200., "ptj2",  25,   250.,   750.,  [&]() { return  hh.fatJet2MassSD(); }, [&]() { return hh.fatJet2Pt();} );
 histograms.add2DHistogram("fat Jet1 MassSD vs pT", "mj1", 30,   50.,   200., "ptj1",  25,   250.,   750.,  [&]() { return  hh.fatJet1MassSD(); }, [&]() { return hh.fatJet1Pt();} );
 histograms.add2DHistogram("fat Jet1 pT vs Jet2 pT", "ptj1", 72,   200.,   2000., "ptj2",  72,   200.,   2000.,  [&]() { return  hh.fatJet1Pt(); }, [&]() { return hh.fatJet2Pt();} );
@@ -288,6 +298,7 @@ histograms.addHistogram("hh_pt",               "; p_{T}^{jj} (GeV); Events",    
 histograms.addHistogram("hh_eta",               "; #eta^{jj}; Events",                 200,   -5.0,  5.0,  [&]() { return hh.hh_eta(); } );
 histograms.addHistogram("hh_phi",               "; #Phi^{jj}; Events",                 200,   -3.2,  3.2,  [&]() { return hh.hh_phi(); } );
 histograms.addHistogram("hh_mass",             "; m_{jj} (GeV); Events",               200,   0.,  1500.,  [&]() { return hh.hh_mass(); } );
+histograms.addHistogram("hh_mass_lr",             "; m_{jj} (GeV); Events",               200,   0.,  3000.,  [&]() { return hh.hh_mass(); } );
 histograms.addHistogram("fatJet1PNetXbb",   "; j_{1} PNet Xbb tagger; Events",           200,   0.0,  1.0,   [&]() { return  hh.fatJet1PNetXbb(); } );
 histograms.addHistogram("fatJet2PNetXbb",   "; j_{2} PNet Xbb tagger; Events",           200,   0.0,  1.0,   [&]() { return  hh.fatJet2PNetXbb(); } );
 histograms.addHistogram("fatJet1PNetXbb_Bin1",   "; j_{1} PNet Xbb tagger; Events",    {0.90, 0.95,  0.975, 0.985,  1.00} ,   [&]() { return  hh.fatJet1PNetXbb(); } );

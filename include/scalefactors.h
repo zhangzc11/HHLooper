@@ -9,7 +9,7 @@ class PNetHbbScaleFactors
         
         PNetHbbScaleFactors(string year)
         {
-            file_sf = new  TFile("data/scale_factor/PNetXBB_SF.root");
+            file_sf = new  TFile("data/scale_factor/PNetXBB_SF_v2.root");
             PNetXBBSF =   (TH2D*)file_sf->Get(("PNetXBBSF_"+year).data());  
             PNetXBBSF->SetDirectory(0);           
             file_sf->Close();               
@@ -24,20 +24,25 @@ class PNetHbbScaleFactors
             if( pt > PNetXBBSF->GetXaxis()->GetXmax() * 0.999 ) {
                     pt = PNetXBBSF->GetXaxis()->GetXmax() * 0.999;
             }
-            
+           
+            float result = 1.0;
+
             int bin_index_x = PNetXBBSF->GetXaxis()->FindFixBin(pt);
             int bin_index_y = PNetXBBSF->GetYaxis()->FindFixBin(PNetXbb);
             
-            float result = 1.0;
-            if ( (bin_index_x !=0) &&  (bin_index_y !=0) ){
+            int nbin_x = PNetXBBSF->GetNbinsX();
+            int nbin_y = PNetXBBSF->GetNbinsY();
+            
+            if ( (bin_index_x>0) && (bin_index_y>0) && (bin_index_x<=nbin_x) && (bin_index_y<=nbin_y) ){
                 if( (variation==1) && (ibinx == bin_index_x) && (ibiny == bin_index_y) ){
-                result = PNetXBBSF->GetBinContent(bin_index_x, bin_index_y) + PNetXBBSF->GetBinError(bin_index_x, bin_index_y);
+                    result = PNetXBBSF->GetBinContent(bin_index_x, bin_index_y) + PNetXBBSF->GetBinError(bin_index_x, bin_index_y);
                 }
                 else if( (variation==-1) && (ibinx == bin_index_x) && (ibiny == bin_index_y) ){
                     result = PNetXBBSF->GetBinContent(bin_index_x, bin_index_y) - PNetXBBSF->GetBinError(bin_index_x, bin_index_y);
                 }
                 else result = PNetXBBSF->GetBinContent(bin_index_x, bin_index_y);
-            }            
+            }   
+ 
             return result;
         }
 };
