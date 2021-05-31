@@ -15,7 +15,7 @@ import pandas as pd
 import math
 import pickle as pickle
 import ROOT as root
-import uproot
+import uproot3 as uproot
 
 #################
 ##Preliminaries
@@ -45,6 +45,7 @@ print(input_file, output_file, _year, _bkg_type, _bdt_type)
 FileName = input_file
 File = root.TFile(FileName,'READ')
 inputTree = File.Get('tree')
+#inputTree = File.Get('Events') #for new ntuples from Cristina
 Nevents = File.Get('NEvents')
 
 
@@ -68,6 +69,7 @@ elif _bdt_type == 'enhanced_v8p2':
     #['hh_phi', 'hh_phi', '$\phi^{HH}$', 40, -3.2, 3.2],
     ['hh_mass', 'hh_mass', '$m_{HH}$ (GeV)', 40, 0, 1500],
     ['MET', 'MET', '$MET$ (GeV)', 60, 0, 600],
+    #['met', 'met', '$MET$ (GeV)', 60, 0, 600], #for new ntuples
 
 
     #                ['FatJet1_area', 'j1_area', 'fat j1 area', 40, 1.85, 2.15],
@@ -112,6 +114,7 @@ elif _bdt_type == 'enhanced_v24':
     #['hh_phi', 'hh_phi', '$\phi^{HH}$', 40, -3.2, 3.2],
     ['hh_mass', 'hh_mass', '$m_{HH}$ (GeV)', 40, 0, 1500],
     ['MET', 'MET', '$MET$ (GeV)', 60, 0, 600],
+    #['met', 'met', '$MET$ (GeV)', 60, 0, 600], #for new ntuples
     #                ['FatJet1_area', 'j1_area', 'fat j1 area', 40, 1.85, 2.15],
     #                ['FatJet2_area', 'j2_area', 'fat j2 area', 40,  1.85, 2.15],
     #['fatJet1MassSD', 'j1_m', 'j1 soft drop mass (GeV)', 40,  0.,   200.],
@@ -154,6 +157,7 @@ elif _bdt_type == 'mass_sculpting_control':
     ['hh_phi', 'hh_phi', '$\phi^{HH}$', 40, -3.2, 3.2],
     ['hh_mass', 'hh_mass', '$m_{HH}$ (GeV)', 40, 0, 1500],
     ['MET', 'MET', '$MET$ (GeV)', 60, 0, 600],
+    #['met', 'met', '$MET$ (GeV)', 60, 0, 600], #for new ntuples
 
 
     #                ['FatJet1_area', 'j1_area', 'fat j1 area', 40, 1.85, 2.15],
@@ -203,6 +207,7 @@ for var in variables:
     print (var[0])
     my_variables.append(var[0])
 df = uproot.open(FileName)['tree'].pandas.df([row[0] for row in variables], flatten=False)
+#df = uproot.open(FileName)['Events'].pandas.df([row[0] for row in variables], flatten=False) #for new ntuples
 
 
 #getting a numpy array from two pandas data frames
@@ -290,6 +295,7 @@ for i in range(nEntries):
     tmpXList.append(inputTree.hh_eta)
     tmpXList.append(inputTree.hh_mass)
     tmpXList.append(inputTree.MET)
+    #tmpXList.append(inputTree.met) #for new ntuples
     tmpXList.append(inputTree.fatJet1Tau3OverTau2)
     tmpXList.append(inputTree.fatJet2Tau3OverTau2)
     tmpXList.append(inputTree.fatJet1MassSD)
@@ -307,6 +313,82 @@ for i in range(nEntries):
     tmpXNPArray = np.array([ tmpXList ])
     tmpY = model.predict_proba(tmpXNPArray)[:, 1]
     my_s.disc = tmpY
+
+    ################ JES Up  ###################
+    tmpXList[0] = inputTree.hh_pt_JESUp
+    tmpXList[1] = inputTree.hh_eta_JESUp
+    tmpXList[2] = inputTree.hh_mass_JESUp
+    tmpXList[7] = inputTree.fatJet1Pt_JESUp
+    tmpXList[13] = inputTree.fatJet2Pt_JESUp
+    tmpXList[14] = inputTree.fatJet1PtOverMHH_JESUp
+    tmpXList[15] = inputTree.fatJet2PtOverMHH_JESUp
+    tmpXNPArray = np.array([ tmpXList ])
+    tmpY = model.predict_proba(tmpXNPArray)[:, 1]
+    my_s_JESUp.disc = tmpY
+
+    ################ JES Down  ###################
+    tmpXList[0] = inputTree.hh_pt_JESDown
+    tmpXList[1] = inputTree.hh_eta_JESDown
+    tmpXList[2] = inputTree.hh_mass_JESDown
+    tmpXList[7] = inputTree.fatJet1Pt_JESDown
+    tmpXList[13] = inputTree.fatJet2Pt_JESDown
+    tmpXList[14] = inputTree.fatJet1PtOverMHH_JESDown
+    tmpXList[15] = inputTree.fatJet2PtOverMHH_JESDown
+    tmpXNPArray = np.array([ tmpXList ])
+    tmpY = model.predict_proba(tmpXNPArray)[:, 1]
+    my_s_JESDown.disc = tmpY
+
+    ################ JMS Up  ###################
+    tmpXList[0] = inputTree.hh_pt_JMSUp
+    tmpXList[1] = inputTree.hh_eta_JMSUp
+    tmpXList[2] = inputTree.hh_mass_JMSUp   
+    tmpXList[6] = inputTree.fatJet1MassSD_JMS_Up
+    tmpXList[7] = inputTree.inputTree.fatJet1Pt
+    tmpXList[13] = inputTree.fatJet2Pt
+    tmpXList[14] = inputTree.fatJet1PtOverMHH_JMSUp
+    tmpXList[15] = inputTree.fatJet2PtOverMHH_JMSUp
+    tmpXNPArray = np.array([ tmpXList ])
+    tmpY = model.predict_proba(tmpXNPArray)[:, 1]
+    my_s_JMSUp.disc = tmpY
+
+    ################ JMS Down  ###################
+    tmpXList[0] = inputTree.hh_pt_JMSDown
+    tmpXList[1] = inputTree.hh_eta_JMSDown
+    tmpXList[2] = inputTree.hh_mass_JMSDown
+    tmpXList[6] = inputTree.fatJet1MassSD_JMS_Down
+    tmpXList[7] = inputTree.inputTree.fatJet1Pt
+    tmpXList[13] = inputTree.fatJet2Pt
+    tmpXList[14] = inputTree.fatJet1PtOverMHH_JMSDown
+    tmpXList[15] = inputTree.fatJet2PtOverMHH_JMSDown
+    tmpXNPArray = np.array([ tmpXList ])
+    tmpY = model.predict_proba(tmpXNPArray)[:, 1]
+    my_s_JMSDown.disc = tmpY
+
+    ################ JMR Up  ###################
+    tmpXList[0] = inputTree.hh_pt_JMRUp
+    tmpXList[1] = inputTree.hh_eta_JMRUp
+    tmpXList[2] = inputTree.hh_mass_JMRUp
+    tmpXList[6] = inputTree.fatJet1MassSD_JMR_Up
+    tmpXList[7] = inputTree.inputTree.fatJet1Pt
+    tmpXList[13] = inputTree.fatJet2Pt
+    tmpXList[14] = inputTree.fatJet1PtOverMHH_JMRUp
+    tmpXList[15] = inputTree.fatJet2PtOverMHH_JMRUp
+    tmpXNPArray = np.array([ tmpXList ])
+    tmpY = model.predict_proba(tmpXNPArray)[:, 1]
+    my_s_JMRUp.disc = tmpY
+
+    ################ JMR Down  ###################
+    tmpXList[0] = inputTree.hh_pt_JMRDown
+    tmpXList[1] = inputTree.hh_eta_JMRDown
+    tmpXList[2] = inputTree.hh_mass_JMRDown
+    tmpXList[6] = inputTree.fatJet1MassSD_JMR_Down
+    tmpXList[7] = inputTree.inputTree.fatJet1Pt
+    tmpXList[13] = inputTree.fatJet2Pt
+    tmpXList[14] = inputTree.fatJet1PtOverMHH_JMRDown
+    tmpXList[15] = inputTree.fatJet2PtOverMHH_JMRDown
+    tmpXNPArray = np.array([ tmpXList ])
+    tmpY = model.predict_proba(tmpXNPArray)[:, 1]
+    my_s_JMRDown.disc = tmpY
 
     outputTree.Fill()
 
