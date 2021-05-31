@@ -1,10 +1,11 @@
 
 TAG=$1
 
-mkdir -p hists/${TAG}/
-rm -rf hists/${TAG}/*
+#mkdir -p hists/${TAG}/
+#rm -rf hists/${TAG}/*
 
-inputBase=/eos/cms/store/group/phys_susy/razor/Run2Analysis/HHBoost/Tau3Over20p54Skim/
+inputBase=/storage/user/nlu/work/HH/ntuples/20210310/option10/combined/Tau3Over20p54Skim/BDT/
+#/eos/cms/store/group/phys_susy/razor/Run2Analysis/HHBoost/Tau3Over20p54Skim/
 #inputBase=/eos/cms/store/group/phys_susy/razor/Run2Analysis/HHBoost/HHTo4BNtupler_20200902_option5_combined_BDT_Jet2Xbb0p8Skim/ 
 #inputBase=data/Jet2Xbb0p8Skim/
 #inputBase=data/Option5NonSkim/
@@ -23,6 +24,10 @@ do
  (set -x ;./HHLooper ${inputBase}/${year}/data/ data.root ${TAG} 1 ${doSyst} >&1) &
  (set -x ;./HHLooper ${inputBase}/${year}/qcd/  qcd.root ${TAG} 0 ${doSyst} >&1) &
  (set -x ;./HHLooper ${inputBase}/${year}/ttbar/ ttbar.root ${TAG} 0 ${doSyst} >&1) &
+
+ #(set -x ;./HHLooper ${inputBase}/${year}/ttbarMtt700to1000/ ttbarMtt700to1000.root ${TAG} 0 ${doSyst} >&1) &
+ #(set -x ;./HHLooper ${inputBase}/${year}/ttbarMtt1000toInf/ ttbarMtt1000toInf.root ${TAG} 0 ${doSyst} >&1) &
+
  (set -x ;./HHLooper ${inputBase}/${year}/HHSM/ HHSM.root ${TAG} 0 ${doSyst} >&1) &
  (set -x ;./HHLooper ${inputBase}/${year}/HHc0/ HHc0.root ${TAG} 0 ${doSyst} >&1) &
  (set -x ;./HHLooper ${inputBase}/${year}/HHc1/ HHc1.root ${TAG} 0 ${doSyst} >&1) &
@@ -32,6 +37,7 @@ do
  (set -x ;./HHLooper ${inputBase}/${year}/Higgs/ Higgs.root ${TAG} 0 ${doSyst} >&1) &
  (set -x ;./HHLooper ${inputBase}/${year}/ttH/ ttH.root ${TAG} 0 ${doSyst} >&1) &
  (set -x ;./HHLooper ${inputBase}/${year}/others/ others.root ${TAG} 0 ${doSyst} >&1) &
+
  #(set -x ;./HHLooper ${inputBase}/${year}/tW/ tW.root ${TAG} 0 ${doSyst} >&1) &
 
 done

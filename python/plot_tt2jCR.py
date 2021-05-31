@@ -8,7 +8,7 @@ from colors import *
 
 parser = argparse.ArgumentParser(description="plot settings")
 parser.add_argument('-i' , '--input_dir'              , dest='input_dir'       , help='input dir path '                        , required=True      )
-parser.add_argument('-o' , '--output_dir'             , dest='output_dir'      , help='output dir path'                        , default='/storage/user/nlu/work/HH/CMSSW_9_4_2/src/HHLooper/output_plot'                                                 )
+parser.add_argument('-o' , '--output_dir'             , dest='output_dir'      , help='output dir path'                        , default='/storage/user/nlu/work/HH/CMSSW_9_4_2/src/HHLooper/output_plot')
 #parser.add_argument('-o' , '--output_dir'             , dest='output_dir'      , help='output dir path'                        , default='plots/'                                                 )
 parser.add_argument('-n' , '--nbins'                  , dest='nbins'           , help='number of bins for the histograms'      , default=30                                                      )
 parser.add_argument('-xt', '--xaxis_title'            , dest='xaxis_title'     , help='X-axis title'                           , default=None                                                    )
@@ -23,7 +23,8 @@ parser.add_argument('-ov' , '--rm_ovflow'              , dest='rm_ovflow'       
 parser.add_argument('-au' , '--add_udflow'              , dest='add_udflow'       , help='Add underflow'                       , default=False                              , action='store_true')
 parser.add_argument('-aov' , '--add_ovflow'              , dest='add_ovflow'       , help='Add overflow'                       , default=True                              , action='store_true')
 parser.add_argument('-d' , '--draw_data'              , dest='draw_data'       , help='Draw data'                              , default=False                              , action='store_true')
-parser.add_argument('-1' , '--stack_signal'           , dest='stack_signal'    , help='stack signal'                           , default=True                              , action='store_true')
+parser.add_argument('-bd' , '--blind_data'              , dest='blind_data'       , help='Draw data'                              , default=False                              , action='store_true')
+parser.add_argument('-1' , '--stack_signal'           , dest='stack_signal'    , help='stack signal'                           , default=False                              , action='store_true')
 parser.add_argument('-O' , '--output_name'            , dest='output_name'     , help='output file name when plot single hist' , default=None                                                    )
 parser.add_argument('-w' , '--whatSR'                 , dest='whatSR'          , help='what selecton for the nine bins'        , default="FatJetsSDMassCut"                                      )
 parser.add_argument('-R' , '--right_hand'             , dest='right_hand'      , help='remove right side (<)'                , default=False                      , action='store_true')
@@ -85,30 +86,22 @@ else:
     year = 6051
     lumi = 137
 
-#sig_fnames = [input_dir+"ttbar.root"]
-sig_fnames = [input_dir+"tt1L.root"]
+sig_fnames = [input_dir+"ttbar.root"]
 #bkg_fnames = [input_dir+"others.root", input_dir+"Higgs.root", input_dir+"VH.root", input_dir+"ttH.root", input_dir+"tW.root", input_dir+"qcd.root", input_dir+"ttbar.root"]
-#bkg_fnames = [input_dir+"others.root", input_dir+"Higgs.root", input_dir+"VH.root", input_dir+"ttH.root", input_dir+"qcd.root", input_dir+"ttbar.root"]
+bkg_fnames = [input_dir+"others.root", input_dir+"qcd.root"]
 #bkg_fnames = [input_dir+"others.root", input_dir+"Higgs.root", input_dir+"VH.root", input_dir+"ttH.root", input_dir+"ttbar.root", input_dir+"qcd.root"]
-#bkg_fnames = [input_dir+"WJets.root", input_dir+"qcd.root", input_dir+"tt1L.root", input_dir+"tt2L.root"]
-bkg_fnames = [input_dir+"others.root", input_dir+"qcd.root", input_dir+"tt2L.root"]
 
-#sig_legends = ["t#bar{t}+jets"]
-#sig_legends = ["t#bar{t}+jets"]
-sig_legends = ["t#bar{t}+jets 1L"]
+sig_legends = ["t#bar{t}+jets"]
 #bkg_legends = ["others", "ggH+VBFH", "VH", "t#bar{t}H", "tW", "QCD", "t#bar{t}+jets"]
-#bkg_legends = ["others", "ggH+VBFH", "VH", "t#bar{t}H", "QCD", "t#bar{t}+jets"]
+bkg_legends = ["V+jets,VV", "QCD"]
 #bkg_legends = ["others", "ggH+VBFH", "VH", "t#bar{t}H", "t#bar{t}+jets", "QCD"]
-#bkg_legends = ["w(lv)+jets", "V+jets,VV", "QCD", "t#bar{t}+jets 1L", "t#bar{t}+jets 2L"]
-bkg_legends = ["V+jets,VV", "QCD", "t#bar{t}+jets 2L"]
 
 
 data_fname = input_dir+"data.root"
-sig_colors = [2005,617, 839, 800, 1, 632]
+sig_colors = [617, 839, 800, 1, 632]
 #bkg_colors = [2001, 2003, 2011, 920, 2007, 46, 2005, 800]
-#bkg_colors = [2001, 2003, 2011, 920, 2007, 2005, 800, 839]
+bkg_colors = [2001, 2003, 2011, 920, 2007, 2005, 800, 839]
 #bkg_colors = [2001, 2003, 2011, 920, 2005, 2007, 800, 839]
-bkg_colors = [2001, 2007, 800, 839]
 
 
 if float(args.sig_scale) != 1:
@@ -179,6 +172,7 @@ if hist_name:
                 "remove_overflow":args.rm_ovflow,
                 "add_underflow":args.add_udflow,
                 "add_overflow":args.add_ovflow,
+                "blind_data":args.blind_data,
                 "lumi_value": lumi,
                 "ratio_range": [0., 2.],
                 "xaxis_label": args.xaxis_title,
@@ -210,8 +204,9 @@ else:
             "remove_overflow":args.rm_ovflow,
             "add_underflow":args.add_udflow,
             "add_overflow":args.add_ovflow,
+            "blind_data":args.blind_data,
             "lumi_value": lumi,
-            "ratio_range": [0.6, 1.2],
+            "ratio_range": [0., 2.],
             "stack_signal": args.stack_signal
             },
         )
