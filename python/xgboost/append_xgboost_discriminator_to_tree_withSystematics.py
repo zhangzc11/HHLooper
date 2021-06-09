@@ -318,8 +318,10 @@ for i in range(nEntries):
     tmpXList[0] = inputTree.hh_pt_JESUp
     tmpXList[1] = inputTree.hh_eta_JESUp
     tmpXList[2] = inputTree.hh_mass_JESUp
-    tmpXList[7] = inputTree.fatJet1Pt_JESUp
-    tmpXList[13] = inputTree.fatJet2Pt_JESUp
+    tmpXList[7] = inputTree.fatJet1Pt_JES_Up
+    tmpXList[13] = inputTree.fatJet2Pt_JES_Up
+    #tmpXList[7] = inputTree.fatJet1Pt_JESUp #for new ntuples
+    #tmpXList[13] = inputTree.fatJet2Pt_JESUp #for new ntuples
     tmpXList[14] = inputTree.fatJet1PtOverMHH_JESUp
     tmpXList[15] = inputTree.fatJet2PtOverMHH_JESUp
     tmpXNPArray = np.array([ tmpXList ])
@@ -330,8 +332,10 @@ for i in range(nEntries):
     tmpXList[0] = inputTree.hh_pt_JESDown
     tmpXList[1] = inputTree.hh_eta_JESDown
     tmpXList[2] = inputTree.hh_mass_JESDown
-    tmpXList[7] = inputTree.fatJet1Pt_JESDown
-    tmpXList[13] = inputTree.fatJet2Pt_JESDown
+    tmpXList[7] = inputTree.fatJet1Pt_JES_Down
+    tmpXList[13] = inputTree.fatJet2Pt_JES_Down
+    #tmpXList[7] = inputTree.fatJet1Pt_JESDown #for new ntuples
+    #tmpXList[13] = inputTree.fatJet2Pt_JESDown #for new ntuples
     tmpXList[14] = inputTree.fatJet1PtOverMHH_JESDown
     tmpXList[15] = inputTree.fatJet2PtOverMHH_JESDown
     tmpXNPArray = np.array([ tmpXList ])
@@ -343,7 +347,7 @@ for i in range(nEntries):
     tmpXList[1] = inputTree.hh_eta_JMSUp
     tmpXList[2] = inputTree.hh_mass_JMSUp   
     tmpXList[6] = inputTree.fatJet1MassSD_JMS_Up
-    tmpXList[7] = inputTree.inputTree.fatJet1Pt
+    tmpXList[7] = inputTree.fatJet1Pt
     tmpXList[13] = inputTree.fatJet2Pt
     tmpXList[14] = inputTree.fatJet1PtOverMHH_JMSUp
     tmpXList[15] = inputTree.fatJet2PtOverMHH_JMSUp
@@ -356,7 +360,7 @@ for i in range(nEntries):
     tmpXList[1] = inputTree.hh_eta_JMSDown
     tmpXList[2] = inputTree.hh_mass_JMSDown
     tmpXList[6] = inputTree.fatJet1MassSD_JMS_Down
-    tmpXList[7] = inputTree.inputTree.fatJet1Pt
+    tmpXList[7] = inputTree.fatJet1Pt
     tmpXList[13] = inputTree.fatJet2Pt
     tmpXList[14] = inputTree.fatJet1PtOverMHH_JMSDown
     tmpXList[15] = inputTree.fatJet2PtOverMHH_JMSDown
@@ -369,7 +373,7 @@ for i in range(nEntries):
     tmpXList[1] = inputTree.hh_eta_JMRUp
     tmpXList[2] = inputTree.hh_mass_JMRUp
     tmpXList[6] = inputTree.fatJet1MassSD_JMR_Up
-    tmpXList[7] = inputTree.inputTree.fatJet1Pt
+    tmpXList[7] = inputTree.fatJet1Pt
     tmpXList[13] = inputTree.fatJet2Pt
     tmpXList[14] = inputTree.fatJet1PtOverMHH_JMRUp
     tmpXList[15] = inputTree.fatJet2PtOverMHH_JMRUp
@@ -382,7 +386,7 @@ for i in range(nEntries):
     tmpXList[1] = inputTree.hh_eta_JMRDown
     tmpXList[2] = inputTree.hh_mass_JMRDown
     tmpXList[6] = inputTree.fatJet1MassSD_JMR_Down
-    tmpXList[7] = inputTree.inputTree.fatJet1Pt
+    tmpXList[7] = inputTree.fatJet1Pt
     tmpXList[13] = inputTree.fatJet2Pt
     tmpXList[14] = inputTree.fatJet1PtOverMHH_JMRDown
     tmpXList[15] = inputTree.fatJet2PtOverMHH_JMRDown
