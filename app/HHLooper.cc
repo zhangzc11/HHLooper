@@ -263,6 +263,7 @@ histograms.addHistogram("yield",               "; yield; Events",               
 if(doSystematics)
 {
 histograms.addHistogram("fatJet2MassSD",   "; j_{2} soft drop mass (GeV); Events", 46,   40.,    500.,  [&]() { return hh.fatJet2MassSD();} );
+histograms.addHistogram("fatJet1MassSD",   "; j_{1} soft drop mass (GeV); Events", 46,   40.,    500.,  [&]() { return hh.fatJet1MassSD();} );
 histograms.addHistogram("fatJet1PNetXbb",   "; j_{1} PNet Xbb tagger; Events",           200,   0.95, 1.0,   [&]() { return  hh.fatJet1PNetXbb(); } );
 histograms.addHistogram("fatJet2PNetXbb",   "; j_{2} PNet Xbb tagger; Events",           200,   0.95, 1.0,   [&]() { return  hh.fatJet2PNetXbb(); } );
 histograms.addHistogram("EventBDTv8p2",   "; Event BDT; Events",           200, 0.0, 1.0,   [&]() { return  hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2(); } );
@@ -283,12 +284,19 @@ histograms.addHistogram("fatJet2MassSD",   "; j_{2} soft drop mass (GeV); Events
  else if(syst_name.find("JMR_Up") != std::string::npos) return hh.fatJet2MassSD_JMR_Up();
  else return hh.fatJet2MassSD();
 } );
+histograms.addHistogram("fatJet1MassSD",   "; j_{1} soft drop mass (GeV); Events", 46,   40.,    500.,  [&]() {
+ if(syst_name.find("JMS_Down") != std::string::npos) return hh.fatJet1MassSD_JMS_Down();
+ else if(syst_name.find("JMS_Up") != std::string::npos) return hh.fatJet1MassSD_JMS_Up();
+ else if(syst_name.find("JMR_Down") != std::string::npos) return hh.fatJet1MassSD_JMR_Down();
+ else if(syst_name.find("JMR_Up") != std::string::npos) return hh.fatJet1MassSD_JMR_Up();
+ else return hh.fatJet1MassSD();
+} );
 //other variables does not have correct JMS/JMR variations    
 histograms.add2DHistogram("fat Jet2 MassSD vs pT", "mj2", 30,   50.,   200., "ptj2",  25,   250.,   750.,  [&]() { return  hh.fatJet2MassSD(); }, [&]() { return hh.fatJet2Pt();} );
 histograms.add2DHistogram("fat Jet1 MassSD vs pT", "mj1", 30,   50.,   200., "ptj1",  25,   250.,   750.,  [&]() { return  hh.fatJet1MassSD(); }, [&]() { return hh.fatJet1Pt();} );
 histograms.add2DHistogram("fat Jet1 pT vs Jet2 pT", "ptj1", 72,   200.,   2000., "ptj2",  72,   200.,   2000.,  [&]() { return  hh.fatJet1Pt(); }, [&]() { return hh.fatJet2Pt();} );
 
-histograms.addHistogram("fatJet1MassSD",   "; j_{1} soft drop mass (GeV); Events", 300,   0.,   300.,  [&]() { return  hh.fatJet1MassSD(); } );
+histograms.addHistogram("fatJet1MassSDLR",   "; j_{1} soft drop mass (GeV); Events", 300,   0.,   300.,  [&]() { return  hh.fatJet1MassSD(); } );
 //histograms.addHistogram("fatJet2MassSD",   "; j_{2} soft drop mass (GeV); Events", 300,   0.,   300.,  [&]() { return  hh.fatJet2MassSD(); } );
 histograms.addHistogram("fatJet1MassSD_raw",   "; j_{1} soft drop mass (GeV); Events", 300,   0.,   300.,  [&]() { return  hh.fatJet1MassSD_UnCorrected(); } );
 histograms.addHistogram("fatJet2MassSD_raw",   "; j_{1} soft drop mass (GeV); Events", 300,   0.,   300.,  [&]() { return  hh.fatJet2MassSD_UnCorrected(); } );
@@ -477,6 +485,78 @@ cutflow.addCutToLastActiveCut("SRv8p2Bin3",       [&](){
 //cutflow.addCutToLastActiveCut("J2MassSideBandv8p2Bin3",       [&](){ return hh.fatJet2MassSD() <= 110 || hh.fatJet2MassSD() >= 140.0; },   UNITY);
 
 cutflow.getCut("CutfatJetsMassSD");
+cutflow.addCutToLastActiveCut("SRv8p2Bin1PNetp95",       [&](){    
+    if(isData || syst_name.find("nominal") != std::string::npos) return hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2() > 0.43 && hh.fatJet2PNetXbb() > 0.95; 
+    else if(syst_name.find("JMS_Up") != std::string::npos) return hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2_JMSUp() > 0.43 && hh.fatJet2PNetXbb() > 0.95; 
+    else if(syst_name.find("JMS_Down") != std::string::npos) return hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2_JMSDown() > 0.43 && hh.fatJet2PNetXbb() > 0.95; 
+    else if(syst_name.find("JMR_Up") != std::string::npos) return hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2_JMRUp() > 0.43 && hh.fatJet2PNetXbb() > 0.95; 
+    else if(syst_name.find("JMR_Down") != std::string::npos) return hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2_JMRDown() > 0.43 && hh.fatJet2PNetXbb() > 0.95;
+    else if(syst_name.find("JES_Up") != std::string::npos) return hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2_JESUp() > 0.43 && hh.fatJet2PNetXbb() > 0.95;
+    else if(syst_name.find("JES_Down") != std::string::npos) return hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2_JESDown() > 0.43 && hh.fatJet2PNetXbb() > 0.95;
+    else return hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2() > 0.43 && hh.fatJet2PNetXbb() > 0.95; 
+},   [&](){ return isTTJets  ? ttjets_sf.getPNetXbbShapeScaleFactors(year_, hh.fatJet2PNetXbb(), 0): 1.0; });
+    
+cutflow.getCut("CutfatJetsMassSD");
+cutflow.addCutToLastActiveCut("SRv8p2Bin1PNetp9",       [&](){    
+    if(isData || syst_name.find("nominal") != std::string::npos) return hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2() > 0.43 && hh.fatJet2PNetXbb() > 0.9; 
+    else if(syst_name.find("JMS_Up") != std::string::npos) return hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2_JMSUp() > 0.43 && hh.fatJet2PNetXbb() > 0.9; 
+    else if(syst_name.find("JMS_Down") != std::string::npos) return hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2_JMSDown() > 0.43 && hh.fatJet2PNetXbb() > 0.9; 
+    else if(syst_name.find("JMR_Up") != std::string::npos) return hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2_JMRUp() > 0.43 && hh.fatJet2PNetXbb() > 0.9; 
+    else if(syst_name.find("JMR_Down") != std::string::npos) return hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2_JMRDown() > 0.43 && hh.fatJet2PNetXbb() > 0.9;
+    else if(syst_name.find("JES_Up") != std::string::npos) return hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2_JESUp() > 0.43 && hh.fatJet2PNetXbb() > 0.9;
+    else if(syst_name.find("JES_Down") != std::string::npos) return hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2_JESDown() > 0.43 && hh.fatJet2PNetXbb() > 0.9;
+    else return hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2() > 0.43 && hh.fatJet2PNetXbb() > 0.9; 
+},   [&](){ return isTTJets  ? ttjets_sf.getPNetXbbShapeScaleFactors(year_, hh.fatJet2PNetXbb(), 0): 1.0; });
+
+    cutflow.getCut("CutfatJetsMassSD");
+cutflow.addCutToLastActiveCut("SRv8p2Bin1PNetp8",       [&](){
+    if(isData || syst_name.find("nominal") != std::string::npos) return hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2() > 0.43 && hh.fatJet2PNetXbb() > 0.8;
+    else if(syst_name.find("JMS_Up") != std::string::npos) return hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2_JMSUp() > 0.43 && hh.fatJet2PNetXbb() > 0.8;
+    else if(syst_name.find("JMS_Down") != std::string::npos) return hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2_JMSDown() > 0.43 && hh.fatJet2PNetXbb() > 0.8; 
+    else if(syst_name.find("JMR_Up") != std::string::npos) return hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2_JMRUp() > 0.43 && hh.fatJet2PNetXbb() > 0.8;
+    else if(syst_name.find("JMR_Down") != std::string::npos) return hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2_JMRDown() > 0.43 && hh.fatJet2PNetXbb() > 0.8;
+    else if(syst_name.find("JES_Up") != std::string::npos) return hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2_JESUp() > 0.43 && hh.fatJet2PNetXbb() > 0.8;
+    else if(syst_name.find("JES_Down") != std::string::npos) return hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2_JESDown() > 0.43 && hh.fatJet2PNetXbb() > 0.8;
+    else return hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2() > 0.43 && hh.fatJet2PNetXbb() > 0.8; 
+},   [&](){ return isTTJets  ? ttjets_sf.getPNetXbbShapeScaleFactors(year_, hh.fatJet2PNetXbb(), 0): 1.0; });
+    
+    cutflow.getCut("CutfatJetsMassSD");
+cutflow.addCutToLastActiveCut("SRv8p2Bin1PNetp5",       [&](){
+    if(isData || syst_name.find("nominal") != std::string::npos) return hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2() > 0.43 && hh.fatJet2PNetXbb() > 0.5;
+    else if(syst_name.find("JMS_Up") != std::string::npos) return hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2_JMSUp() > 0.43 && hh.fatJet2PNetXbb() > 0.5;
+    else if(syst_name.find("JMS_Down") != std::string::npos) return hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2_JMSDown() > 0.43 && hh.fatJet2PNetXbb() > 0.5; 
+    else if(syst_name.find("JMR_Up") != std::string::npos) return hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2_JMRUp() > 0.43 && hh.fatJet2PNetXbb() > 0.5;
+    else if(syst_name.find("JMR_Down") != std::string::npos) return hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2_JMRDown() > 0.43 && hh.fatJet2PNetXbb() > 0.5;
+    else if(syst_name.find("JES_Up") != std::string::npos) return hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2_JESUp() > 0.43 && hh.fatJet2PNetXbb() > 0.5;
+    else if(syst_name.find("JES_Down") != std::string::npos) return hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2_JESDown() > 0.43 && hh.fatJet2PNetXbb() > 0.5;
+    else return hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2() > 0.43 && hh.fatJet2PNetXbb() > 0.5; 
+},   [&](){ return isTTJets  ? ttjets_sf.getPNetXbbShapeScaleFactors(year_, hh.fatJet2PNetXbb(), 0): 1.0; });
+    
+    cutflow.getCut("CutfatJetsMassSD");
+cutflow.addCutToLastActiveCut("SRv8p2Bin1PNetp2",       [&](){
+    if(isData || syst_name.find("nominal") != std::string::npos) return hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2() > 0.43 && hh.fatJet2PNetXbb() > 0.2;
+    else if(syst_name.find("JMS_Up") != std::string::npos) return hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2_JMSUp() > 0.43 && hh.fatJet2PNetXbb() > 0.2;
+    else if(syst_name.find("JMS_Down") != std::string::npos) return hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2_JMSDown() > 0.43 && hh.fatJet2PNetXbb() > 0.2; 
+    else if(syst_name.find("JMR_Up") != std::string::npos) return hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2_JMRUp() > 0.43 && hh.fatJet2PNetXbb() > 0.2;
+    else if(syst_name.find("JMR_Down") != std::string::npos) return hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2_JMRDown() > 0.43 && hh.fatJet2PNetXbb() > 0.2;
+    else if(syst_name.find("JES_Up") != std::string::npos) return hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2_JESUp() > 0.43 && hh.fatJet2PNetXbb() > 0.2;
+    else if(syst_name.find("JES_Down") != std::string::npos) return hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2_JESDown() > 0.43 && hh.fatJet2PNetXbb() > 0.2;
+    else return hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2() > 0.43 && hh.fatJet2PNetXbb() > 0.2; 
+},   [&](){ return isTTJets  ? ttjets_sf.getPNetXbbShapeScaleFactors(year_, hh.fatJet2PNetXbb(), 0): 1.0; });
+    
+    cutflow.getCut("CutfatJetsMassSD");
+cutflow.addCutToLastActiveCut("SRv8p2Bin1PNetp0",       [&](){
+    if(isData || syst_name.find("nominal") != std::string::npos) return hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2() > 0.43 && hh.fatJet2PNetXbb() > 0.0;
+    else if(syst_name.find("JMS_Up") != std::string::npos) return hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2_JMSUp() > 0.43 && hh.fatJet2PNetXbb() > 0.0;
+    else if(syst_name.find("JMS_Down") != std::string::npos) return hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2_JMSDown() > 0.43 && hh.fatJet2PNetXbb() > 0.0; 
+    else if(syst_name.find("JMR_Up") != std::string::npos) return hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2_JMRUp() > 0.43 && hh.fatJet2PNetXbb() > 0.0;
+    else if(syst_name.find("JMR_Down") != std::string::npos) return hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2_JMRDown() > 0.43 && hh.fatJet2PNetXbb() > 0.0;
+    else if(syst_name.find("JES_Up") != std::string::npos) return hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2_JESUp() > 0.43 && hh.fatJet2PNetXbb() > 0.0;
+    else if(syst_name.find("JES_Down") != std::string::npos) return hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2_JESDown() > 0.43 && hh.fatJet2PNetXbb() > 0.0;
+    else return hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2() > 0.43 && hh.fatJet2PNetXbb() > 0.0; 
+},   [&](){ return isTTJets  ? ttjets_sf.getPNetXbbShapeScaleFactors(year_, hh.fatJet2PNetXbb(), 0): 1.0; });
+    
+cutflow.getCut("CutfatJetsMassSD");
 cutflow.addCutToLastActiveCut("FailSRv8p2",       [&](){ 
     if(isData || syst_name.find("nominal") != std::string::npos) return  hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2() > 0.03 && hh.fatJet2PNetXbb() < 0.950; 
     else if(syst_name.find("JMS_Up") != std::string::npos) return  hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2_JMSUp() > 0.03 && hh.fatJet2PNetXbb() < 0.950; 
@@ -508,7 +588,19 @@ cutflow.addCutToLastActiveCut("FailSRv8p2",       [&](){
 else{
     cutflow.getCut("CutfatJetsMassSD");
     cutflow.addCutToLastActiveCut("CutfatJetsXbb",       [&](){ return hh.fatJet1PNetXbb() > 0.1 && hh.fatJet2PNetXbb() > 0.1; },   [&](){ return isTTJets  ? ttjets_sf.getPNetXbbShapeScaleFactors(year_, hh.fatJet1PNetXbb(), 0) * ttjets_sf.getPNetXbbShapeScaleFactors(year_, hh.fatJet2PNetXbb(), 0)     : 1.0; });
-    cutflow.addCutToLastActiveCut("TTBarCR",       [&](){ return hh.fatJet1Tau3OverTau2() < 0.46 && hh.fatJet2Tau3OverTau2() < 0.46 &&  hh.fatJet1HasBJetCSVLoose() && hh.fatJet2HasBJetCSVLoose(); },   [&]() {return isTTJets ? (TopTagSF("0.46", year_, hh.fatJet1Pt()) * TopTagSF("0.46", year_, hh.fatJet2Pt())) : 1.0;} );
+    cutflow.addCutToLastActiveCut("TTBarCR",       [&](){ 
+    return hh.fatJet1Tau3OverTau2() < 0.46 && hh.fatJet2Tau3OverTau2() < 0.46 &&  hh.fatJet1HasBJetCSVLoose() && hh.fatJet2HasBJetCSVLoose(); },   [&]() {
+   
+    if(syst_name.find("JES_Up") != std::string::npos){
+        return isTTJets ? (TopTagSF("0.46", year_, hh.fatJet1Pt_JES_Up()) * TopTagSF("0.46", year_, hh.fatJet2Pt_JES_Up())) : 1.0;
+    }
+    else if(syst_name.find("JES_Down") != std::string::npos){
+        return isTTJets ? (TopTagSF("0.46", year_, hh.fatJet1Pt_JES_Down()) * TopTagSF("0.46", year_, hh.fatJet2Pt_JES_Down())) : 1.0;
+    }
+    else{
+        return isTTJets ? (TopTagSF("0.46", year_, hh.fatJet1Pt()) * TopTagSF("0.46", year_, hh.fatJet2Pt())) : 1.0;
+    } 
+    } );
 
     cutflow.getCut("TTBarCR");
     cutflow.addCutToLastActiveCut("TTBarCRBDT1v8p2",       [&](){ return  hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2() < 0.00008 && hh.disc_qcd_and_ttbar_Run2_enhanced_v8p2() > 0.000; },   UNITY);
@@ -2651,6 +2743,12 @@ else
         //cutflow.bookHistogramsForCut(histograms, "FailFitCRv24");
 
         cutflow.bookHistogramsForCut(histograms, "SRv8p2Bin1");
+        cutflow.bookHistogramsForCut(histograms, "SRv8p2Bin1PNetp95");
+        cutflow.bookHistogramsForCut(histograms, "SRv8p2Bin1PNetp9");
+        cutflow.bookHistogramsForCut(histograms, "SRv8p2Bin1PNetp8");
+        cutflow.bookHistogramsForCut(histograms, "SRv8p2Bin1PNetp5");
+        cutflow.bookHistogramsForCut(histograms, "SRv8p2Bin1PNetp2");
+        cutflow.bookHistogramsForCut(histograms, "SRv8p2Bin1PNetp0");
         cutflow.bookHistogramsForCut(histograms, "SRv8p2Bin2");
         cutflow.bookHistogramsForCut(histograms, "SRv8p2Bin3");
         cutflow.bookHistogramsForCut(histograms, "FailSRv8p2");
