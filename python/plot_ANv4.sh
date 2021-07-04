@@ -1,5 +1,5 @@
 #recoil plots, Figure 21
-TAG=yield_AN_ttbar
+TAG=yield_AN_ttbar_cor
 for year in 2016 2017  2018
 do
     python plot.py -i ../hists/${TAG}/${year}/ -s 1 TTBarCR__hh_pt  -d 
