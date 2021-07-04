@@ -92,7 +92,8 @@ void PNetcorrection() {
     SetPlotStyle();
     
     TString year="2018";
-    TFile *f = new TFile("yield_AN_1Lttbar_0329pileupweight/"+year+"/TTBarLepJetCR__fatJet1PNetXbb_Bin2.root");
+
+    TFile *f = new TFile("../../hists/yield_AN_1Lttbar_0329pileupweight/"+year+"/TTBarLepJetCR__fatJet1PNetXbb_Bin2.root");
     TH1F *h_data = (TH1F*)f->Get("TTBarLepJetCR__fatJet1PNetXbb_Bin2_data");
     TH1F *h_bkg1 = (TH1F*)f->Get("TTBarLepJetCR__fatJet1PNetXbb_Bin2_bkg_1_stack_2_stack_2");
     TH1F *h_bkg2 = (TH1F*)f->Get("TTBarLepJetCR__fatJet1PNetXbb_Bin2_bkg_2_stack_3_stack_3");
