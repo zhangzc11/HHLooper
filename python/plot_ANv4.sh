@@ -11,7 +11,7 @@ done
 #\includegraphics[width=0.45\textwidth]{figs/yield_AN_ttbar_cor/combine/TTBarCRTight__EventBDTv8p2v3_logY.pdf}
 
 TAG=yield_AN_ttbar_cor
-python plot.py -i ../hists/${TAG}/combine/ -s 1 -w TTBarCRTight__EventBDTv24 -d
+python plot.py -i ../hists/${TAG}/combine/ -s 1 -w TTBarCRTight__EventBDTv8p2 -d
 
 #Figure 25
 #\includegraphics[width=0.4\textwidth]{figs/yield_AN_ttbar_cor/combine/TTBarCRBDT1v8p2__fatJet2MassSD_linY.pdf}
