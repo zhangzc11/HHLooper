@@ -1,3 +1,4 @@
+#output of plot_1Lttbar.py and plot.py will be in python/plots folder by default if no output folder directory is given directly
 #figure 16,17,18
 #I added the red line in the AN by hand
 
