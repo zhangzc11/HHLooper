@@ -107,11 +107,11 @@ void fit_topmass_inBDTbins() {
     gStyle->SetOptFit(0111);
     SetPlotStyle();
     
-    TF1 *func = new TF1("fit",fitf,-10,10,2);
+    TF1 *func = new TF1("fit","fitf",-10,10,2);
     func->SetParameters(0,0);
     func->SetParNames("Constant","Slope");
     
-    TFile *f = new TFile("../../hists/yield_AN_ttbar_cor_0408pileupweight_mbkgmjjcorrection/combine/"+name+"__fatJet2MassSD.root");
+    TFile *f = new TFile("../../python/plots/yield_AN_ttbar_cor/combine/"+name+"__fatJet2MassSD.root");
     
     TH1F *h_data = (TH1F*)f->Get(name+"__fatJet2MassSD_data");
     TH1F *h_bkg1 = (TH1F*)f->Get(name+"__fatJet2MassSD_bkg_0_stack_1_stack_1");
