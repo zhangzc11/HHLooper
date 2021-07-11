@@ -127,7 +127,7 @@ class hhtree{
    bool HLT_AK8PFJet330_TrimMass30_PFAK8BTagDeepCSV_p1_;
    TBranch *HLT_AK8PFJet330_TrimMass30_PFAK8BTagDeepCSV_p1_branch;
    bool HLT_AK8PFJet330_TrimMass30_PFAK8BTagDeepCSV_p1_isLoaded;
-   bool HLT_AK8PFJet330_PFAK8BTagCSV_p17_;
+   bool HLT_AK8PFJet330_PFAK8BTagCSV_p17_=false;
    TBranch *HLT_AK8PFJet330_PFAK8BTagCSV_p17_branch;
    bool HLT_AK8PFJet330_PFAK8BTagCSV_p17_isLoaded;
    bool HLT_AK8PFJet330_TrimMass30_PFAK8BoostedDoubleB_p02_;

@@ -1304,13 +1304,15 @@ const bool &hhtree::HLT_AK8PFJet330_PFAK8BTagCSV_p17()
 {
  if(not HLT_AK8PFJet330_PFAK8BTagCSV_p17_isLoaded)
  {
-   if(HLT_AK8PFJet330_PFAK8BTagCSV_p17_branch != 0) HLT_AK8PFJet330_PFAK8BTagCSV_p17_branch->GetEntry(index);
-   else
-   {
-     printf("branch HLT_AK8PFJet330_PFAK8BTagCSV_p17_branch does not exist!\n");
-exit(1);
+   if(HLT_AK8PFJet330_PFAK8BTagCSV_p17_branch != 0){
+     HLT_AK8PFJet330_PFAK8BTagCSV_p17_branch->GetEntry(index);
+     HLT_AK8PFJet330_PFAK8BTagCSV_p17_isLoaded = true;
    }
-   HLT_AK8PFJet330_PFAK8BTagCSV_p17_isLoaded = true;
+   //else
+   //{
+     //printf("branch HLT_AK8PFJet330_PFAK8BTagCSV_p17_branch does not exist!\n");
+     //exit(1);
+   //}
  }
  return HLT_AK8PFJet330_PFAK8BTagCSV_p17_;
 }
