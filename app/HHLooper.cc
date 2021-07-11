@@ -441,7 +441,7 @@ cutflow.addCutToLastActiveCut("CutfatJetsMassSD",       [&](){
 
   
 //Signal regions - pass - BDT v8p2
-if(input.find("Tau3Over20p54Skim") == std::string::npos){    
+if(input.find("Tau32TopSkim") == std::string::npos){    
 
 cutflow.getCut("CutfatJetsMassSD");
 cutflow.addCutToLastActiveCut("SRv8p2Bin1",       [&](){    
@@ -2708,12 +2708,12 @@ if(doSystematics && (outputFileName.find("qcd") == std::string::npos ) && (outpu
     cutflow.addWgtSyst("triggerEffSF"+year_+"bin480Down",[&](){return trig_sf.get_unc_ratio(hh.fatJet1Pt(), hh.fatJet1Mass(), hh.fatJet1PNetXbb(), hh.fatJet2Pt(), hh.fatJet2Mass(), hh.fatJet2PNetXbb(), -1, 480);});
     }
 }
-
+ 
 //book histograms for cuts
 if(not doSystematics) cutflow.bookHistogramsForCutAndBelow(histograms, "CutWeight");
 else
 {
-    if(input.find("Tau3Over20p54Skim") != std::string::npos) // this is ttbar enriched input
+    if(input.find("Tau32TopSkim") != std::string::npos) // this is ttbar enriched input
     {
         cutflow.bookHistogramsForCut(histograms, "TTBarCR");
         cutflow.bookHistogramsForCut(histograms, "TTBarCRTight");
