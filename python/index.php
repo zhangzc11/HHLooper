@@ -38,6 +38,8 @@ a:hover { text-decoration: underline; color: rgb(255,80,80); }
 <h2><a name="directories">Directories</a></h2>
 <ul>
 <?php
+error_reporting(0);
+print "<a href=\"..\">Go Up to Parent Directory</a>";
 foreach (glob("*") as $filename) {
     if ($_GET['noplots'] || !in_array($filename, $displayed)) {
         if (isset($_GET['match']) && !fnmatch('*'.$_GET['match'].'*', $filename)) continue;
@@ -53,6 +55,7 @@ foreach (glob("*") as $filename) {
 <div style="width: 100%;">
 <?php
 $displayed = array();
+error_reporting(0);
 if ($_GET['noplots']) {
     print "Plots will not be displayed.\n";
 } else {
@@ -61,7 +64,7 @@ if ($_GET['noplots']) {
     foreach ($filenames as $filename) {
         if (isset($_GET['match']) && !fnmatch('*'.$_GET['match'].'*', $filename)) continue;
         array_push($displayed, $filename);
-        print "<div class='pic' style=\"width: 22%;\">\n";
+        print "<div class='pic' style=\"width: 30%;\">\n";
         print "<h3><a href=\"$filename\">$filename</a></h3>";
         print "<a href=\"$filename\"><img src=\"$filename\" style=\"border: none; width: 100%; \"></a>";
         $others = array();
@@ -82,6 +85,7 @@ if ($_GET['noplots']) {
 <h2><a name="files">Other files</a></h2>
 <ul>
 <?php
+error_reporting(0);
 foreach (glob("*") as $filename) {
     if ($_GET['noplots'] || !in_array($filename, $displayed)) {
         if (isset($_GET['match']) && !fnmatch('*'.$_GET['match'].'*', $filename)) continue;
