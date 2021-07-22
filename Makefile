@@ -4,7 +4,7 @@ LD = $(shell root-config --ld)
 INC = $(shell pwd)
 
 CPPFLAGS := $(shell root-config --cflags) -I$(INC)/include
-LDFLAGS := $(LDFLAGS) $(shell root-config --glibs) -lMathMore
+LDFLAGS := $(LDFLAGS) $(shell root-config --glibs)
 CPPFLAGS += -g -Wall -Wextra -Wno-sign-compare
 
 

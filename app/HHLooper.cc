@@ -20,8 +20,7 @@
 
 using namespace std;
 
-int lumi = 137000.0;
-TTJetsScaleFactors ttjets_sf;
+int lumi = 139000.0;
 TRandom3* r_nominal = new TRandom3(0);
 const float pi = 3.141592653;
 
@@ -58,7 +57,7 @@ if(argc > 6)
 system("mkdir -p hists");
 system(("mkdir -p hists/"+label).c_str());
 
-std::string year_ = "2016";
+std::string year_ = "all";
 if(input.find("2016") != std::string::npos) {year_ = "2016"; lumi = 35922.0;}
 if(input.find("2017") != std::string::npos) {year_ = "2017"; lumi = 41480.0;}
 if(input.find("2018") != std::string::npos) {year_ = "2018"; lumi = 59741.0;}
@@ -121,7 +120,7 @@ RooUtil::Histograms histograms;
 histograms.addHistogram("yield",               "; yield; Events",                      1,    0.,   1.,    [&]() { return 0; } );
 
 
-histograms.addHistogram("fatJet1MassSD",   "; j_{1} soft drop mass (GeV); Events", 300,   0.,   300.,  [&]() { return  hh.fatJet1MassSD(); } );
+histograms.addHistogram("ph_pt1",   "; p_{T}^{#gamma 1} (GeV); Events", 300,   0.,   300.,  [&]() { return  hh.ph_pt1(); } );
 
 
 //************define cuts**********//
@@ -130,7 +129,7 @@ cutflow.setTFile(outfile);
 
 
 ////Pre-selection cuts
-cutflow.addCut("CutWeight", [&](){ return 1; },   [&](){ return isData ?  lumi : lumi*hh.weight(); });
+cutflow.addCut("CutWeight", [&](){ return 1; },   [&](){ return isData ?  lumi : lumi*hh.m_weight(); });
 cutflow.addCutToLastActiveCut("CutHLT",       [&](){ return 1;}, UNITY); 
 
 //book histograms for cuts
@@ -142,58 +141,14 @@ int iEntry = 0;
 if(saveSkim) outfile_skim->cd();
 TTree *tree_out;
 
-float weight;
-float fatJet1MassSD;
-float fatJet2MassSD;
-float fatJet1PNetXbb;
-float fatJet2PNetXbb;
-float fatJet1Pt;
-float fatJet2Pt;
-float fatJet1Eta;
-float fatJet2Eta;
-float fatJet1Phi;
-float fatJet2Phi;
-float fatJet1PtOverMHH;
-float fatJet2PtOverMHH;
-float fatJet1PtOverMSD;
-float fatJet2PtOverMSD;
-float abs_dEta_j1j2;
-float abs_dPhi_j1j2;
-float abs_dR_j1j2;
-float ptj2_over_ptj1;
-float mj2_over_mj1;
-float hh_pt;
-float hh_eta;
-float hh_phi;
-float hh_mass;
+float m_weight;
+float ph_pt1;
 
 if(saveSkim)
 { 
-tree_out = new TTree("hh", "output skim tree");
-tree_out->Branch("weight", &weight, "weight/F");
-tree_out->Branch("fatJet1MassSD", &fatJet1MassSD, "fatJet1MassSD/F");
-tree_out->Branch("fatJet1PNetXbb", &fatJet1PNetXbb, "fatJet1PNetXbb/F");
-tree_out->Branch("fatJet1Pt", &fatJet1Pt, "fatJet1Pt/F");
-tree_out->Branch("fatJet1Eta", &fatJet1Eta, "fatJet1Eta/F");
-tree_out->Branch("fatJet1Phi", &fatJet1Phi, "fatJet1Phi/F");
-tree_out->Branch("fatJet1PtOverMHH", &fatJet1PtOverMHH, "fatJet1PtOverMHH/F");
-tree_out->Branch("fatJet1PtOverMSD", &fatJet1PtOverMSD, "fatJet1PtOverMSD/F");
-tree_out->Branch("fatJet2MassSD", &fatJet2MassSD, "fatJet2MassSD/F");
-tree_out->Branch("fatJet2PNetXbb", &fatJet2PNetXbb, "fatJet2PNetXbb/F");
-tree_out->Branch("fatJet2Pt", &fatJet2Pt, "fatJet2Pt/F");
-tree_out->Branch("fatJet2Eta", &fatJet2Eta, "fatJet2Eta/F");
-tree_out->Branch("fatJet2Phi", &fatJet2Phi, "fatJet2Phi/F");
-tree_out->Branch("fatJet2PtOverMHH", &fatJet2PtOverMHH, "fatJet2PtOverMHH/F");
-tree_out->Branch("fatJet2PtOverMSD", &fatJet2PtOverMSD, "fatJet2PtOverMSD/F");
-tree_out->Branch("abs_dEta_j1j2", &abs_dEta_j1j2, "abs_dEta_j1j2/F");
-tree_out->Branch("abs_dPhi_j1j2", &abs_dPhi_j1j2, "abs_dPhi_j1j2/F");
-tree_out->Branch("abs_dR_j1j2", &abs_dR_j1j2, "abs_dR_j1j2/F");
-tree_out->Branch("ptj2_over_ptj1", &ptj2_over_ptj1, "ptj2_over_ptj1/F");
-tree_out->Branch("mj2_over_mj1", &mj2_over_mj1, "mj2_over_mj1/F");
-tree_out->Branch("hh_pt", &hh_pt, "hh_pt/F");
-tree_out->Branch("hh_eta", &hh_eta, "hh_eta/F");
-tree_out->Branch("hh_phi", &hh_phi, "hh_phi/F");
-tree_out->Branch("hh_mass", &hh_mass, "hh_mass/F");
+tree_out = new TTree("output", "output skim tree");
+tree_out->Branch("m_weight", &m_weight, "m_weight/F");
+tree_out->Branch("ph_pt1", &ph_pt1, "ph_pt1/F");
 }
 
 for(int idx = 0; idx < list_chain.size(); idx++)
@@ -209,35 +164,11 @@ for(int idx = 0; idx < list_chain.size(); idx++)
 	hh.GetEntry(iEntry_this);
         if(saveSkim) outfile->cd();
 	cutflow.fill();
-	//if(saveSkim && cutflow.getCut("TwofatJets").pass)
-	if(saveSkim && cutflow.getCut("BDTTrainPreSelection").pass)
+	if(saveSkim && cutflow.getCut("CutWeight").pass)
 	{
 	  outfile_skim->cd();	
-	  weight = isData ?  1.0 : lumi*hh.weight()*hh.triggerEffWeight()*hh.puWeight();
-	  fatJet1MassSD = hh.fatJet1MassSD();
-	  fatJet1PNetXbb = hh.fatJet1PNetXbb();
-	  fatJet1Pt = hh.fatJet1Pt();
-	  fatJet1Eta = hh.fatJet1Eta();
-	  fatJet1Phi = hh.fatJet1Phi();
-	  fatJet1PtOverMHH = hh.fatJet1PtOverMHH();
-	  fatJet1PtOverMSD = hh.fatJet1PtOverMSD();
-	  fatJet2MassSD = hh.fatJet2MassSD();
-	  fatJet2PNetXbb = hh.fatJet2PNetXbb();
-	  fatJet2Pt = hh.fatJet2Pt();
-	  fatJet2Eta = hh.fatJet2Eta();
-	  fatJet2Phi = hh.fatJet2Phi();
-	  fatJet2PtOverMHH = hh.fatJet2PtOverMHH();
-	  fatJet2PtOverMSD = hh.fatJet2PtOverMSD();
-
-	  abs_dEta_j1j2 = fabs(hh.fatJet1Eta() - hh.fatJet2Eta());
-	  abs_dPhi_j1j2 = fabs(hh.fatJet1Phi() - hh.fatJet2Phi());
-	  abs_dR_j1j2 = sqrt((hh.fatJet1Eta() - hh.fatJet2Eta())*(hh.fatJet1Eta() - hh.fatJet2Eta())  + (hh.fatJet1Phi() - hh.fatJet2Phi())*(hh.fatJet1Phi() - hh.fatJet2Phi()));
-	  ptj2_over_ptj1 = hh.fatJet2Pt() / hh.fatJet1Pt();
-	  mj2_over_mj1 = fatJet2MassSD/fatJet1MassSD;
-	  hh_pt = hh.hh_pt();
-	  hh_eta = hh.hh_eta();
-	  hh_phi = hh.hh_phi();
-	  hh_mass = hh.hh_mass();
+	  m_weight = isData ?  1.0 : lumi*hh.m_weight();
+	  ph_pt1 = hh.ph_pt1();
 
       tree_out->Fill();
 	}
