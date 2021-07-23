@@ -27,7 +27,7 @@ class hhtree{
    float mcweight_;
    TBranch *mcweight_branch;
    bool mcweight_isLoaded;
-   int m_weight_;
+   double m_weight_;
    TBranch *m_weight_branch;
    bool m_weight_isLoaded;
    int n_ph_;
@@ -357,13 +357,13 @@ class hhtree{
    int N_j_central_;
    TBranch *N_j_central_branch;
    bool N_j_central_isLoaded;
-   int m_HT_;
+   double m_HT_;
    TBranch *m_HT_branch;
    bool m_HT_isLoaded;
-   int m_HT_central_;
+   double m_HT_central_;
    TBranch *m_HT_central_branch;
    bool m_HT_central_isLoaded;
-   int m_mass_multijet_;
+   double m_mass_multijet_;
    TBranch *m_mass_multijet_branch;
    bool m_mass_multijet_isLoaded;
    int m_nbjet_fixed60_;
@@ -387,7 +387,7 @@ class hhtree{
    int lep_flav_2_;
    TBranch *lep_flav_2_branch;
    bool lep_flav_2_isLoaded;
-   int m_mll_;
+   double m_mll_;
    TBranch *m_mll_branch;
    bool m_mll_isLoaded;
    float m_H_;
@@ -429,7 +429,7 @@ class hhtree{
    bool ph_iso3_;
    TBranch *ph_iso3_branch;
    bool ph_iso3_isLoaded;
-   int score_recotop1_;
+   double score_recotop1_;
    TBranch *score_recotop1_branch;
    bool score_recotop1_isLoaded;
    bool isPassedTriggerMatch_;
@@ -447,6 +447,9 @@ class hhtree{
    float m_met_;
    TBranch *m_met_branch;
    bool m_met_isLoaded;
+   float gnn_score_;
+   TBranch *gnn_score_branch;
+   bool gnn_score_isLoaded;
  
  
  public:
@@ -458,7 +461,7 @@ class hhtree{
    const int &m_mcChannelNumber();
    const int &eventNumber();
    const float &mcweight();
-   const int &m_weight();
+   const double &m_weight();
    const int &n_ph();
    const int &n_el();
    const int &n_mu();
@@ -568,9 +571,9 @@ class hhtree{
    const int &susy_pdg();
    const int &m_njet();
    const int &N_j_central();
-   const int &m_HT();
-   const int &m_HT_central();
-   const int &m_mass_multijet();
+   const double &m_HT();
+   const double &m_HT_central();
+   const double &m_mass_multijet();
    const int &m_nbjet_fixed60();
    const int &m_nbjet_fixed80();
    const int &m_nbjet_fixed70();
@@ -578,7 +581,7 @@ class hhtree{
    const int &N_lep();
    const int &lep_flav_1();
    const int &lep_flav_2();
-   const int &m_mll();
+   const double &m_mll();
    const float &m_H();
    const int &m_nph();
    const int &m_tau_pt();
@@ -592,12 +595,13 @@ class hhtree{
    const bool &ph_iso1();
    const bool &ph_iso2();
    const bool &ph_iso3();
-   const int &score_recotop1();
+   const double &score_recotop1();
    const bool &isPassedTriggerMatch();
    const float &m_mpx();
    const float &m_mpy();
    const float &m_sumet();
    const float &m_met();
+   const float &gnn_score();
 };   
 
 #ifndef __CINT__   

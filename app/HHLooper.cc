@@ -20,7 +20,7 @@
 
 using namespace std;
 
-int lumi = 139000.0;
+double lumi = 139.0;
 TRandom3* r_nominal = new TRandom3(0);
 const float pi = 3.141592653;
 
@@ -58,14 +58,17 @@ system("mkdir -p hists");
 system(("mkdir -p hists/"+label).c_str());
 
 std::string year_ = "all";
-if(input.find("2016") != std::string::npos) {year_ = "2016"; lumi = 35922.0;}
-if(input.find("2017") != std::string::npos) {year_ = "2017"; lumi = 41480.0;}
-if(input.find("2018") != std::string::npos) {year_ = "2018"; lumi = 59741.0;}
+if(input.find("2016") != std::string::npos) {year_ = "2016"; lumi = 36.2;}
+if(input.find("2017") != std::string::npos) {year_ = "2017"; lumi = 44.3;}
+if(input.find("2018") != std::string::npos) {year_ = "2018"; lumi = 58.5;}
 system(("mkdir -p hists/"+label+"/"+year_).c_str());
 
 bool isData = false;
 if(isData_ == "1" || isData_ == "true" || isData_ == "yes" || isData_ == "True" || isData_ == "Yes") isData = true;
+
 if(isData) lumi = 1.0;
+
+if(outputFileName.find("HH") != std::string::npos) lumi = lumi * 2.27e-3; //HH fix
 
 
 std::vector<std::string> list_chain;
@@ -103,7 +106,7 @@ else //a directory is given
 
 }
 
-TChain * chain = new TChain("tree");
+TChain * chain = new TChain("output");
 for(int idx = 0; idx < list_chain.size(); idx++) chain->Add(list_chain[idx].c_str());
 int nEntries = chain->GetEntries();
 cout<<"total number of events to process: "<<nEntries<<endl;
@@ -119,9 +122,15 @@ RooUtil::Histograms histograms;
 //************define histograms**********//
 histograms.addHistogram("yield",               "; yield; Events",                      1,    0.,   1.,    [&]() { return 0; } );
 
+histograms.addHistogram("gnn_score",   "; GNN score; Events", 300,   0.,   1.,  [&]() { return  hh.gnn_score(); } );
 
 histograms.addHistogram("ph_pt1",   "; p_{T}^{#gamma 1} (GeV); Events", 300,   0.,   300.,  [&]() { return  hh.ph_pt1(); } );
+histograms.addHistogram("ph_eta1",               "; #eta^{#gamma 1}; Events",                 200,   -5.0,  5.0,  [&]() { return hh.ph_eta1(); } );
+histograms.addHistogram("ph_phi1",               "; #Phi^{#gamma 1}; Events",                 200,   -3.2,  3.2,  [&]() { return hh.ph_phi1(); } );
 
+histograms.addHistogram("ph_pt2",   "; p_{T}^{#gamma 2} (GeV); Events", 300,   0.,   300.,  [&]() { return  hh.ph_pt1(); } );
+histograms.addHistogram("ph_eta2",               "; #eta^{#gamma 2}; Events",                 200,   -5.0,  5.0,  [&]() { return hh.ph_eta2(); } );
+histograms.addHistogram("ph_phi2",               "; #Phi^{#gamma 2}; Events",                 200,   -3.2,  3.2,  [&]() { return hh.ph_phi2(); } );
 
 //************define cuts**********//
 
@@ -130,7 +139,9 @@ cutflow.setTFile(outfile);
 
 ////Pre-selection cuts
 cutflow.addCut("CutWeight", [&](){ return 1; },   [&](){ return isData ?  lumi : lumi*hh.m_weight(); });
-cutflow.addCutToLastActiveCut("CutHLT",       [&](){ return 1;}, UNITY); 
+cutflow.addCutToLastActiveCut("CutPhPtOverMgg",       [&](){ return hh.ph_pt1()/hh.m_mgg() > 0.35 && hh.ph_pt2()/hh.m_mgg() < 0.25;}, UNITY); 
+cutflow.addCutToLastActiveCut("CutMgg",       [&](){ return hh.m_mgg() > 105.0 && hh.m_mgg() < 160.0;}, UNITY); 
+cutflow.addCutToLastActiveCut("CutNbVeto",       [&](){ return hh.m_nbjet_fixed80() < 2;}, UNITY); 
 
 //book histograms for cuts
 cutflow.bookHistogramsForCutAndBelow(histograms, "CutWeight");
@@ -156,7 +167,7 @@ for(int idx = 0; idx < list_chain.size(); idx++)
   cout<<"[INFO] processing file: "<<list_chain[idx]<<endl;
   TTree * tree_this;
   TFile * file_this = new TFile(list_chain[idx].c_str(), "READ");
-  tree_this = (TTree*)file_this->Get("tree");
+  tree_this = (TTree*)file_this->Get("output");
   hh.Init(tree_this);
   int nEntries_this = tree_this->GetEntries();
   for(int iEntry_this=0; iEntry_this<nEntries_this; iEntry_this++)
@@ -172,6 +183,7 @@ for(int idx = 0; idx < list_chain.size(); idx++)
 
       tree_out->Fill();
 	}
+    //cout<<"event: "<<iEntry_this<<", m_weight: "<<hh.m_weight()<<endl;
 	if(iEntry%10000 == 0) cout<<"[INFO] processing event "<<iEntry<<" / "<<nEntries<<endl;
 	iEntry ++;
   }

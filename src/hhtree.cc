@@ -294,6 +294,8 @@ void hhtree::Init(TTree *tree)
  if(m_sumet_branch) m_sumet_branch->SetAddress(&m_sumet_);
  m_met_branch = tree->GetBranch("m_met");
  if(m_met_branch) m_met_branch->SetAddress(&m_met_);
+ gnn_score_branch = tree->GetBranch("gnn_score");
+ if(gnn_score_branch) gnn_score_branch->SetAddress(&gnn_score_);
 }
 
 void hhtree::GetEntry(unsigned int idx)
@@ -445,6 +447,7 @@ void hhtree::GetEntry(unsigned int idx)
  m_mpy_isLoaded = false;
  m_sumet_isLoaded = false;
  m_met_isLoaded = false;
+ gnn_score_isLoaded = false;
 }
 
 const int &hhtree::runNumber() 
@@ -522,7 +525,7 @@ exit(1);
  return mcweight_;
 }
 
-const int &hhtree::m_weight() 
+const double &hhtree::m_weight() 
 {
  if(not m_weight_isLoaded)
  {
@@ -2172,7 +2175,7 @@ exit(1);
  return N_j_central_;
 }
 
-const int &hhtree::m_HT() 
+const double &hhtree::m_HT() 
 {
  if(not m_HT_isLoaded)
  {
@@ -2187,7 +2190,7 @@ exit(1);
  return m_HT_;
 }
 
-const int &hhtree::m_HT_central() 
+const double &hhtree::m_HT_central() 
 {
  if(not m_HT_central_isLoaded)
  {
@@ -2202,7 +2205,7 @@ exit(1);
  return m_HT_central_;
 }
 
-const int &hhtree::m_mass_multijet() 
+const double &hhtree::m_mass_multijet() 
 {
  if(not m_mass_multijet_isLoaded)
  {
@@ -2322,7 +2325,7 @@ exit(1);
  return lep_flav_2_;
 }
 
-const int &hhtree::m_mll() 
+const double &hhtree::m_mll() 
 {
  if(not m_mll_isLoaded)
  {
@@ -2532,7 +2535,7 @@ exit(1);
  return ph_iso3_;
 }
 
-const int &hhtree::score_recotop1() 
+const double &hhtree::score_recotop1() 
 {
  if(not score_recotop1_isLoaded)
  {
@@ -2620,5 +2623,20 @@ exit(1);
    m_met_isLoaded = true;
  }
  return m_met_;
+}
+
+const float &hhtree::gnn_score() 
+{
+ if(not gnn_score_isLoaded)
+ {
+   if(gnn_score_branch != 0) gnn_score_branch->GetEntry(index);
+   else
+   {
+     printf("branch gnn_score_branch does not exist!\n");
+exit(1);
+   }
+   gnn_score_isLoaded = true;
+ }
+ return gnn_score_;
 }
 
