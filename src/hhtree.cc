@@ -1620,7 +1620,7 @@ exit(1);
  return b_phi3_;
 }
 
-const int &hhtree::ph_pt() 
+const vector<float> &hhtree::ph_pt() 
 {
  if(not ph_pt_isLoaded)
  {
@@ -1632,10 +1632,10 @@ exit(1);
    }
    ph_pt_isLoaded = true;
  }
- return ph_pt_;
+ return *ph_pt_;
 }
 
-const int &hhtree::ph_eta() 
+const vector<float> &hhtree::ph_eta() 
 {
  if(not ph_eta_isLoaded)
  {
@@ -1647,10 +1647,10 @@ exit(1);
    }
    ph_eta_isLoaded = true;
  }
- return ph_eta_;
+ return *ph_eta_;
 }
 
-const int &hhtree::ph_phi() 
+const vector<float> &hhtree::ph_phi() 
 {
  if(not ph_phi_isLoaded)
  {
@@ -1662,10 +1662,10 @@ exit(1);
    }
    ph_phi_isLoaded = true;
  }
- return ph_phi_;
+ return *ph_phi_;
 }
 
-const int &hhtree::ph_parent_id() 
+const vector<float> &hhtree::ph_parent_id() 
 {
  if(not ph_parent_id_isLoaded)
  {
@@ -1677,10 +1677,10 @@ exit(1);
    }
    ph_parent_id_isLoaded = true;
  }
- return ph_parent_id_;
+ return *ph_parent_id_;
 }
 
-const int &hhtree::m_el_pt() 
+const vector<float> &hhtree::m_el_pt() 
 {
  if(not m_el_pt_isLoaded)
  {
@@ -1692,10 +1692,10 @@ exit(1);
    }
    m_el_pt_isLoaded = true;
  }
- return m_el_pt_;
+ return *m_el_pt_;
 }
 
-const int &hhtree::m_el_eta() 
+const vector<float> &hhtree::m_el_eta() 
 {
  if(not m_el_eta_isLoaded)
  {
@@ -1707,10 +1707,10 @@ exit(1);
    }
    m_el_eta_isLoaded = true;
  }
- return m_el_eta_;
+ return *m_el_eta_;
 }
 
-const int &hhtree::m_el_phi() 
+const vector<float> &hhtree::m_el_phi() 
 {
  if(not m_el_phi_isLoaded)
  {
@@ -1722,10 +1722,10 @@ exit(1);
    }
    m_el_phi_isLoaded = true;
  }
- return m_el_phi_;
+ return *m_el_phi_;
 }
 
-const int &hhtree::m_el_E() 
+const vector<float> &hhtree::m_el_E() 
 {
  if(not m_el_E_isLoaded)
  {
@@ -1737,10 +1737,10 @@ exit(1);
    }
    m_el_E_isLoaded = true;
  }
- return m_el_E_;
+ return *m_el_E_;
 }
 
-const int &hhtree::m_el_pdg() 
+const vector<float> &hhtree::m_el_pdg() 
 {
  if(not m_el_pdg_isLoaded)
  {
@@ -1752,10 +1752,10 @@ exit(1);
    }
    m_el_pdg_isLoaded = true;
  }
- return m_el_pdg_;
+ return *m_el_pdg_;
 }
 
-const int &hhtree::m_mu_pt() 
+const vector<float> &hhtree::m_mu_pt() 
 {
  if(not m_mu_pt_isLoaded)
  {
@@ -1767,10 +1767,10 @@ exit(1);
    }
    m_mu_pt_isLoaded = true;
  }
- return m_mu_pt_;
+ return *m_mu_pt_;
 }
 
-const int &hhtree::m_mu_eta() 
+const vector<float> &hhtree::m_mu_eta() 
 {
  if(not m_mu_eta_isLoaded)
  {
@@ -1782,10 +1782,10 @@ exit(1);
    }
    m_mu_eta_isLoaded = true;
  }
- return m_mu_eta_;
+ return *m_mu_eta_;
 }
 
-const int &hhtree::m_mu_phi() 
+const vector<float> &hhtree::m_mu_phi() 
 {
  if(not m_mu_phi_isLoaded)
  {
@@ -1797,10 +1797,10 @@ exit(1);
    }
    m_mu_phi_isLoaded = true;
  }
- return m_mu_phi_;
+ return *m_mu_phi_;
 }
 
-const int &hhtree::m_mu_E() 
+const vector<float> &hhtree::m_mu_E() 
 {
  if(not m_mu_E_isLoaded)
  {
@@ -1812,10 +1812,10 @@ exit(1);
    }
    m_mu_E_isLoaded = true;
  }
- return m_mu_E_;
+ return *m_mu_E_;
 }
 
-const int &hhtree::m_mu_pdg() 
+const vector<float> &hhtree::m_mu_pdg() 
 {
  if(not m_mu_pdg_isLoaded)
  {
@@ -1827,10 +1827,10 @@ exit(1);
    }
    m_mu_pdg_isLoaded = true;
  }
- return m_mu_pdg_;
+ return *m_mu_pdg_;
 }
 
-const int &hhtree::tau_pt() 
+const vector<float> &hhtree::tau_pt() 
 {
  if(not tau_pt_isLoaded)
  {
@@ -1842,10 +1842,10 @@ exit(1);
    }
    tau_pt_isLoaded = true;
  }
- return tau_pt_;
+ return *tau_pt_;
 }
 
-const int &hhtree::tau_eta() 
+const vector<float> &hhtree::tau_eta() 
 {
  if(not tau_eta_isLoaded)
  {
@@ -1857,10 +1857,10 @@ exit(1);
    }
    tau_eta_isLoaded = true;
  }
- return tau_eta_;
+ return *tau_eta_;
 }
 
-const int &hhtree::top_pt() 
+const vector<float> &hhtree::top_pt() 
 {
  if(not top_pt_isLoaded)
  {
@@ -1872,10 +1872,10 @@ exit(1);
    }
    top_pt_isLoaded = true;
  }
- return top_pt_;
+ return *top_pt_;
 }
 
-const int &hhtree::top_eta() 
+const vector<float> &hhtree::top_eta() 
 {
  if(not top_eta_isLoaded)
  {
@@ -1887,10 +1887,10 @@ exit(1);
    }
    top_eta_isLoaded = true;
  }
- return top_eta_;
+ return *top_eta_;
 }
 
-const int &hhtree::b_pt() 
+const vector<float> &hhtree::b_pt() 
 {
  if(not b_pt_isLoaded)
  {
@@ -1902,10 +1902,10 @@ exit(1);
    }
    b_pt_isLoaded = true;
  }
- return b_pt_;
+ return *b_pt_;
 }
 
-const int &hhtree::b_eta() 
+const vector<float> &hhtree::b_eta() 
 {
  if(not b_eta_isLoaded)
  {
@@ -1917,10 +1917,10 @@ exit(1);
    }
    b_eta_isLoaded = true;
  }
- return b_eta_;
+ return *b_eta_;
 }
 
-const int &hhtree::b_phi() 
+const vector<float> &hhtree::b_phi() 
 {
  if(not b_phi_isLoaded)
  {
@@ -1932,10 +1932,10 @@ exit(1);
    }
    b_phi_isLoaded = true;
  }
- return b_phi_;
+ return *b_phi_;
 }
 
-const int &hhtree::m_jet_pt() 
+const vector<float> &hhtree::m_jet_pt() 
 {
  if(not m_jet_pt_isLoaded)
  {
@@ -1947,10 +1947,10 @@ exit(1);
    }
    m_jet_pt_isLoaded = true;
  }
- return m_jet_pt_;
+ return *m_jet_pt_;
 }
 
-const int &hhtree::m_jet_eta() 
+const vector<float> &hhtree::m_jet_eta() 
 {
  if(not m_jet_eta_isLoaded)
  {
@@ -1962,10 +1962,10 @@ exit(1);
    }
    m_jet_eta_isLoaded = true;
  }
- return m_jet_eta_;
+ return *m_jet_eta_;
 }
 
-const int &hhtree::m_jet_phi() 
+const vector<float> &hhtree::m_jet_phi() 
 {
  if(not m_jet_phi_isLoaded)
  {
@@ -1977,10 +1977,10 @@ exit(1);
    }
    m_jet_phi_isLoaded = true;
  }
- return m_jet_phi_;
+ return *m_jet_phi_;
 }
 
-const int &hhtree::m_jet_m() 
+const vector<float> &hhtree::m_jet_m() 
 {
  if(not m_jet_m_isLoaded)
  {
@@ -1992,10 +1992,10 @@ exit(1);
    }
    m_jet_m_isLoaded = true;
  }
- return m_jet_m_;
+ return *m_jet_m_;
 }
 
-const int &hhtree::m_jet_btag70() 
+const vector<float> &hhtree::m_jet_btag70() 
 {
  if(not m_jet_btag70_isLoaded)
  {
@@ -2007,10 +2007,10 @@ exit(1);
    }
    m_jet_btag70_isLoaded = true;
  }
- return m_jet_btag70_;
+ return *m_jet_btag70_;
 }
 
-const int &hhtree::m_jet_btag77() 
+const vector<float> &hhtree::m_jet_btag77() 
 {
  if(not m_jet_btag77_isLoaded)
  {
@@ -2022,10 +2022,10 @@ exit(1);
    }
    m_jet_btag77_isLoaded = true;
  }
- return m_jet_btag77_;
+ return *m_jet_btag77_;
 }
 
-const int &hhtree::m_jet_btag60() 
+const vector<float> &hhtree::m_jet_btag60() 
 {
  if(not m_jet_btag60_isLoaded)
  {
@@ -2037,10 +2037,10 @@ exit(1);
    }
    m_jet_btag60_isLoaded = true;
  }
- return m_jet_btag60_;
+ return *m_jet_btag60_;
 }
 
-const int &hhtree::m_jet_btag85() 
+const vector<float> &hhtree::m_jet_btag85() 
 {
  if(not m_jet_btag85_isLoaded)
  {
@@ -2052,10 +2052,10 @@ exit(1);
    }
    m_jet_btag85_isLoaded = true;
  }
- return m_jet_btag85_;
+ return *m_jet_btag85_;
 }
 
-const int &hhtree::jet_AK4_b_tag() 
+const vector<float> &hhtree::jet_AK4_b_tag() 
 {
  if(not jet_AK4_b_tag_isLoaded)
  {
@@ -2067,10 +2067,10 @@ exit(1);
    }
    jet_AK4_b_tag_isLoaded = true;
  }
- return jet_AK4_b_tag_;
+ return *jet_AK4_b_tag_;
 }
 
-const int &hhtree::susy_m() 
+const vector<float> &hhtree::susy_m() 
 {
  if(not susy_m_isLoaded)
  {
@@ -2082,10 +2082,10 @@ exit(1);
    }
    susy_m_isLoaded = true;
  }
- return susy_m_;
+ return *susy_m_;
 }
 
-const int &hhtree::susy_pt() 
+const vector<float> &hhtree::susy_pt() 
 {
  if(not susy_pt_isLoaded)
  {
@@ -2097,10 +2097,10 @@ exit(1);
    }
    susy_pt_isLoaded = true;
  }
- return susy_pt_;
+ return *susy_pt_;
 }
 
-const int &hhtree::susy_eta() 
+const vector<float> &hhtree::susy_eta() 
 {
  if(not susy_eta_isLoaded)
  {
@@ -2112,10 +2112,10 @@ exit(1);
    }
    susy_eta_isLoaded = true;
  }
- return susy_eta_;
+ return *susy_eta_;
 }
 
-const int &hhtree::susy_phi() 
+const vector<float> &hhtree::susy_phi() 
 {
  if(not susy_phi_isLoaded)
  {
@@ -2127,10 +2127,10 @@ exit(1);
    }
    susy_phi_isLoaded = true;
  }
- return susy_phi_;
+ return *susy_phi_;
 }
 
-const int &hhtree::susy_pdg() 
+const vector<float> &hhtree::susy_pdg() 
 {
  if(not susy_pdg_isLoaded)
  {
@@ -2142,7 +2142,7 @@ exit(1);
    }
    susy_pdg_isLoaded = true;
  }
- return susy_pdg_;
+ return *susy_pdg_;
 }
 
 const int &hhtree::m_njet() 
@@ -2370,7 +2370,7 @@ exit(1);
  return m_nph_;
 }
 
-const int &hhtree::m_tau_pt() 
+const vector<float> &hhtree::m_tau_pt() 
 {
  if(not m_tau_pt_isLoaded)
  {
@@ -2382,7 +2382,7 @@ exit(1);
    }
    m_tau_pt_isLoaded = true;
  }
- return m_tau_pt_;
+ return *m_tau_pt_;
 }
 
 const int &hhtree::m_ntau_medium() 

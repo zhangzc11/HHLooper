@@ -2,7 +2,7 @@
 
 void makeClass()
 {
- TFile * file = new TFile("/global/projecta/projectdirs/atlas/zhicaiz/HH/samples/input_final.root");
+ TFile * file = new TFile("../data/all/HH/input_final.root");
  TTree * tree = (TTree*)file->Get("output");
  
 
@@ -92,12 +92,25 @@ void makeClass()
   if(branchtitle.EndsWith("/l")) type = "unsigned long int";
   if(branchtitle.EndsWith("/L")) type = "long int";
   if(branchtitle.EndsWith("/O")) type = "bool";
-  if(branchtitle.EndsWith("/Double")) type = "double";
+  if(branchtitle.EndsWith("/D")) type = "double";
   if(branchtitle.Contains("Trigger/flag bit (process: HLT)")) type = "bool";
   if(branchtitle.Contains("generator weight")) type = "float";
   srcf<<" "<<branchname<<"_branch = tree->GetBranch(\""<<branchname<<"\");"<<endl;
+ 
 
-  if(branchtitle.Contains("["))
+  TString returnS = "";
+  if(branchclass.Contains("vector"))
+  {
+    headerf << "   " << branchclass << " *" << aliasname << "_;" << endl;   
+    headerf<<"   TBranch *"<<branchname<<"_branch;"<<endl;
+    headerf<<"   bool "<<branchname<<"_isLoaded;"<<endl;
+    temp_h<<"   const "<<branchclass<<" &"<<branchname<<"();"<<endl;
+    srcf<<" if("<<branchname<<"_branch) "<<branchname<<"_branch->SetAddress(&"<<branchname<<"_);"<<endl;
+    temp_c2<<"const "<<branchclass<<" &hhtree::"<<branchname<<"() \n{"<<endl;
+    returnS = "*";
+  }
+
+  else if(branchtitle.Contains("["))
   {
     headerf<<"   "<<type<<" "<<branchname<<"_[10];"<<endl;
     headerf<<"   TBranch *"<<branchname<<"_branch;"<<endl;
@@ -123,7 +136,7 @@ void makeClass()
   temp_c2<<"     printf(\"branch "<<branchname<<"_branch does not exist!\\n\");"<<endl;
   temp_c2<<"exit(1);\n   }"<<endl;
   temp_c2<<"   "<<branchname<<"_isLoaded = true;\n }"<<endl;
-  temp_c2<<" return "<<branchname<<"_;\n}\n"<<endl;
+  temp_c2<<" return "<<returnS<<branchname<<"_;\n}\n"<<endl;
   
  }
  temp_c1<<"}\n"<<endl;
