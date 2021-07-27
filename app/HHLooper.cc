@@ -11,12 +11,17 @@
 #include <TTree.h>
 #include <TChain.h>
 #include <TFile.h>
+#include <TString.h>
 #include <TROOT.h>
 #include <TRandom3.h>
-//LOCAL INCLUDES
-#include "hhtree.hh"
-#include "anautil.h"
-#include "scalefactors.h"
+
+#include "ROOT/RDataFrame.hxx"
+#include "ROOT/RVec.hxx"
+#include "ROOT/RDF/RInterface.hxx"
+
+using namespace ROOT::VecOps;
+using RNode = ROOT::RDF::RNode;
+
 
 using namespace std;
 
@@ -24,6 +29,16 @@ double lumi = 139.0;
 TRandom3* r_nominal = new TRandom3(0);
 const float pi = 3.141592653;
 
+
+struct histogram_type{
+   TString savename;
+   TString title;
+   int nbins;
+   double xlow;
+   double xhigh;
+   std::string varname;
+   std::string weight;
+};
 
 int main ( int argc, char* argv[])
 {
@@ -39,20 +54,7 @@ std::string input = argv[1];
 std::string outputFileName = argv[2];
 std::string label = argv[3];
 std::string isData_ = argv[4];
-bool saveSkim = false;
-bool doSystematics = false;
 
-if(argc > 5)
-{
-  std::string s_syst = argv[5];
-  if(s_syst == "1" || s_syst == "syst" || s_syst == "yes") doSystematics = true; 
-}
-
-if(argc > 6)
-{
-  std::string s_skim = argv[6];
-  if(s_skim == "1" || s_skim == "skim" || s_skim == "yes") saveSkim= true; 
-}
 
 system("mkdir -p hists");
 system(("mkdir -p hists/"+label).c_str());
@@ -66,10 +68,7 @@ system(("mkdir -p hists/"+label+"/"+year_).c_str());
 bool isData = false;
 if(isData_ == "1" || isData_ == "true" || isData_ == "yes" || isData_ == "True" || isData_ == "Yes") isData = true;
 
-if(isData) lumi = 1.0;
-
 if(outputFileName.find("HH") != std::string::npos) lumi = lumi * 2.27e-3; //HH fix
-
 
 std::vector<std::string> list_chain;
 
@@ -106,102 +105,56 @@ else //a directory is given
 
 }
 
-TChain * chain = new TChain("output");
-for(int idx = 0; idx < list_chain.size(); idx++) chain->Add(list_chain[idx].c_str());
-int nEntries = chain->GetEntries();
-cout<<"total number of events to process: "<<nEntries<<endl;
+//construct RDataFrame:
+ROOT::RDataFrame df("output", list_chain);
+auto nEntries = df.Filter("1").Count();
+cout<<"total number of events to process: "<<*nEntries<<endl;
 
+
+ROOT::EnableImplicitMT();
+
+//*********************define cuts*****************//
+auto df_CutWeight = df.Define("lumi", [&]() {return isData ? 1.0 : lumi;}, {}).Define("isData", [&]() {return isData;}, {}).Define("CutWeight", "isData ? lumi : lumi*m_weight");
+auto df_yield = df_CutWeight.Define("yield", [&]() {return 0.0;}, {});
+auto df_CutPhPtOverMgg = df_yield.Filter("ph_pt1/m_mgg > 0.35 && ph_pt2/m_mgg > 0.25", "CutPhPtOverMgg");
+auto df_CutMgg = df_CutPhPtOverMgg.Filter("m_mgg > 105.0 && m_mgg < 160.0","CutMgg");
+auto df_CutNbVeto = df_CutMgg.Filter("m_nbjet_fixed80 < 2", "CutNbVeto");
+//************************************************//
+
+
+//*******select cuts to save histogram************//
+std::vector<std::pair<std::string, RNode>> cuts;
+cuts.push_back(std::make_pair("CutWeight", df_CutWeight));
+cuts.push_back(std::make_pair("CutPhPtOverMgg", df_CutPhPtOverMgg));
+cuts.push_back(std::make_pair("CutMgg", df_CutMgg));
+cuts.push_back(std::make_pair("CutNbVeto", df_CutNbVeto));
+//************************************************//
+
+//******define histograms to save for each cut****//
+std::vector<histogram_type> histograms;
+histograms.push_back((histogram_type){"yield", "; yield; Events", 1, 0., 1., "yield", "CutWeight"});
+histograms.push_back((histogram_type){"gnn_score", "; GNN score; Events", 300, 0., 1., "gnn_score", "CutWeight"});
+histograms.push_back((histogram_type){"ph_pt1", "; p_{T}^{#gamma 1} (GeV); Events", 300, 0., 300., "ph_pt1", "CutWeight"});
+//************************************************//
+
+
+
+//save histograms for all cuts:
 TFile *outfile = new TFile(("hists/"+label+"/"+year_+"/"+outputFileName).c_str(), "recreate");
-TFile *outfile_skim;
-if(saveSkim) outfile_skim = new TFile(("hists/"+label+"/"+year_+"/"+outputFileName.replace(outputFileName.find(".root"), 5, "_skim.root")).c_str(), "recreate");
-
-RooUtil::Cutflow cutflow;
-RooUtil::Histograms histograms;
-
-
-//************define histograms**********//
-histograms.addHistogram("yield",               "; yield; Events",                      1,    0.,   1.,    [&]() { return 0; } );
-
-histograms.addHistogram("gnn_score",   "; GNN score; Events", 300,   0.,   1.,  [&]() { return  hh.gnn_score(); } );
-
-histograms.addHistogram("ph_pt1",   "; p_{T}^{#gamma 1} (GeV); Events", 300,   0.,   300.,  [&]() { return  hh.ph_pt1(); } );
-histograms.addHistogram("ph_eta1",               "; #eta^{#gamma 1}; Events",                 200,   -5.0,  5.0,  [&]() { return hh.ph_eta1(); } );
-histograms.addHistogram("ph_phi1",               "; #Phi^{#gamma 1}; Events",                 200,   -3.2,  3.2,  [&]() { return hh.ph_phi1(); } );
-
-histograms.addHistogram("ph_pt2",   "; p_{T}^{#gamma 2} (GeV); Events", 300,   0.,   300.,  [&]() { return  hh.ph_pt1(); } );
-histograms.addHistogram("ph_eta2",               "; #eta^{#gamma 2}; Events",                 200,   -5.0,  5.0,  [&]() { return hh.ph_eta2(); } );
-histograms.addHistogram("ph_phi2",               "; #Phi^{#gamma 2}; Events",                 200,   -3.2,  3.2,  [&]() { return hh.ph_phi2(); } );
-
-//************define cuts**********//
-
-cutflow.setTFile(outfile);
-
-
-////Pre-selection cuts
-cutflow.addCut("CutWeight", [&](){ return 1; },   [&](){ return isData ?  lumi : lumi*hh.m_weight(); });
-cutflow.addCutToLastActiveCut("CutPhPtOverMgg",       [&](){ return hh.ph_pt1()/hh.m_mgg() > 0.35 && hh.ph_pt2()/hh.m_mgg() < 0.25;}, UNITY); 
-cutflow.addCutToLastActiveCut("CutMgg",       [&](){ return hh.m_mgg() > 105.0 && hh.m_mgg() < 160.0;}, UNITY); 
-cutflow.addCutToLastActiveCut("CutNbVeto",       [&](){ return hh.m_nbjet_fixed80() < 2;}, UNITY); 
-
-//book histograms for cuts
-cutflow.bookHistogramsForCutAndBelow(histograms, "CutWeight");
-cutflow.bookCutflows();
-
-int iEntry = 0;
-
-if(saveSkim) outfile_skim->cd();
-TTree *tree_out;
-
-float m_weight;
-float ph_pt1;
-
-if(saveSkim)
-{ 
-tree_out = new TTree("output", "output skim tree");
-tree_out->Branch("m_weight", &m_weight, "m_weight/F");
-tree_out->Branch("ph_pt1", &ph_pt1, "ph_pt1/F");
-}
-
-for(int idx = 0; idx < list_chain.size(); idx++)
+auto hist_yield_root = df_yield.Histo1D({cuts[0].first+"__"+histograms[0].savename, histograms[0].title, histograms[0].nbins, histograms[0].xlow, histograms[0].xhigh}, histograms[0].varname, histograms[0].weight);
+std::vector<decltype(hist_yield_root)> hists;
+hists.push_back(hist_yield_root);
+for(int ic=0; ic<cuts.size(); ic++)
 {
-  cout<<"[INFO] processing file: "<<list_chain[idx]<<endl;
-  TTree * tree_this;
-  TFile * file_this = new TFile(list_chain[idx].c_str(), "READ");
-  tree_this = (TTree*)file_this->Get("output");
-  hh.Init(tree_this);
-  int nEntries_this = tree_this->GetEntries();
-  for(int iEntry_this=0; iEntry_this<nEntries_this; iEntry_this++)
-  {
-	hh.GetEntry(iEntry_this);
-        if(saveSkim) outfile->cd();
-	cutflow.fill();
-	if(saveSkim && cutflow.getCut("CutWeight").pass)
-	{
-	  outfile_skim->cd();	
-	  m_weight = isData ?  1.0 : lumi*hh.m_weight();
-	  ph_pt1 = hh.ph_pt1();
-
-      tree_out->Fill();
-	}
-    //cout<<"event: "<<iEntry_this<<", m_weight: "<<hh.m_weight()<<endl;
-	if(iEntry%10000 == 0) cout<<"[INFO] processing event "<<iEntry<<" / "<<nEntries<<endl;
-	iEntry ++;
-  }
-  delete tree_this;
-  file_this->Close();
-  delete file_this;
+    for(int ih=0; ih<histograms.size(); ih++)
+    {
+        if(cuts[ic].first == "CutWeight" && histograms[ih].varname =="yield") continue;
+        auto hist_temp = cuts[ic].second.Histo1D({cuts[ic].first+"__"+histograms[ih].savename, histograms[ih].title, histograms[ih].nbins, histograms[ih].xlow, histograms[ih].xhigh}, histograms[ih].varname, histograms[ih].weight);
+        hists.push_back(hist_temp);
+    }
 }
-
-//save histograms
-cutflow.saveOutput();
+for(int idx=0; idx<hists.size(); idx++) hists[idx]->Write();
 outfile->Close();
-if(saveSkim) 
-{
- outfile_skim->cd();
- tree_out->Write();
- outfile_skim->Close();
-}
-cout<<"[INFO]: all  files successfully processed... ignore segfault below..."<<endl;
 
 return 0;
 }
