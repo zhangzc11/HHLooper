@@ -128,8 +128,8 @@ auto df_yield = df_CutWeight.Define("yield", [&]() {return 0.0;}, {});
 auto df_CutPhPtOverMgg = df_yield.Filter("ph_pt1/m_mgg > 0.35 && ph_pt2/m_mgg > 0.25", "CutPhPtOverMgg");
 auto df_CutMgg = df_CutPhPtOverMgg.Filter("m_mgg > 105.0 && m_mgg < 160.0","CutMgg");
 auto df_CutNbVeto = df_CutMgg.Filter("m_nbjet_fixed80 < 2", "CutNbVeto");
-auto df_SRFull = df_CutNbVeto.Define("doContEstimate", [&](){return isData && doContEstimate;}, {}).Filter("doContEstimate ? (!(ph_isTight1 && ph_isTight2 && ph_iso1 && ph_iso2)) : (ph_isTight1 && ph_isTight2 && ph_iso1 && ph_iso2)", "SRFull");
-auto df_SRPeak = df_SRFull.Filter("m_mgg > 123. && m_mgg < 127.", "SRPeak");
+auto df_PhoID = df_CutNbVeto.Define("doContEstimate", [&](){return isData && doContEstimate;}, {}).Filter("doContEstimate ? (!(ph_isTight1 && ph_isTight2 && ph_iso1 && ph_iso2)) : (ph_isTight1 && ph_isTight2 && ph_iso1 && ph_iso2)", "PhoID");
+auto df_HPeak = df_PhoID.Filter("m_mgg > 123. && m_mgg < 127.", "HPeak");
 //************************************************//
 
 
@@ -139,8 +139,8 @@ std::vector<cut_type> cuts_temp;
 cuts_temp.push_back((cut_type){"CutWeight", "CutWeight", df_CutWeight});
 cuts_temp.push_back((cut_type){"CutMgg", "CutWeight", df_CutMgg});
 cuts_temp.push_back((cut_type){"CutNbVeto", "CutWeight", df_CutNbVeto});
-cuts_temp.push_back((cut_type){"SRFull", "CutWeight", df_SRFull});
-cuts_temp.push_back((cut_type){"SRPeak", "CutWeight", df_SRPeak});
+cuts_temp.push_back((cut_type){"PhoID", "CutWeight", df_PhoID});
+cuts_temp.push_back((cut_type){"HPeak", "CutWeight", df_HPeak});
 //************************************************//
 
 
@@ -148,7 +148,7 @@ cuts_temp.push_back((cut_type){"SRPeak", "CutWeight", df_SRPeak});
 std::vector<histogram_type> histograms;
 
 histograms.push_back((histogram_type){"yield", "; yield; Events", 1, 0., 1., "yield"});
-histograms.push_back((histogram_type){"gnn_score", "; GNN score; Events", 300, 0., 1., "gnn_score"});
+histograms.push_back((histogram_type){"gnn_score", "; GNN score; Events", 900, 0., 1., "gnn_score"});
 histograms.push_back((histogram_type){"ph_pt1", "; p_{T}^{#gamma 1} (GeV); Events", 300, 0., 300., "ph_pt1"});
 histograms.push_back((histogram_type){"ph_pt2", "; p_{T}^{#gamma 2} (GeV); Events", 300, 0., 300., "ph_pt2"});
 histograms.push_back((histogram_type){"m_mgg", "; m_{#gamma#gamma} (GeV); Events", 300, 105., 160., "m_mgg"});

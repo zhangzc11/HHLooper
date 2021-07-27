@@ -1142,7 +1142,7 @@ def makeplot_ROC(
     ntotal_bkg[-1] = hist_all_b.Integral(0, nbins)
 
     for idx in range(0, nbins+1):
-        npass_sig = hist_all_s.Integral(idx, 300)
+        npass_sig = hist_all_s.Integral(idx, nbins) 
         if ntotal_sig < 1e-8:
             eff_sig[idx] = 1.0
         else:
@@ -1209,13 +1209,13 @@ def makeplot_ROC(
         lumi_value = extraoptions["lumi_value"]
     #ATLASLabel(leftMargin+0.1, 0.85, lumi_value)
  
-    text1 = r.TLatex(leftMargin+0.06, 0.85, "ATLAS")
+    text1 = r.TLatex(leftMargin+0.055, 0.85, "ATLAS")
     text1.SetNDC()
     text1.SetTextFont(72)
     text1.SetTextSize(0.05)
     text1.Draw()
 
-    text2 = r.TLatex(leftMargin+0.23, 0.85, "Internal  #sqrt{s}= 13 TeV  #int L dt = %d"%lumi_value+" fb^{-1}")
+    text2 = r.TLatex(leftMargin+0.225, 0.85, "Internal  #sqrt{s}= 13 TeV #int L dt = %d"%lumi_value+" fb^{-1}")
     text2.SetNDC()
     text2.SetTextFont(42)
     text2.SetTextSize(0.04)
