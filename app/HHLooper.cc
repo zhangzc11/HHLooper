@@ -37,8 +37,14 @@ struct histogram_type{
    double xlow;
    double xhigh;
    std::string varname;
-   std::string weight;
 };
+
+struct cut_type{
+   TString cutname;
+   std::string weight;
+   RNode node;
+};
+
 
 int main ( int argc, char* argv[])
 {
@@ -119,37 +125,70 @@ auto df_yield = df_CutWeight.Define("yield", [&]() {return 0.0;}, {});
 auto df_CutPhPtOverMgg = df_yield.Filter("ph_pt1/m_mgg > 0.35 && ph_pt2/m_mgg > 0.25", "CutPhPtOverMgg");
 auto df_CutMgg = df_CutPhPtOverMgg.Filter("m_mgg > 105.0 && m_mgg < 160.0","CutMgg");
 auto df_CutNbVeto = df_CutMgg.Filter("m_nbjet_fixed80 < 2", "CutNbVeto");
+auto df_NTISideBand = df_CutNbVeto.Filter("(!(ph_isTight1 && ph_isTight2 && ph_iso1 && ph_iso2)) && (m_mgg < 120. || m_mgg > 130.)", "NTISideBand");
+auto df_NTIHPeak = df_CutNbVeto.Filter("(!(ph_isTight1 && ph_isTight2 && ph_iso1 && ph_iso2)) && (m_mgg > 123. && m_mgg < 127.)", "NTIHPeak");
+auto df_TISideBand = df_CutNbVeto.Filter("ph_isTight1 && ph_isTight2 && ph_iso1 && ph_iso2 && (m_mgg < 120. || m_mgg > 130.)", "TISideBand");
+auto df_TIHPeak = df_CutNbVeto.Filter("ph_isTight1 && ph_isTight2 && ph_iso1 && ph_iso2 && (m_mgg > 123. && m_mgg < 127.)", "TIHPeak");
+
+//calculate scale factors for continuum background
+double SF1 = 1.0;
+double SF2 = 1.0;
+if(isData)
+{
+    auto hist_NTISideBand = df_NTISideBand.Histo1D({"yield_NTISideBand", "", 1, 0., 1.}, "yield", "CutWeight");
+    auto hist_NTIHPeak = df_NTIHPeak.Histo1D({"yield_NTIHPeak", "", 1, 0., 1.}, "yield", "CutWeight");
+    auto hist_TISideBand = df_TISideBand.Histo1D({"yield_TIHSideBand", "", 1, 0., 1.}, "yield", "CutWeight");
+    auto hist_TIHPeak = df_TIHPeak.Histo1D({"yield_TIHPeak", "", 1, 0., 1.}, "yield", "CutWeight");
+
+    SF1 = hist_NTIHPeak->Integral() / hist_NTISideBand->Integral();
+    SF2 = hist_TISideBand->Integral() /hist_NTISideBand->Integral();
+}
+
+cout<<"SF1: "<<SF1<<endl;
+cout<<"SF2: "<<SF2<<endl;
+
+auto df_SR = df_CutNbVeto.Filter("ph_isTight1 && ph_isTight2 && ph_iso1 && ph_iso2", "SR");
+auto df_SFweight = df_CutNbVeto.Define("SF1", [&](){return SF1;}, {}).Define("SF2", [&](){return SF2;}, {}).Define("SFweight2", "CutWeight * SF2").Define("SFweight12", "CutWeight * SF1 * SF2");
+auto df_SREstimateFull = df_SFweight.Filter("isData ? (!(ph_isTight1 && ph_isTight2 && ph_iso1 && ph_iso2)) : (ph_isTight1 && ph_isTight2 && ph_iso1 && ph_iso2)", "SREstimateFull");
+auto df_SREstimatePeak = df_SREstimateFull.Filter("m_mgg > 123. && m_mgg < 127.", "SREstimatePeak");
+
 //************************************************//
 
 
+
+
 //*******select cuts to save histogram************//
-std::vector<std::pair<std::string, RNode>> cuts;
-cuts.push_back(std::make_pair("CutWeight", df_CutWeight));
-cuts.push_back(std::make_pair("CutPhPtOverMgg", df_CutPhPtOverMgg));
-cuts.push_back(std::make_pair("CutMgg", df_CutMgg));
-cuts.push_back(std::make_pair("CutNbVeto", df_CutNbVeto));
+std::vector<cut_type> cuts;
+cuts.push_back((cut_type){"CutWeight", "CutWeight", df_CutWeight});
+cuts.push_back((cut_type){"CutMgg", "CutWeight", df_CutMgg});
+cuts.push_back((cut_type){"CutNbVeto", "CutWeight", df_CutNbVeto});
+cuts.push_back((cut_type){"SR", "CutWeight", df_SR});
+cuts.push_back((cut_type){"SREstimateFull", "SFweight2", df_SREstimateFull});
+cuts.push_back((cut_type){"SREstimatePeak", "SFweight2", df_SREstimatePeak});
 //************************************************//
 
 //******define histograms to save for each cut****//
 std::vector<histogram_type> histograms;
-histograms.push_back((histogram_type){"yield", "; yield; Events", 1, 0., 1., "yield", "CutWeight"});
-histograms.push_back((histogram_type){"gnn_score", "; GNN score; Events", 300, 0., 1., "gnn_score", "CutWeight"});
-histograms.push_back((histogram_type){"ph_pt1", "; p_{T}^{#gamma 1} (GeV); Events", 300, 0., 300., "ph_pt1", "CutWeight"});
+histograms.push_back((histogram_type){"yield", "; yield; Events", 1, 0., 1., "yield"});
+histograms.push_back((histogram_type){"gnn_score", "; GNN score; Events", 300, 0., 1., "gnn_score"});
+histograms.push_back((histogram_type){"ph_pt1", "; p_{T}^{#gamma 1} (GeV); Events", 300, 0., 300., "ph_pt1"});
+histograms.push_back((histogram_type){"ph_pt2", "; p_{T}^{#gamma 1} (GeV); Events", 300, 0., 300., "ph_pt2"});
+histograms.push_back((histogram_type){"m_mgg", "; m_{#gamma#gamma} (GeV); Events", 300, 105., 160., "m_mgg"});
 //************************************************//
 
 
 
 //save histograms for all cuts:
 TFile *outfile = new TFile(("hists/"+label+"/"+year_+"/"+outputFileName).c_str(), "recreate");
-auto hist_yield_root = df_yield.Histo1D({cuts[0].first+"__"+histograms[0].savename, histograms[0].title, histograms[0].nbins, histograms[0].xlow, histograms[0].xhigh}, histograms[0].varname, histograms[0].weight);
+auto hist_yield_root = df_yield.Histo1D({cuts[0].cutname+"__"+histograms[0].savename, histograms[0].title, histograms[0].nbins, histograms[0].xlow, histograms[0].xhigh}, histograms[0].varname, cuts[0].weight);
 std::vector<decltype(hist_yield_root)> hists;
 hists.push_back(hist_yield_root);
 for(int ic=0; ic<cuts.size(); ic++)
 {
     for(int ih=0; ih<histograms.size(); ih++)
     {
-        if(cuts[ic].first == "CutWeight" && histograms[ih].varname =="yield") continue;
-        auto hist_temp = cuts[ic].second.Histo1D({cuts[ic].first+"__"+histograms[ih].savename, histograms[ih].title, histograms[ih].nbins, histograms[ih].xlow, histograms[ih].xhigh}, histograms[ih].varname, histograms[ih].weight);
+        if(cuts[ic].cutname == "CutWeight" && histograms[ih].varname =="yield") continue;
+        auto hist_temp = cuts[ic].node.Histo1D({cuts[ic].cutname+"__"+histograms[ih].savename, histograms[ih].title, histograms[ih].nbins, histograms[ih].xlow, histograms[ih].xhigh}, histograms[ih].varname, cuts[ic].weight);
         hists.push_back(hist_temp);
     }
 }

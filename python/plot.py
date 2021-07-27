@@ -74,34 +74,26 @@ year = -1
 lumi = -1
 if "2016" in input_dir:
     year = 2016
-    lumi = 35.9
+    lumi = 36.2
 elif "2017" in input_dir:
     year = 2017
-    lumi = 41.3
+    lumi = 44.3
 elif "2018" in input_dir:
     year = 2018
-    lumi = 59.7
+    lumi = 58.5
 else:
     year = 6051
-    lumi = 137
+    lumi = 139
     
 
 sig_fnames = []
 
-#sig_fnames = [input_dir+"HHc1.root"]
-#bkg_fnames = [input_dir+"others.root", input_dir+"Higgs.root", input_dir+"VH.root", input_dir+"ttH.root", input_dir+"tW.root", input_dir+"qcd.root", input_dir+"ttbar.root"]
-
-#bkg_fnames = [input_dir+"others.root", input_dir+"Higgs.root", input_dir+"VH.root", input_dir+"ttH.root", input_dir+"qcd.root", input_dir+"ttbar.root"]
-#sig_legends = ["HH"]
-#bkg_legends = ["V+jets,VV", "ggH+VBFH", "VH", "t#bar{t}H", "QCD", "t#bar{t}+jets"]
-#sig_colors = [617, 839, 800, 1, 632]
-#bkg_colors = [2001, 2003, 2011, 920, 2007, 2005, 800, 839]
-
-bkg_fnames = [input_dir+"others.root", input_dir+"qcd.root", input_dir+"ttbar.root"]
-sig_legends = []
-bkg_legends = ["V+jets,VV", "QCD", "t#bar{t}+jets"]
-sig_colors = []
-bkg_colors = [2001, 2007, 2005]
+sig_fnames = [input_dir+"HH.root"]
+sig_legends = ["HH"]
+sig_colors = [632, 617, 839, 800, 1]
+bkg_fnames = [input_dir+"nti.root"]
+bkg_legends = ["NTI"]
+bkg_colors = [920, 2007, 2005, 2003, 2001, 2011]
 
 data_fname = input_dir+"data.root"
 

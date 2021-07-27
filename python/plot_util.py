@@ -18,6 +18,22 @@ r.gStyle.SetStatW(0.2)
 r.gStyle.SetStatH(0.15)
 r.gROOT.SetBatch(1)
 
+r.gROOT.SetStyle("ATLAS")
+
+def ATLASLabel(x, y, lumi=139, color=1):
+    l = r.TLatex(x, y, "ATLAS")
+    l.SetNDC()
+    l.SetTextFont(72)
+    l.SetTextColor(color)
+    l.Draw()
+
+    p = r.TLatex(x+0.1, y, "Internal #sqrt{s}= 13 TeV #int L dt = %d"%lumi+" fb^{-1}")
+    p.SetNDC()
+    p.SetTextFont(42)
+    p.SetTextColor(color)
+    p.Draw()
+
+
 def rebin(hists, nbin):
     for hist in hists:
         if not hist: continue
@@ -187,7 +203,7 @@ def makeplot_single_2d(
     h2_sig[0].GetYaxis().SetLabelSize(0.045)
     h2_sig[0].GetYaxis().CenterTitle()
 
-    leg = r.TLegend(leftMargin, 0.7, leftMargin+0.20, 0.9)
+    leg = r.TLegend(leftMargin, 0.65, leftMargin+0.20, 0.85)
     #leg.SetNColumns(2)
     #leg.SetFillStyle(1)
     leg.SetFillColor(0)
@@ -212,30 +228,25 @@ def makeplot_single_2d(
         y_title = extraoptions["yaxis_label"]
         h2_sig[0].GetYaxis().SetTitle(y_title)
 
-    ##########draw CMS preliminary
-    tex1 = r.TLatex(leftMargin, 0.91, "CMS")
-    tex1.SetNDC()
-    tex1.SetTextFont(61)
-    tex1.SetTextSize(0.070)
-    tex1.SetLineWidth(2)
-    tex1.Draw()
-    tex2 = r.TLatex(leftMargin+0.15,0.912,"Preliminary")
-    tex2.SetNDC()
-    tex2.SetTextFont(52)
-    tex2.SetTextSize(0.055)
-    tex2.SetLineWidth(2)
-    tex2.Draw()
-    
-    lumi_value = 137
+    ##########draw ATLAS 
+     
+    lumi_value = 139
     if "lumi_value" in extraoptions:
         lumi_value = extraoptions["lumi_value"]
-    tex3 = r.TLatex(0.6,0.912,"%d"%lumi_value+" fb^{-1} (13 TeV)")
-    tex3.SetNDC()
-    tex3.SetTextFont(42)
-    tex3.SetTextSize(0.055)
-    tex3.SetLineWidth(2)
-    tex3.Draw()
+ 
+    text1 = r.TLatex(leftMargin+0.03, 0.85, "ATLAS")
+    text1.SetNDC()
+    text1.SetTextFont(72)
+    text1.SetTextSize(0.070)
+    text1.Draw()
 
+    text2 = r.TLatex(leftMargin+0.2, 0.85, "Internal   #sqrt{s}= 13 TeV   #int L dt = %d"%lumi_value+" fb^{-1}")
+    text2.SetNDC()
+    text2.SetTextFont(42)
+    text2.SetTextSize(0.055)
+    text2.Draw()
+
+    #ATLASLabel(leftMargin+0.1, 0.85, lumi_value)
 
     outFile = dir_name_
     if output_name_:
@@ -318,29 +329,25 @@ def makeplot_fitmass(
     tex_nb.SetLineWidth(2)
     tex_nb.Draw()
 
-    ##########draw CMS preliminary
-    tex1 = r.TLatex(leftMargin, 0.91, "CMS")
-    tex1.SetNDC()
-    tex1.SetTextFont(61)
-    tex1.SetTextSize(0.070)
-    tex1.SetLineWidth(2)
-    tex1.Draw()
-    tex2 = r.TLatex(leftMargin+0.15,0.912,"Preliminary")
-    tex2.SetNDC()
-    tex2.SetTextFont(52)
-    tex2.SetTextSize(0.055)
-    tex2.SetLineWidth(2)
-    tex2.Draw()
-    
+    ##########draw ATLAS
+   
     lumi_value = 137
     if "lumi_value" in extraoptions:
         lumi_value = extraoptions["lumi_value"]
-    tex3 = r.TLatex(0.63,0.912,"%d"%lumi_value+" fb^{-1} (13 TeV)")
-    tex3.SetNDC()
-    tex3.SetTextFont(42)
-    tex3.SetTextSize(0.055)
-    tex3.SetLineWidth(2)
-    tex3.Draw()
+    #ATLASLabel(leftMargin+0.1, 0.85, lumi_value)
+ 
+    text1 = r.TLatex(leftMargin+0.03, 0.85, "ATLAS")
+    text1.SetNDC()
+    text1.SetTextFont(72)
+    text1.SetTextSize(0.070)
+    text1.Draw()
+
+    text2 = r.TLatex(leftMargin+0.2, 0.85, "Internal   #sqrt{s}= 13 TeV   #int L dt = %d"%lumi_value+" fb^{-1}")
+    text2.SetNDC()
+    text2.SetTextFont(42)
+    text2.SetTextSize(0.055)
+    text2.Draw()
+
 
     outFile = dir_name_
     if output_name_:
@@ -546,7 +553,7 @@ def makeplot_single(
     #if "xaxis_range" in extraoptions:
     #    stack.GetXaxis().SetRangeUser(float(extraoptions["xaxis_range"][0]),float(extraoptions["xaxis_range"][1]))
 
-    leg = r.TLegend(0.16, 0.70, 0.97, 0.88)
+    leg = r.TLegend(0.16, 0.65, 0.97, 0.85)
     leg.SetNColumns(4)
     leg.SetFillStyle(0)
     leg.SetBorderSize(0)
@@ -621,30 +628,24 @@ def makeplot_single(
         ratio.GetXaxis().SetTitle(x_title)
     ratio.GetYaxis().CenterTitle()
 
-    ##########draw CMS preliminary
+    ##########draw ATLAS 
     pad1.cd()
-    tex1 = r.TLatex(leftMargin, 0.91, "CMS")
-    tex1.SetNDC()
-    tex1.SetTextFont(61)
-    tex1.SetTextSize(0.070)
-    tex1.SetLineWidth(2)
-    tex1.Draw()
-    tex2 = r.TLatex(leftMargin+0.12,0.912,"Preliminary")
-    tex2.SetNDC()
-    tex2.SetTextFont(52)
-    tex2.SetTextSize(0.055)
-    tex2.SetLineWidth(2)
-    tex2.Draw()
-    
-    lumi_value = 137
+   
+    lumi_value = 139
     if "lumi_value" in extraoptions:
         lumi_value = extraoptions["lumi_value"]
-    tex3 = r.TLatex(0.72,0.912,"%d"%lumi_value+" fb^{-1} (13 TeV)")
-    tex3.SetNDC()
-    tex3.SetTextFont(42)
-    tex3.SetTextSize(0.055)
-    tex3.SetLineWidth(2)
-    tex3.Draw()
+    
+    text1 = r.TLatex(leftMargin+0.03, 0.85, "ATLAS")
+    text1.SetNDC()
+    text1.SetTextFont(72)
+    text1.SetTextSize(0.070)
+    text1.Draw()
+
+    text2 = r.TLatex(leftMargin+0.2, 0.85, "Internal   #sqrt{s}= 13 TeV   #int L dt = %d"%lumi_value+" fb^{-1}")
+    text2.SetNDC()
+    text2.SetTextFont(42)
+    text2.SetTextSize(0.055)
+    text2.Draw()
 
 
     outFile = dir_name_
@@ -655,7 +656,7 @@ def makeplot_single(
 
     #print("maxY = "+str(maxY))
     #Y maximum range
-    stack.SetMaximum(maxY*1.7)
+    stack.SetMaximum(maxY*1.5)
 
     #print everything into txt file
     text_file = open(outFile+"_linY.txt", "w")
@@ -692,7 +693,7 @@ def makeplot_single(
     myC.SaveAs(outFile+"_linY.pdf")
     myC.SaveAs(outFile+"_linY.C")
     pad1.cd()
-    stack.SetMaximum(maxY*100.0)
+    stack.SetMaximum(maxY*1000.0)
     stack.SetMinimum(0.5)
     pad1.SetLogy()
     myC.SaveAs(outFile+"_logY.png")
@@ -900,7 +901,7 @@ def makeplot_cutOptimize(
     stack.GetYaxis().SetLabelSize(0.045)
     stack.GetYaxis().CenterTitle()
 
-    leg = r.TLegend(0.15, 0.70, 0.95, 0.88)
+    leg = r.TLegend(0.15, 0.65, 0.95, 0.85)
     leg.SetFillStyle(0)
     leg.SetBorderSize(0)
     leg.SetTextFont(28)
@@ -934,30 +935,26 @@ def makeplot_cutOptimize(
     ratio.GetYaxis().SetNdivisions(505)
     ratio.GetXaxis().SetTitle(x_title)
 
-    ##########draw CMS preliminary
+    ##########draw ATLAS 
     pad1.cd()
-    tex1 = r.TLatex(leftMargin, 0.91, "CMS")
-    tex1.SetNDC()
-    tex1.SetTextFont(61)
-    tex1.SetTextSize(0.070)
-    tex1.SetLineWidth(2)
-    tex1.Draw()
-    tex2 = r.TLatex(leftMargin+0.12,0.912,"Preliminary")
-    tex2.SetNDC()
-    tex2.SetTextFont(52)
-    tex2.SetTextSize(0.055)
-    tex2.SetLineWidth(2)
-    tex2.Draw()
 
     lumi_value = 137
     if "lumi_value" in extraoptions:
         lumi_value = extraoptions["lumi_value"]
-    tex3 = r.TLatex(0.72,0.912,"%d"%lumi_value+" fb^{-1} (13 TeV)")
-    tex3.SetNDC()
-    tex3.SetTextFont(42)
-    tex3.SetTextSize(0.055)
-    tex3.SetLineWidth(2)
-    tex3.Draw()
+    #ATLASLabel(leftMargin+0.1, 0.85, lumi_value)
+ 
+    text1 = r.TLatex(leftMargin+0.03, 0.85, "ATLAS")
+    text1.SetNDC()
+    text1.SetTextFont(72)
+    text1.SetTextSize(0.070)
+    text1.Draw()
+
+    text2 = r.TLatex(leftMargin+0.2, 0.85, "Internal   #sqrt{s}= 13 TeV   #int L dt = %d"%lumi_value+" fb^{-1}")
+    text2.SetNDC()
+    text2.SetTextFont(42)
+    text2.SetTextSize(0.055)
+    text2.Draw()
+
 
     ##print out best cut and s, b, L
     c_best = ratio.GetBinCenter(bestCut)
@@ -1014,7 +1011,7 @@ def makeplot_cutOptimize(
     else:
         outFile = outFile + "/" + hist_name_
 
-    stack.SetMaximum(maxY1*1.3)
+    stack.SetMaximum(maxY1*1.5)
 
     #print everything into txt file
     text_file = open(outFile+"_linY.txt", "w")
