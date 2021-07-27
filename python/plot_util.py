@@ -208,7 +208,8 @@ def makeplot_single_2d(
     #leg.SetFillStyle(1)
     leg.SetFillColor(0)
     leg.SetBorderSize(1)
-    leg.SetTextFont(32)
+    leg.SetTextFont(42)
+    leg.SetTextSize(0.07)
     for idx in range(len(h2_sig)):
         leg.AddEntry(h2_sig[idx], sig_legends_[idx], "p")
     for idx in range(len(h2_bkg)):
@@ -904,7 +905,8 @@ def makeplot_cutOptimize(
     leg = r.TLegend(0.15, 0.65, 0.95, 0.85)
     leg.SetFillStyle(0)
     leg.SetBorderSize(0)
-    leg.SetTextFont(28)
+    leg.SetTextFont(42)
+    leg.SetTextSize(0.07)
     for idx in range(len(h1_bkg)):
         leg.AddEntry(h1_bkg[idx], bkg_legends_[idx], "F")
     for idx in range(len(h1_sig)):
@@ -1051,8 +1053,211 @@ def makeplot_cutOptimize(
     myC.SaveAs(outFile+"_logY.C")
 
 
+def makeplot_ROC(
+    sig_fnames_=None,
+    bkg_fnames_=None,
+    sig_legends_=None,
+    bkg_legends_=None,
+    sig_colors_=None,
+    bkg_colors_=None,
+    hist_name_=None,
+    sig_scale_=1.0,
+    bkg_scale_=1.0,
+    dir_name_="plots",
+    output_name_=None,
+    right_hand_=False,
+    extraoptions=None
+    ):
 
-
-
+    if sig_fnames_ == None or bkg_fnames_ == None or hist_name_ == None or sig_legends_ == None or bkg_legends_ == None:
+        print("nothing to plot....")
+        return
+   
+    s_color = [632, 617, 839, 800, 1]
+    b_color = [920, 2007, 2005, 2003, 2001, 2011]
+    if sig_colors_:
+        s_color = sig_colors_
+    if bkg_colors_:
+        b_color = bkg_colors_
     
+    tfs_sig = {}
+    h1_sig = []
+    for idx in range(len(sig_fnames_)): 
+        fn = sig_fnames_[idx]
+        n = os.path.basename(fn.replace(".root", ""))
+        tfs_sig[n] = r.TFile(fn)
+        h1 = tfs_sig[n].Get(hist_name_)
+        h1.SetName(hist_name_+"_sig_"+str(idx))
+        h1.Scale(sig_scale_)
+        h1.SetLineWidth(2)
+        h1.SetLineColor(s_color[idx])
+        h1_sig.append(h1)
+
+    tfs_bkg = {}
+    h1_bkg = []
+    for idx in range(len(bkg_fnames_)): 
+        fn = bkg_fnames_[idx]
+        n = os.path.basename(fn.replace(".root", ""))
+        tfs_bkg[n] = r.TFile(fn)
+        h1 = tfs_bkg[n].Get(hist_name_)
+        h1.SetName(hist_name_+"_bkg_"+str(idx))
+        h1.Scale(bkg_scale_)
+        h1.SetLineWidth(2)
+        h1.SetLineColor(b_color[idx])
+        h1.SetFillColorAlpha(b_color[idx], 1)
+        h1_bkg.append(h1)
+   
+    if "remove_underflow" in extraoptions:
+        if extraoptions["remove_underflow"]:
+            remove_underflow(h1_sig)
+            remove_underflow(h1_bkg)
+    if "remove_overflow" in extraoptions:
+        if extraoptions["remove_overflow"]:
+            remove_overflow(h1_sig)
+            remove_overflow(h1_bkg)
+
+    hist_all_b = h1_bkg[0].Clone("hist_all_b")
+    for idx in range(len(h1_bkg)):
+        if idx > 0:
+            hist_all_b.Add(h1_bkg[idx])
+    hist_all_s = h1_sig[0].Clone("hist_all_s")
+    for idx in range(len(h1_sig)):
+        if idx > 0:
+            hist_all_s.Add(h1_sig[idx])
+
+    myC = r.TCanvas("myC","myC", 600, 600)
+    myC.SetTicky(1)
+    myC.SetTickx(1)
+
+    nbins = h1_sig[0].GetNbinsX()+1
+
+    eff_sig = np.zeros(nbins+1)
+    eff_bkg = np.zeros((len(h1_bkg)+1, nbins+1))
+    AUC = np.zeros(len(h1_bkg)+1)
+
+    ntotal_sig = hist_all_s.Integral(0, nbins)
+    ntotal_bkg = np.zeros(len(h1_bkg)+1)
+    for idx in range(len(h1_bkg)):
+        ntotal_bkg[idx] = h1_bkg[idx].Integral(0, nbins)
+    ntotal_bkg[-1] = hist_all_b.Integral(0, nbins)
+
+    for idx in range(0, nbins+1):
+        npass_sig = hist_all_s.Integral(idx, 300)
+        if ntotal_sig < 1e-8:
+            eff_sig[idx] = 1.0
+        else:
+            eff_sig[idx] = npass_sig/ntotal_sig
+        
+        for ib in range(len(h1_bkg)):
+            npass_bkg = h1_bkg[ib].Integral(idx, nbins)
+            if ntotal_bkg[ib] < 1e-8:
+                eff_bkg[ib][idx]  = 1.0
+            else:
+                eff_bkg[ib][idx] =  npass_bkg/ntotal_bkg[ib]
+        npass_bkg = hist_all_b.Integral(idx, nbins)
+        if ntotal_bkg[-1] < 1e-8:
+            eff_bkg[-1][idx] = 1.0
+        else:
+            eff_bkg[-1][idx] = npass_bkg/ntotal_bkg[-1]
+
+    grs = []
+    for idx in range(len(h1_bkg)+1):
+        gr = r.TGraph(nbins+1, eff_bkg[idx], eff_sig)
+        gr.SetLineColor(b_color[idx])
+        gr.SetLineWidth(2)
+        grs.append(gr)
+        AUC[idx] = 0.5 + gr.Integral()
+    grs[0].Draw("AL")
+
+    grs[0].GetYaxis().SetTitle("Signal Efficiency")
+    grs[0].GetYaxis().SetTitleOffset(0.85)
+    grs[0].GetYaxis().SetTitleSize(0.07)
+    grs[0].GetYaxis().SetLabelSize(0.045)
+
+    grs[0].GetXaxis().SetTitle("Background Efficiency")
+    grs[0].GetXaxis().SetTitleOffset(0.94)
+    grs[0].GetXaxis().SetTitleSize(0.06)
+    grs[0].GetXaxis().SetLabelSize(0.045)
+    grs[0].GetXaxis().SetLabelOffset(0.013)
+    grs[0].SetMaximum(1.20)
+    grs[0].SetMinimum(0.0)
+    grs[0].GetXaxis().SetLimits(0.0,1.0)
+
+    for idx in range(1, len(h1_bkg)+1):
+        grs[idx].Draw("Lsame")
+
+    leg = r.TLegend(0.2, 0.15, 0.97, 0.5)
+    leg.SetFillStyle(0)
+    leg.SetBorderSize(0)
+    leg.SetTextFont(42)
+    leg.SetTextSize(0.05)
+    for idx in range(len(h1_bkg)):
+        leg.AddEntry(grs[idx], bkg_legends_[idx]+", AUC = %.2f"%AUC[idx], "l")
+    leg.AddEntry(grs[-1], "Total bkg, AUC = %.2f"%AUC[-1], "l")
+    leg.Draw()
+    
+    #draw line of y=x
+    f2 = r.TF1("f2", "0.0+1.0*x", 0.0, 1.0)
+    f2.SetLineColor(r.kBlack)
+    f2.SetLineStyle(9)
+    f2.SetLineWidth(1)
+    #f2.Draw("same")
+
+    ##########draw ATLAS 
+    lumi_value = 137
+    if "lumi_value" in extraoptions:
+        lumi_value = extraoptions["lumi_value"]
+    #ATLASLabel(leftMargin+0.1, 0.85, lumi_value)
+ 
+    text1 = r.TLatex(leftMargin+0.06, 0.85, "ATLAS")
+    text1.SetNDC()
+    text1.SetTextFont(72)
+    text1.SetTextSize(0.05)
+    text1.Draw()
+
+    text2 = r.TLatex(leftMargin+0.23, 0.85, "Internal  #sqrt{s}= 13 TeV  #int L dt = %d"%lumi_value+" fb^{-1}")
+    text2.SetNDC()
+    text2.SetTextFont(42)
+    text2.SetTextSize(0.04)
+    text2.Draw()
+
+    outFile = dir_name_
+    if output_name_:
+        outFile = outFile + "/" +output_name_
+    else:
+        outFile = outFile + "/" + hist_name_
+
+
+    #print everything into txt file
+    text_file = open(outFile+"_ROC_linY.txt", "w")
+    text_file.write("cut    ")
+    for idx in range(len(bkg_legends_)):
+        text_file.write(" | %8s"%bkg_legends_[idx])
+    text_file.write(" | %8s"%("total B"))
+    text_file.write(" | signal")
+    text_file.write("\n-------------")
+    for idx in range(10*(len(bkg_legends_) + 1)+ 10):
+        text_file.write("-")
+    text_file.write("\n")
+    for ibin in range(0,nbins+1):
+        text_file.write("%6.3f"%h1_sig[0].GetBinCenter(ibin)+" ")
+        for idx in range(len(bkg_legends_)+1):
+            text_file.write(" | %7.3f "%eff_bkg[idx][ibin])
+        text_file.write(" | %7.3f "%eff_sig[ibin])
+        text_file.write("\n")
+    text_file.close()
+    os.system("cp "+outFile+"_ROC_linY.txt "+outFile+"_ROC_logY.txt")
+
+    myC.SaveAs(outFile+"_ROC_linY.png")
+    myC.SaveAs(outFile+"_ROC_linY.pdf")
+    myC.SaveAs(outFile+"_ROC_linY.C")
+
+    grs[0].SetMaximum(5.)
+    grs[0].SetMinimum(0.001)
+    grs[0].GetXaxis().SetLimits(0.001,1.0)
+    myC.SetLogy()
+    myC.SetLogx()
+    myC.SaveAs(outFile+"_ROC_logY.png")
+    myC.SaveAs(outFile+"_ROC_logY.pdf")
+    myC.SaveAs(outFile+"_ROC_logY.C")
 

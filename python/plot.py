@@ -28,6 +28,7 @@ parser.add_argument('-O' , '--output_name'            , dest='output_name'     ,
 parser.add_argument('-w' , '--whatSR'                 , dest='whatSR'          , help='what selecton for the nine bins'        , default="FatJetsSDMassCut"                                      )
 parser.add_argument('-R' , '--right_hand'             , dest='right_hand'      , help='remove right side (<)'                , default=False                      , action='store_true')
 parser.add_argument('-OP' , '--do_optimize'           , dest='do_optimize'     , help='do cut optimization'                , default=False                      , action='store_true')
+parser.add_argument('-RO' , '--do_ROC'           , dest='do_ROC'     , help='do ROC curve'                , default=False                      , action='store_true')
 parser.add_argument('-F' , '--do_fit'           , dest='do_fit'     , help='do fit'                , default=False                      , action='store_true')
 
 parser.add_argument('hist_name', metavar='<histogram_names>=(e.g. FatJetsSDMassCut__hh_pt)', type=str, nargs='*', help='patterns to use to filter histograms to dump')
@@ -53,6 +54,7 @@ bkg_scale = float(args.bkg_scale)
 right_hand = args.right_hand
 output_name = args.output_name
 do_optimize = args.do_optimize
+do_ROC = args.do_ROC
 do_fit = args.do_fit
 
 input_dir = args.input_dir
@@ -86,14 +88,13 @@ else:
     lumi = 139
     
 
-sig_fnames = []
 
 sig_fnames = [input_dir+"HH.root"]
 sig_legends = ["HH"]
 sig_colors = [632, 617, 839, 800, 1]
-bkg_fnames = [input_dir+"nti.root"]
-bkg_legends = ["NTI"]
-bkg_colors = [920, 2007, 2005, 2003, 2001, 2011]
+bkg_fnames = [input_dir+"cont.root"]
+bkg_legends = ["continuum"]
+bkg_colors = [2007, 2005, 2003, 2001, 2011, 920]
 
 data_fname = input_dir+"data.root"
 
@@ -122,7 +123,27 @@ if hist_name:
                 "remove_underflow":args.rm_udflow,
                 "remove_overflow":args.rm_ovflow,
                 "lumi_value": lumi,
-                "xaxis_label": args.xaxis_title,
+                },
+            )
+    if do_ROC:
+        print("make ROC curve for "+hist_name)
+        p.makeplot_ROC(
+            sig_fnames_=sig_fnames,
+            bkg_fnames_=bkg_fnames,
+            sig_legends_=sig_legends,
+            bkg_legends_=bkg_legends,
+            sig_colors_=sig_colors,
+            bkg_colors_=bkg_colors,
+            hist_name_=hist_name,
+            sig_scale_=sig_scale,
+            bkg_scale_=bkg_scale,
+            dir_name_=output_dir,
+            right_hand_=right_hand,
+            output_name_=args.output_name,
+            extraoptions={
+                "remove_underflow":args.rm_udflow,
+                "remove_overflow":args.rm_ovflow,
+                "lumi_value": lumi,
                 },
             )
 
