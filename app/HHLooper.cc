@@ -66,13 +66,16 @@ system("mkdir -p hists");
 system(("mkdir -p hists/"+label).c_str());
 
 std::string year_ = "all";
-if(input.find("2016") != std::string::npos) {year_ = "2016"; lumi = 36.2;}
-if(input.find("2017") != std::string::npos) {year_ = "2017"; lumi = 44.3;}
-if(input.find("2018") != std::string::npos) {year_ = "2018"; lumi = 58.5;}
+if(input.find("mc16") != std::string::npos || input.find("data16") != std::string::npos) {year_ = "2016"; lumi = 36.2;}
+if(input.find("mc17") != std::string::npos || input.find("data17") != std::string::npos) {year_ = "2017"; lumi = 44.3;}
+if(input.find("mc18") != std::string::npos || input.find("data18") != std::string::npos) {year_ = "2018"; lumi = 58.5;}
 system(("mkdir -p hists/"+label+"/"+year_).c_str());
 
 bool isData = false;
 if(isData_ == "1" || isData_ == "true" || isData_ == "yes" || isData_ == "True" || isData_ == "Yes") isData = true;
+
+bool doContEstimate = false;
+if(outputFileName.find("cont") != std::string::npos) doContEstimate = true;
 
 if(outputFileName.find("HH") != std::string::npos) lumi = lumi * 2.27e-3; //HH fix
 
@@ -125,50 +128,25 @@ auto df_yield = df_CutWeight.Define("yield", [&]() {return 0.0;}, {});
 auto df_CutPhPtOverMgg = df_yield.Filter("ph_pt1/m_mgg > 0.35 && ph_pt2/m_mgg > 0.25", "CutPhPtOverMgg");
 auto df_CutMgg = df_CutPhPtOverMgg.Filter("m_mgg > 105.0 && m_mgg < 160.0","CutMgg");
 auto df_CutNbVeto = df_CutMgg.Filter("m_nbjet_fixed80 < 2", "CutNbVeto");
-auto df_NTISideBand = df_CutNbVeto.Filter("(!(ph_isTight1 && ph_isTight2 && ph_iso1 && ph_iso2)) && (m_mgg < 120. || m_mgg > 130.)", "NTISideBand");
-auto df_NTIHPeak = df_CutNbVeto.Filter("(!(ph_isTight1 && ph_isTight2 && ph_iso1 && ph_iso2)) && (m_mgg > 123. && m_mgg < 127.)", "NTIHPeak");
-auto df_TISideBand = df_CutNbVeto.Filter("ph_isTight1 && ph_isTight2 && ph_iso1 && ph_iso2 && (m_mgg < 120. || m_mgg > 130.)", "TISideBand");
-auto df_TIHPeak = df_CutNbVeto.Filter("ph_isTight1 && ph_isTight2 && ph_iso1 && ph_iso2 && (m_mgg > 123. && m_mgg < 127.)", "TIHPeak");
-
-//calculate scale factors for continuum background
-double SF1 = 1.0;
-double SF2 = 1.0;
-if(isData)
-{
-    auto hist_NTISideBand = df_NTISideBand.Histo1D({"yield_NTISideBand", "", 1, 0., 1.}, "yield", "CutWeight");
-    auto hist_NTIHPeak = df_NTIHPeak.Histo1D({"yield_NTIHPeak", "", 1, 0., 1.}, "yield", "CutWeight");
-    auto hist_TISideBand = df_TISideBand.Histo1D({"yield_TIHSideBand", "", 1, 0., 1.}, "yield", "CutWeight");
-    auto hist_TIHPeak = df_TIHPeak.Histo1D({"yield_TIHPeak", "", 1, 0., 1.}, "yield", "CutWeight");
-
-    SF1 = hist_NTIHPeak->Integral() / hist_NTISideBand->Integral();
-    SF2 = hist_TISideBand->Integral() /hist_NTISideBand->Integral();
-}
-
-cout<<"SF1: "<<SF1<<endl;
-cout<<"SF2: "<<SF2<<endl;
-
-auto df_SR = df_CutNbVeto.Filter("ph_isTight1 && ph_isTight2 && ph_iso1 && ph_iso2", "SR");
-auto df_SFweight = df_CutNbVeto.Define("SF1", [&](){return SF1;}, {}).Define("SF2", [&](){return SF2;}, {}).Define("SFweight2", "CutWeight * SF2").Define("SFweight12", "CutWeight * SF1 * SF2");
-auto df_SREstimateFull = df_SFweight.Filter("isData ? (!(ph_isTight1 && ph_isTight2 && ph_iso1 && ph_iso2)) : (ph_isTight1 && ph_isTight2 && ph_iso1 && ph_iso2)", "SREstimateFull");
-auto df_SREstimatePeak = df_SREstimateFull.Filter("m_mgg > 123. && m_mgg < 127.", "SREstimatePeak");
-
+auto df_SRFull = df_CutNbVeto.Define("doContEstimate", [&](){return isData && doContEstimate;}, {}).Filter("doContEstimate ? (!(ph_isTight1 && ph_isTight2 && ph_iso1 && ph_iso2)) : (ph_isTight1 && ph_isTight2 && ph_iso1 && ph_iso2)", "SRFull");
+auto df_SRPeak = df_SRFull.Filter("m_mgg > 123. && m_mgg < 127.", "SRPeak");
 //************************************************//
-
-
 
 
 //*******select cuts to save histogram************//
-std::vector<cut_type> cuts;
-cuts.push_back((cut_type){"CutWeight", "CutWeight", df_CutWeight});
-cuts.push_back((cut_type){"CutMgg", "CutWeight", df_CutMgg});
-cuts.push_back((cut_type){"CutNbVeto", "CutWeight", df_CutNbVeto});
-cuts.push_back((cut_type){"SR", "CutWeight", df_SR});
-cuts.push_back((cut_type){"SREstimateFull", "SFweight2", df_SREstimateFull});
-cuts.push_back((cut_type){"SREstimatePeak", "SFweight2", df_SREstimatePeak});
+std::vector<cut_type> cuts_temp;
+
+cuts_temp.push_back((cut_type){"CutWeight", "CutWeight", df_CutWeight});
+cuts_temp.push_back((cut_type){"CutMgg", "CutWeight", df_CutMgg});
+cuts_temp.push_back((cut_type){"CutNbVeto", "CutWeight", df_CutNbVeto});
+cuts_temp.push_back((cut_type){"SRFull", "CutWeight", df_SRFull});
+cuts_temp.push_back((cut_type){"SRPeak", "CutWeight", df_SRPeak});
 //************************************************//
+
 
 //******define histograms to save for each cut****//
 std::vector<histogram_type> histograms;
+
 histograms.push_back((histogram_type){"yield", "; yield; Events", 1, 0., 1., "yield"});
 histograms.push_back((histogram_type){"gnn_score", "; GNN score; Events", 300, 0., 1., "gnn_score"});
 histograms.push_back((histogram_type){"ph_pt1", "; p_{T}^{#gamma 1} (GeV); Events", 300, 0., 300., "ph_pt1"});
@@ -178,9 +156,51 @@ histograms.push_back((histogram_type){"m_mgg", "; m_{#gamma#gamma} (GeV); Events
 
 
 
+
+//calculate scale factors for continuum background estimation
+double SF1 = 1.0;
+double SF2 = 1.0;
+if(isData && doContEstimate)
+{
+    auto df_NTISideBand = df_CutNbVeto.Filter("(!(ph_isTight1 && ph_isTight2 && ph_iso1 && ph_iso2)) && (m_mgg < 120. || m_mgg > 130.)", "NTISideBand");
+    auto df_NTIHPeak = df_CutNbVeto.Filter("(!(ph_isTight1 && ph_isTight2 && ph_iso1 && ph_iso2)) && (m_mgg > 123. && m_mgg < 127.)", "NTIHPeak");
+    auto df_TISideBand = df_CutNbVeto.Filter("ph_isTight1 && ph_isTight2 && ph_iso1 && ph_iso2 && (m_mgg < 120. || m_mgg > 130.)", "TISideBand");
+    auto df_TIHPeak = df_CutNbVeto.Filter("ph_isTight1 && ph_isTight2 && ph_iso1 && ph_iso2 && (m_mgg > 123. && m_mgg < 127.)", "TIHPeak");
+
+    auto hist_NTISideBand = df_NTISideBand.Histo1D({"yield_NTISideBand", "", 1, 0., 1.}, "yield", "CutWeight");
+    auto hist_NTIHPeak = df_NTIHPeak.Histo1D({"yield_NTIHPeak", "", 1, 0., 1.}, "yield", "CutWeight");
+    auto hist_TISideBand = df_TISideBand.Histo1D({"yield_TIHSideBand", "", 1, 0., 1.}, "yield", "CutWeight");
+    auto hist_TIHPeak = df_TIHPeak.Histo1D({"yield_TIHPeak", "", 1, 0., 1.}, "yield", "CutWeight");
+
+    SF1 = hist_NTIHPeak->Integral() / hist_NTISideBand->Integral();
+    SF2 = hist_TISideBand->Integral() /hist_NTISideBand->Integral();
+    cout<<"SF1: "<<SF1<<endl;
+    cout<<"SF2: "<<SF2<<endl;
+}
+
+std::vector<cut_type> cuts;
+
+std::vector<RNode> nodes_cont;
+if(isData && doContEstimate)
+{
+    for(int ic=0; ic<cuts_temp.size(); ic++)
+    {
+        auto df_cut_this = cuts_temp[ic].node.Define("SFweight", [&](double m_weight){return m_weight * SF2;}, {"CutWeight"}).Filter("!(ph_isTight1 && ph_isTight2 && ph_iso1 && ph_iso2)", "select NTI events");
+        nodes_cont.push_back(df_cut_this);
+    }
+}
+for(int ic=0; ic<cuts_temp.size(); ic++)
+{
+    if(isData & doContEstimate) cuts.push_back((cut_type){cuts_temp[ic].cutname, "SFweight", nodes_cont[ic]});
+    else cuts.push_back(cuts_temp[ic]);
+}
+auto df_yield2 = cuts[0].node.Define("yield2", [&]() {return 0.0;}, {});
+
+//************************************************//
+
 //save histograms for all cuts:
 TFile *outfile = new TFile(("hists/"+label+"/"+year_+"/"+outputFileName).c_str(), "recreate");
-auto hist_yield_root = df_yield.Histo1D({cuts[0].cutname+"__"+histograms[0].savename, histograms[0].title, histograms[0].nbins, histograms[0].xlow, histograms[0].xhigh}, histograms[0].varname, cuts[0].weight);
+auto hist_yield_root = df_yield2.Histo1D({cuts[0].cutname+"__"+histograms[0].savename, histograms[0].title, histograms[0].nbins, histograms[0].xlow, histograms[0].xhigh}, "yield2", cuts[0].weight);
 std::vector<decltype(hist_yield_root)> hists;
 hists.push_back(hist_yield_root);
 for(int ic=0; ic<cuts.size(); ic++)
