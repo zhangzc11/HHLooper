@@ -172,7 +172,7 @@ std::vector<histogram_type> histograms;
 histograms.push_back((histogram_type){"yield", "; yield; Events", 1, 0., 1., "yield"});
 histograms.push_back((histogram_type){"gnn_score", "; GNN score; Events", 300, 0., 1., "gnn_score"});
 histograms.push_back((histogram_type){"ph_pt1", "; p_{T}^{#gamma 1} (GeV); Events", 300, 0., 300., "ph_pt1"});
-histograms.push_back((histogram_type){"ph_pt2", "; p_{T}^{#gamma 1} (GeV); Events", 300, 0., 300., "ph_pt2"});
+histograms.push_back((histogram_type){"ph_pt2", "; p_{T}^{#gamma 2} (GeV); Events", 300, 0., 300., "ph_pt2"});
 histograms.push_back((histogram_type){"m_mgg", "; m_{#gamma#gamma} (GeV); Events", 300, 105., 160., "m_mgg"});
 //************************************************//
 
