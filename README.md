@@ -34,13 +34,18 @@ Each output histogram will have the name of `CutName__HistogramName`, i.e. by de
 # Run looper
 
 ```
-./HHLooper /global/projecta/projectdirs/atlas/zhicaiz/HH/samples/Ntuple_h026_0630/DiHiggs/*GNNv0.root HH.root test01 0
+./process.sh 20210728v0 GNNv0
 
 ```
 
-The first argument is the input ntuple (can be a file, a directory, or an expression with star);
-the second argument is the output file name;
-the third argument is a tag to be added to the output file directory
-the last argument is a bool for whether it's data or not (not =  MC)
+The first argument is a (random) label you set for the directory to store the output histograms
+the second argument is the GNN version tag
 
+# Make plots
 
+```
+cd python
+./plot.sh ../hists/20210728v0/all/
+```
+
+The argument to this script is the directory where the histograms are stored
