@@ -3,11 +3,23 @@ HHLooper
 
 # Setup
 
+first time setup:
+
 ```
 module load root python
+conda create --name venv_root python=3.7
+source activate venv_root
+conda install numpy
 git clone -b HHyyXX git@github.com:zhangzc11/HHLooper.git
 cd HHLooper
 make
+```
+
+every time login:
+
+```
+module load root python
+source activate venv_root
 ```
 
 # About  the looper:
