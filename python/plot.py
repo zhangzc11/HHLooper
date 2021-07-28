@@ -91,10 +91,10 @@ else:
 
 sig_fnames = [input_dir+"HH.root"]
 sig_legends = ["HH"]
-sig_colors = [632, 617, 839, 800, 1]
-bkg_fnames = [input_dir+"cont.root"]
-bkg_legends = ["continuum"]
-bkg_colors = [2007, 2005, 2003, 2001, 2011, 920]
+sig_colors = [632, 617, 800, 1]
+bkg_fnames = [input_dir+"ggH.root", input_dir+"VBFH.root", input_dir+"ttH.root", input_dir+"VH.root", input_dir+"otherH.root", input_dir+"cont.root"]
+bkg_legends = ["ggH", "VBFH", "ttH", "VH", "other Higgs", "continuum"]
+bkg_colors = [2007, 2005, 2003, 2001, 2011, 920, 617, 839]
 
 data_fname = input_dir+"data.root"
 

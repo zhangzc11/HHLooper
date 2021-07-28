@@ -554,8 +554,8 @@ def makeplot_single(
     #if "xaxis_range" in extraoptions:
     #    stack.GetXaxis().SetRangeUser(float(extraoptions["xaxis_range"][0]),float(extraoptions["xaxis_range"][1]))
 
-    leg = r.TLegend(0.16, 0.65, 0.97, 0.85)
-    leg.SetNColumns(4)
+    leg = r.TLegend(0.16, 0.60, 0.97, 0.82)
+    leg.SetNColumns(3)
     leg.SetFillStyle(0)
     leg.SetBorderSize(0)
     leg.SetTextFont(42)
@@ -657,7 +657,7 @@ def makeplot_single(
 
     #print("maxY = "+str(maxY))
     #Y maximum range
-    stack.SetMaximum(maxY*1.5)
+    stack.SetMaximum(maxY*1.6)
 
     #print everything into txt file
     text_file = open(outFile+"_linY.txt", "w")
@@ -694,7 +694,7 @@ def makeplot_single(
     myC.SaveAs(outFile+"_linY.pdf")
     myC.SaveAs(outFile+"_linY.C")
     pad1.cd()
-    stack.SetMaximum(maxY*1000.0)
+    stack.SetMaximum(maxY*8000.0)
     stack.SetMinimum(0.5)
     pad1.SetLogy()
     myC.SaveAs(outFile+"_logY.png")
@@ -1186,11 +1186,11 @@ def makeplot_ROC(
     for idx in range(1, len(h1_bkg)+1):
         grs[idx].Draw("Lsame")
 
-    leg = r.TLegend(0.2, 0.15, 0.97, 0.5)
+    leg = r.TLegend(0.3, 0.20, 0.92, 0.5)
     leg.SetFillStyle(0)
     leg.SetBorderSize(0)
     leg.SetTextFont(42)
-    leg.SetTextSize(0.05)
+    leg.SetTextSize(0.045)
     for idx in range(len(h1_bkg)):
         leg.AddEntry(grs[idx], bkg_legends_[idx]+", AUC = %.2f"%AUC[idx], "l")
     leg.AddEntry(grs[-1], "Total bkg, AUC = %.2f"%AUC[-1], "l")

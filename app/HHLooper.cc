@@ -66,9 +66,9 @@ system("mkdir -p hists");
 system(("mkdir -p hists/"+label).c_str());
 
 std::string year_ = "all";
-if(input.find("mc16") != std::string::npos || input.find("data16") != std::string::npos) {year_ = "2016"; lumi = 36.2;}
-if(input.find("mc17") != std::string::npos || input.find("data17") != std::string::npos) {year_ = "2017"; lumi = 44.3;}
-if(input.find("mc18") != std::string::npos || input.find("data18") != std::string::npos) {year_ = "2018"; lumi = 58.5;}
+if(input.find("mc16a") != std::string::npos || input.find("data16") != std::string::npos) {year_ = "2016"; lumi = 36.2;}
+if(input.find("mc16d") != std::string::npos || input.find("data17") != std::string::npos) {year_ = "2017"; lumi = 44.3;}
+if(input.find("mc16e") != std::string::npos || input.find("data18") != std::string::npos) {year_ = "2018"; lumi = 58.5;}
 system(("mkdir -p hists/"+label+"/"+year_).c_str());
 
 bool isData = false;
