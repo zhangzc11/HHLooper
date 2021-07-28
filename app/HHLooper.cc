@@ -123,7 +123,7 @@ cout<<"total number of events to process: "<<*nEntries<<endl;
 ROOT::EnableImplicitMT();
 
 //*********************define cuts*****************//
-auto df_CutWeight = df.Define("lumi", [&]() {return isData ? 1.0 : lumi;}, {}).Define("isData", [&]() {return isData;}, {}).Define("CutWeight", "isData ? lumi : lumi*m_weight");
+auto df_CutWeight = df.Define("log_gnn_score", "-1.0*log10(1.0-gnn_score)").Define("lumi", [&]() {return isData ? 1.0 : lumi;}, {}).Define("isData", [&]() {return isData;}, {}).Define("CutWeight", "isData ? lumi : lumi*m_weight");
 auto df_yield = df_CutWeight.Define("yield", [&]() {return 0.0;}, {});
 auto df_CutPhPtOverMgg = df_yield.Filter("ph_pt1/m_mgg > 0.35 && ph_pt2/m_mgg > 0.25", "CutPhPtOverMgg");
 auto df_CutMgg = df_CutPhPtOverMgg.Filter("m_mgg > 105.0 && m_mgg < 160.0","CutMgg");
@@ -149,6 +149,7 @@ std::vector<histogram_type> histograms;
 
 histograms.push_back((histogram_type){"yield", "; yield; Events", 1, 0., 1., "yield"});
 histograms.push_back((histogram_type){"gnn_score", "; GNN score; Events", 900, 0., 1., "gnn_score"});
+histograms.push_back((histogram_type){"log_gnn_score", "; -log10(1-GNN score); Events", 900, 0., 5., "log_gnn_score"});
 histograms.push_back((histogram_type){"ph_pt1", "; p_{T}^{#gamma 1} (GeV); Events", 300, 0., 300., "ph_pt1"});
 histograms.push_back((histogram_type){"ph_pt2", "; p_{T}^{#gamma 2} (GeV); Events", 300, 0., 300., "ph_pt2"});
 histograms.push_back((histogram_type){"m_mgg", "; m_{#gamma#gamma} (GeV); Events", 300, 105., 160., "m_mgg"});

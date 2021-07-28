@@ -1240,10 +1240,10 @@ def makeplot_ROC(
         text_file.write("-")
     text_file.write("\n")
     for ibin in range(0,nbins+1):
-        text_file.write("%6.3f"%h1_sig[0].GetBinCenter(ibin)+" ")
+        text_file.write("%6.4f"%h1_sig[0].GetBinCenter(ibin)+" ")
         for idx in range(len(bkg_legends_)+1):
-            text_file.write(" | %7.3f "%eff_bkg[idx][ibin])
-        text_file.write(" | %7.3f "%eff_sig[ibin])
+            text_file.write(" | %7.4f "%eff_bkg[idx][ibin])
+        text_file.write(" | %7.4f "%eff_sig[ibin])
         text_file.write("\n")
     text_file.close()
     os.system("cp "+outFile+"_ROC_linY.txt "+outFile+"_ROC_logY.txt")
