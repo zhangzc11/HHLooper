@@ -14,7 +14,7 @@ import pickle as pickle
 import ROOT as root
 import os
 import shlex
-import uproot3 as uproot
+import uproot
 
 root.gROOT.SetBatch(True)
 root.gStyle.SetOptStat(0)
@@ -35,7 +35,7 @@ pwd = os.getcwd()
 #dataDir = '/Users/cmorgoth/git/HHLooper/python/xgboost/data/signal_skim/skimmed/'
 _year = 'Run2'
 _bkg_type = 'qcd_and_ttbar'##options are <qcd>, <ttbar>, and <qcd_and_ttbar>
-_bdt_type = 'enhanced_v8p3'
+_bdt_type = 'enhanced_v8p2'
 test_name = test_name + '_' + _bkg_type +'_' + _year + '_bdt_' + _bdt_type
 
 dataDir = ''
@@ -67,15 +67,15 @@ elif _year == '2018':
 
 elif _year == 'Run2':
     dataDir = '/Users/sixie/HH/HHLooper/python/xgboost/data/option5/combined/training/Run2/'
-    signalFileName =  dataDir + 'GluGluToHHTo4B_node_cHHH1_1pb_weighted_Training.root'
-
+    signalFileName =  dataDir + 'GluGluToHHTo4B_node_cHHH1_1pb_weighted_Training_Jet2Xbb0p8Skim.root'
+    #signalFileName =  dataDir + 'GluGluToHHTo4B_node_cHHH1_1pb_weighted_Training_JetXbb0p9Skim.root'
     if _bkg_type == 'qcd':
         bkgFileName    = dataDir + 'QCD_HT_ALL_13TeV-madgraph-pythia8_1pb_weighted_Training.root'
     elif _bkg_type == 'ttbar':
         bkgFileName = dataDir + 'TTToHadronic_and_SemiLeptonic_13TeV-powheg-pythia8_1pb_weighted_Training.root'
     elif _bkg_type == 'qcd_and_ttbar':
-        bkgFileName =  dataDir + 'QCD_AND_TT_1pb_weighted_Training.root'
-
+        bkgFileName =  dataDir + 'QCD_HT_ALL_AND_TTToHadronic_and_SemiLeptonic_1pb_weighted_Training_Jet2Xbb0p8Skim.root'
+        #bkgFileName =  dataDir + 'QCD_HT_ALL_AND_TTToHadronic_and_SemiLeptonic_1pb_weighted_Training_JetXbb0p9Skim.root'
 # elif _year == 'Run2':
 #     dataDir = '/Users/sixie/HH/HHLooper/python/xgboost/data/v7/combined/training/Run2/'
 #     signalFileName =  dataDir + 'GluGluToHHTo4B_node_cHHH1_1pb_weighted_Mass30Skim_Training_BDTs.root'
@@ -727,8 +727,8 @@ elif _bdt_type == 'enhanced_v8p3':
     ['ptj2_over_ptj1', 'ptj2Optj1', '$p_{T}^{j2}/p_{T}^{j1}$', 40,  0.5,  1.],
     #['mj2_over_mj1', 'mj2Omj1', '$m^{j2}/m^{j1}$', 40,  0.0,  1.5],
 
-    ['weight', 'weight', 'weight', 100, -1000, 1000]
-    #['totalWeight', 'totalWeight', 'totalWeight', 100, -1000, 1000]
+    #['weight', 'weight', 'weight', 100, -1000, 1000]
+    ['totalWeight', 'totalWeight', 'totalWeight', 100, -1000, 1000]
     ]
 elif _bdt_type == 'enhanced_v9':
     variables =   [
@@ -1695,10 +1695,6 @@ y = np.concatenate([np.zeros(len(df_bkg)), np.ones(len(df_signal))])
 
 #####Getting SumWeights#######
 
-
-
-
-
 #getting sum_weights for bkg
 bkg_sum_weight = 0
 min_weight = 1e7
@@ -1745,28 +1741,13 @@ print('signal_weights_min', np.amin(signal_weights_np))
 signal_to_bkg_scale_factor = signal_sum_weight/bkg_sum_weight
 print ('signal_to_bkg_scale_factor',signal_to_bkg_scale_factor)
 
-
-
-#zero out all negative weights. SX: added this because training was failing and complaining about negative weights
-signal_weights_np[signal_weights_np<0] = 0
-bkg_weights_np[bkg_weights_np<0] = 0
-print( 'after zeroing negative weights')
-print('bkg_weights_np', bkg_weights_np)
-print('bkg_weights_max', np.amax(bkg_weights_np))
-print('bkg_weights_min', np.amin(bkg_weights_np))
-print('signal_weights_np', signal_weights_np)
-print('signal_weights_max', np.amax(signal_weights_np))
-print('signal_weights_min', np.amin(signal_weights_np))
-
-
-
 #concatenate input features with new weights
 bkg_np_new_weights    = np.concatenate((df_bkg.to_numpy()[:,:-1],bkg_weights_np.T), axis=1)
 signal_np_new_weights = np.concatenate((df_signal.to_numpy()[:,:-1],signal_weights_np.T), axis=1)
 x_new = np.concatenate((bkg_np_new_weights,signal_np_new_weights))
 print('ll',x_new)
 
-
+#exit()
 
 print("signal sample size: "+str(len(df_signal.values)))
 print("bkg sample size: "+str(len(df_bkg.values)))
