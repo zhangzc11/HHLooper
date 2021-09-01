@@ -35,35 +35,17 @@ Each output histogram will have the name of `CutName__HistogramName`, i.e. by de
 # Run looper
 
 ```
-./process.sh tag0 no nominal no no
-
+./process.sh tag0 yes
 ```
 
-The first argument is a tag for the folder name of the output histograms, and the second argument tells the program to include all the weight systematic Up/Down histograms, the third argument tells the program to run a specific shape systematic (reading a different branch in the ntuples. the systematics are JES_Up, JES_Down, JMR_Up, JMR_Down, JMS_Up, JMS_Down), then the next two arguments tells the programs to do trigsys, PNetSFsys or not. the trigsys is very time comsuming. 
+The first argument is a tag for the folder name of the output histograms, and the second argument tells the program to include all the systematic Up/Down histograms
 
-
-## Command to run for the signal region
-
-./run_syst_test.sh 
-
-## Command to run for the ttbar one lepton CR
-
-./process_1Lttbar.sh  yield_AN_1Lttbar
-
-## Command to run for the ttbar two jet CR
-
-./run_syst_ttbar_test.sh (including the recoil correction)
-
-To remove the recoil correction, now comment Line 382, and uncomment Line  384 in ../app/HHLooper.cc to remove recoil correction;  
-
-make clean; make
-
-source process_ttbar.sh yield_AN_ttbar no nominal no no
+There will be segment fault error, just ignore it...
 
 # Make root file for datacard
 ```
 cd python
-
+python prepare_card.py tag0
 ```
 
 The argument of the python script is the tag name you provided in the previous step
@@ -72,5 +54,5 @@ The argument of the python script is the tag name you provided in the previous s
 
 ```
 cd python
-
+./plot_all.sh tag0
 ```
